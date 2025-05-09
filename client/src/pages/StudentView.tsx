@@ -11,7 +11,6 @@ declare global {
   import { useParams } from 'react-router-dom';
   import axios from 'axios';
   import { API_URL } from '../config';
-  import '@auroratide/flip-card/lib/define.js';
   import FlipCard from '../components/FlipCard';
   import { ChevronLeft, ChevronRight } from 'lucide-react';
   

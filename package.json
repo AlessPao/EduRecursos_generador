@@ -1,0 +1,22 @@
+{
+  "name": "sistema-recursos-educativos",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "setup": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "concurrently": "^8.2.1"
+  },
+  "dependencies": {
+    "@auroratide/flip-card": "^0.1.0",
+    "react-simple-wysiwyg": "^3.2.2"
+  }
+}

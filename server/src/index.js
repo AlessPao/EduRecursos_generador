@@ -64,8 +64,8 @@ const startServer = async () => {
     await sequelize.sync({ alter: true });
     console.log('Base de datos sincronizada correctamente');
     
-    app.listen(PORT, () => {
-      console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Servidor ejecutándose en http://0.0.0.0:${PORT}`);
     });
   } catch (error) {
     console.error('Error al iniciar el servidor:', error);
@@ -73,4 +73,7 @@ const startServer = async () => {
   }
 };
 
+
 startServer();
+
+

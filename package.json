@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@auroratide/flip-card": "^0.1.0",
+    "connect-pg-simple": "^10.0.0",
     "react-simple-wysiwyg": "^3.2.2"
   }
 }

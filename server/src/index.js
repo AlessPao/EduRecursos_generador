@@ -34,11 +34,12 @@ app.use(morgan('dev'));
 
 // Configuración de sesiones
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'tu-secreto-temporal',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 }));
@@ -64,8 +65,8 @@ const startServer = async () => {
     await sequelize.sync({ alter: true });
     console.log('Base de datos sincronizada correctamente');
     
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Servidor ejecutándose en http://0.0.0.0:${PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error('Error al iniciar el servidor:', error);
@@ -73,7 +74,4 @@ const startServer = async () => {
   }
 };
 
-
 startServer();
-
-

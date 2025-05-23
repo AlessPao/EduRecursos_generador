@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { BookOpen, AlertCircle } from 'lucide-react';
+import { BookOpen, AlertCircle, Check, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -17,9 +17,24 @@ const Register: React.FC = () => {
   const { register: registerUser, isAuthenticated, error, clearError } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [password, setPassword] = useState('');
   
   // Configuración de React Hook Form
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>();
+  
+  // Vigilar el campo de contraseña para validación en tiempo real
+  const watchedPassword = watch('password', '');
+  
+  // Funciones de validación de contraseña
+  const passwordValidations = {
+    minLength: watchedPassword.length >= 8,
+    hasUpperCase: /[A-Z]/.test(watchedPassword),
+    hasLowerCase: /[a-z]/.test(watchedPassword),
+    hasNumber: /\d/.test(watchedPassword),
+    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(watchedPassword)
+  };
+  
+  const isPasswordValid = Object.values(passwordValidations).every(Boolean);
   
   // Redirigir al dashboard si ya está autenticado
   if (isAuthenticated) {
@@ -28,6 +43,12 @@ const Register: React.FC = () => {
   
   // Manejar envío del formulario
   const onSubmit = async (data: RegisterFormData) => {
+    // Verificar que la contraseña cumpla con todos los requisitos
+    if (!isPasswordValid) {
+      toast.error('La contraseña debe cumplir con todos los requisitos de seguridad.');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       clearError();
@@ -135,10 +156,7 @@ const Register: React.FC = () => {
                 className={`form-input ${errors.password ? 'border-red-500' : ''}`}
                 {...register('password', { 
                   required: 'La contraseña es requerida',
-                  minLength: {
-                    value: 6,
-                    message: 'La contraseña debe tener al menos 6 caracteres'
-                  }
+                  validate: () => isPasswordValid || 'La contraseña no cumple con los requisitos de seguridad'
                 })}
               />
               {errors.password && (
@@ -146,13 +164,104 @@ const Register: React.FC = () => {
                   {errors.password.message}
                 </p>
               )}
+              
+              {/* Validaciones visuales de contraseña */}
+              {watchedPassword && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Requisitos de seguridad:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.minLength ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.minLength ? 'text-green-600' : 'text-red-600'}>
+                        Al menos 8 caracteres
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasUpperCase ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasUpperCase ? 'text-green-600' : 'text-red-600'}>
+                        Una letra mayúscula
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasLowerCase ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasLowerCase ? 'text-green-600' : 'text-red-600'}>
+                        Una letra minúscula
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasNumber ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasNumber ? 'text-green-600' : 'text-red-600'}>
+                        Al menos un número
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasSpecialChar ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasSpecialChar ? 'text-green-600' : 'text-red-600'}>
+                        Un carácter especial (!@#$%^&*(),.?":{}|&lt;&gt;)
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Indicador general de validez */}
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center text-xs">
+                      {isPasswordValid ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-500 mr-2" />
+                          <span className="text-green-600 font-medium">
+                            ¡Contraseña segura!
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 text-red-500 mr-2" />
+                          <span className="text-red-600 font-medium">
+                            Completa todos los requisitos
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                disabled={isSubmitting || !isPasswordValid}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+                  ${(isSubmitting || !isPasswordValid) 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                  } 
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               >
                 {isSubmitting ? (
                   <span className="flex items-center">

@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import * as authController from '../controllers/auth.controller.js';
-import { isAuthenticated, isNotAuthenticated } from '../middleware/auth.middleware.js';
+import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -19,8 +19,8 @@ const validateLogin = [
 ];
 
 // Rutas de autenticación
-router.post('/register', isNotAuthenticated, validateRegister, authController.register);
-router.post('/login', isNotAuthenticated, validateLogin, authController.login);
+router.post('/register', validateRegister, authController.register);
+router.post('/login', validateLogin, authController.login);
 router.post('/logout', isAuthenticated, authController.logout);
 router.get('/profile', isAuthenticated, authController.getProfile);
 

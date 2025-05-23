@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 export const getRecursos = async (req, res, next) => {
   try {
     const recursos = await Recurso.findAll({
-      where: { usuarioId: req.session.userId },
+      where: { usuarioId: req.user.userId },
       order: [['createdAt', 'DESC']]
     });
     
@@ -32,7 +32,7 @@ export const getRecursoById = async (req, res, next) => {
     const recurso = await Recurso.findOne({
       where: { 
         id: req.params.id,
-        usuarioId: req.session.userId
+        usuarioId: req.user.userId
       }
     });
     
@@ -67,15 +67,19 @@ export const createRecurso = async (req, res, next) => {
     const { tipo, titulo, opciones } = req.body;
 
     // Generar contenido con LLM
+    const start = Date.now();
     const contenidoGenerado = await generarRecurso({ tipo, opciones });
-    
+    const end = Date.now();
+    const tiempoGeneracionSegundos = (end - start) / 1000;
+
     // Guardar recurso en base de datos
     const recurso = await Recurso.create({
-      usuarioId: req.session.userId,
+      usuarioId: req.user.userId,
       tipo,
       titulo,
       contenido: contenidoGenerado,
-      meta: { opciones }
+      meta: { opciones },
+      tiempoGeneracionSegundos
     });
     
     res.status(201).json({
@@ -106,7 +110,7 @@ export const updateRecurso = async (req, res, next) => {
     const recurso = await Recurso.findOne({
       where: { 
         id: req.params.id,
-        usuarioId: req.session.userId
+        usuarioId: req.user.userId
       }
     });
     
@@ -140,7 +144,7 @@ export const deleteRecurso = async (req, res, next) => {
     const recurso = await Recurso.findOne({
       where: { 
         id: req.params.id,
-        usuarioId: req.session.userId
+        usuarioId: req.user.userId
       }
     });
     
@@ -169,7 +173,7 @@ export const generatePdf = async (req, res, next) => {
     const recurso = await Recurso.findOne({
       where: { 
         id: req.params.id,
-        usuarioId: req.session.userId
+        usuarioId: req.user.userId
       }
     });
     

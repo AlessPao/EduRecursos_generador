@@ -1,5 +1,6 @@
 import { validationResult } from 'express-validator';
 import Usuario from '../models/Usuario.js';
+import jwt from 'jsonwebtoken';
 
 // Registrar un nuevo usuario
 export const register = async (req, res, next) => {
@@ -78,13 +79,17 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // Crear sesión
-    req.session.userId = usuario.id;
-    req.session.userEmail = usuario.email;
+    // Generar token JWT
+    const token = jwt.sign(
+      { userId: usuario.id, email: usuario.email },
+      process.env.SESSION_SECRET, // Reutilizamos SESSION_SECRET como JWT_SECRET por ahora
+      { expiresIn: '1h' } // El token expira en 1 hora
+    );
 
     res.status(200).json({
       success: true,
       message: 'Inicio de sesión exitoso',
+      token, // Enviar el token al cliente
       usuario: {
         id: usuario.id,
         nombre: usuario.nombre,
@@ -98,26 +103,19 @@ export const login = async (req, res, next) => {
 
 // Cerrar sesión
 export const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: 'Error al cerrar sesión'
-      });
-    }
-    
-    res.clearCookie('connect.sid');
-    res.status(200).json({
-      success: true,
-      message: 'Sesión cerrada correctamente'
-    });
+  // Con JWT, el logout es principalmente manejado en el cliente (borrando el token).
+  // Opcionalmente, se puede implementar una blacklist de tokens en el servidor.
+  res.status(200).json({
+    success: true,
+    message: 'Sesión cerrada correctamente (token invalidado en el cliente)'
   });
 };
 
 // Obtener perfil del usuario actual
 export const getProfile = async (req, res, next) => {
   try {
-    const userId = req.session.userId;
+    // El userId se obtiene del token decodificado en el middleware isAuthenticated
+    const userId = req.user.userId; 
     
     const usuario = await Usuario.findByPk(userId, {
       attributes: ['id', 'nombre', 'email', 'createdAt']

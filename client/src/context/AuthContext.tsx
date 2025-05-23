@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  token: string | null; // Añadir token al contexto
   login: (email: string, password: string) => Promise<void>;
   register: (nombre: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -38,28 +39,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
-  // Configurar Axios
-  axios.defaults.withCredentials = true;
+  // Configurar Axios para enviar el token con cada solicitud si está disponible
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      localStorage.setItem('token', token); // Guardar/actualizar en localStorage
+    } else {
+      delete axios.defaults.headers.common['Authorization'];
+      localStorage.removeItem('token'); // Eliminar de localStorage
+    }
+  }, [token]); // Este efecto se ejecuta cada vez que el token cambia
 
-  // Comprobar si el usuario está autenticado al cargar
+  // Comprobar si el usuario está autenticado al cargar la aplicación
   useEffect(() => {
     const checkAuthStatus = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/auth/profile`);
-        if (res.data.success) {
-          setUser(res.data.usuario);
+      if (token) { // Solo intentar cargar el perfil si hay un token
+        setLoading(true);
+        try {
+          // El token ya está en axios.defaults.headers.common gracias al efecto anterior
+          const res = await axios.get(`${API_URL}/auth/profile`);
+          if (res.data.success) {
+            setUser(res.data.usuario);
+          } else {
+            // Token podría ser inválido o expirado
+            setUser(null);
+            setToken(null); // Limpiar token inválido
+          }
+        } catch (err) {
+          setUser(null);
+          setToken(null); // Limpiar token si hay error (ej. 401, 403)
         }
-      } catch (err) {
-        // Usuario no autenticado, no mostrar error
-        setUser(null);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
 
     checkAuthStatus();
-  }, []);
+  }, []); // Ejecutar solo una vez al montar, el efecto del token se encarga de las actualizaciones de token
 
   // Iniciar sesión
   const login = async (email: string, password: string) => {
@@ -69,11 +86,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const res = await axios.post(`${API_URL}/auth/login`, { email, password });
       
-      if (res.data.success) {
+      if (res.data.success && res.data.token) {
         setUser(res.data.usuario);
+        setToken(res.data.token); // Esto disparará el useEffect para localStorage y axios defaults
+      } else {
+        // Si no hay token en la respuesta, o success es false
+        setError(res.data.message || 'Error al iniciar sesión: Respuesta inesperada del servidor');
+        setUser(null);
+        setToken(null);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al iniciar sesión');
+      setUser(null);
+      setToken(null);
       throw err;
     } finally {
       setLoading(false);
@@ -86,12 +111,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const res = await axios.post(`${API_URL}/auth/register`, { nombre, email, password });
-      
-      if (res.data.success) {
-        // Registro exitoso, pero no inicia sesión automáticamente
-        return;
-      }
+      // No se espera token aquí, solo registro
+      await axios.post(`${API_URL}/auth/register`, { nombre, email, password });
+      // Podrías querer llamar a login() aquí si el backend devuelve un token al registrar
+      // o simplemente mostrar un mensaje de éxito para que el usuario inicie sesión.
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse');
       throw err;
@@ -104,12 +127,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       setLoading(true);
-      
-      await axios.post(`${API_URL}/auth/logout`);
+      // Opcional: llamar al endpoint de logout del backend si implementa blacklist de tokens
+      // await axios.post(`${API_URL}/auth/logout`); 
       setUser(null);
-      
+      setToken(null); // Esto disparará el useEffect para localStorage y axios defaults
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cerrar sesión');
+      // Aún así, limpiar el estado local
+      setUser(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -121,7 +147,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = {
     user,
     loading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!token, // Autenticado si hay usuario Y token
+    token, // Exponer token para quien lo necesite (aunque axios ya lo usa)
     login,
     register,
     logout,

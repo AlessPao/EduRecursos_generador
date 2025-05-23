@@ -31,6 +31,10 @@ const Recurso = sequelize.define('Recurso', {
     type: DataTypes.JSONB,
     allowNull: false,
     defaultValue: {}
+  },
+  tiempoGeneracionSegundos: {
+    type: DataTypes.REAL,
+    allowNull: true
   }
 }, {
   tableName: 'recursos',

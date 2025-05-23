@@ -82,7 +82,7 @@ export const login = async (req, res, next) => {
     // Generar token JWT
     const token = jwt.sign(
       { userId: usuario.id, email: usuario.email },
-      process.env.SESSION_SECRET, // Reutilizamos SESSION_SECRET como JWT_SECRET por ahora
+      process.env.JWT_SECRET, // Usar JWT_SECRET
       { expiresIn: '1h' } // El token expira en 1 hora
     );
 

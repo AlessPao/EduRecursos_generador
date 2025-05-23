@@ -16,7 +16,7 @@ export const isAuthenticated = (req, res, next) => {
 
     try {
       // Verificar el token usando la misma clave secreta que para firmarlo
-      const decoded = jwt.verify(token, process.env.SESSION_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET); // Usar JWT_SECRET
       req.user = decoded; // Adjuntar el payload del token a req.user
       next();
     } catch (error) {

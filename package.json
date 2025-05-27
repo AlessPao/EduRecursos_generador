@@ -20,6 +20,7 @@
   "dependencies": {
     "@auroratide/flip-card": "^0.1.0",
     "connect-pg-simple": "^10.0.0",
+    "googleapis": "^105.0.0",
     "nodemailer": "^7.0.3",
     "react-simple-wysiwyg": "^3.2.2",
     "uuid": "^11.1.0"

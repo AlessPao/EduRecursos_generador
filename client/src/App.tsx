@@ -8,6 +8,8 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import RequestPasswordReset from './pages/RequestPasswordReset';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import RecursosList from './pages/RecursosList';
 import RecursoForm from './pages/RecursoForm';
@@ -15,6 +17,10 @@ import RecursoView from './pages/RecursoView'; // Importar RecursoView
 import StudentView from './pages/StudentView'; // Importar StudentView
 import Perfil from './pages/Perfil';
 import NotFound from './pages/NotFound';
+import EvaluationsList from './pages/EvaluationsList';
+import EvaluationForm from './pages/EvaluationForm';
+import ExamPublic from './pages/ExamPublic';
+import ExamDetail from './pages/ExamDetail'; // Detalle de examen para el docente
 
 const App: React.FC = () => {
   return (
@@ -24,6 +30,10 @@ const App: React.FC = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/request-password-reset" element={<RequestPasswordReset />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* Ruta pública de examen */}
+        <Route path="/evaluaciones/:slug" element={<ExamPublic />} />
         
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute />}>
@@ -35,6 +45,9 @@ const App: React.FC = () => {
             <Route path="/recursos/:id" element={<RecursoView />} /> {/* Agregar ruta para ver el recurso */}
             <Route path="/estudiante/:id" element={<StudentView />} /> {/* Ruta para vista de estudiante */}
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/evaluaciones" element={<EvaluationsList />} />
+            <Route path="/evaluaciones/new" element={<EvaluationForm />} />
+            <Route path="/evaluaciones/:slug/detalle" element={<ExamDetail />} />
           </Route>
         </Route>
         

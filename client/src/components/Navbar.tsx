@@ -80,6 +80,14 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
               Mi Perfil
             </Link>
             
+            <Link
+              to="/evaluacion"
+              className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              Evaluación
+            </Link>
+            
             <button
               onClick={() => {
                 setMenuOpen(false);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BookOpen, List, User, X } from 'lucide-react';
+import { Home, BookOpen, List, User, X, ClipboardList } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
@@ -13,6 +13,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
   const menuItems = [
     { path: '/dashboard', label: 'Inicio', icon: <Home size={20} /> },
     { path: '/recursos', label: 'Mis Recursos', icon: <List size={20} /> },
+    { path: '/evaluaciones', label: 'Evaluaciones', icon: <ClipboardList size={20} /> },
     { path: '/perfil', label: 'Mi Perfil', icon: <User size={20} /> }
   ];
   

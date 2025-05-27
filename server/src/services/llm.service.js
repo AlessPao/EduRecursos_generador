@@ -87,6 +87,27 @@ function crearPrompt({ tipo, opciones }) {
 
   // Generación del prompt según el tipo de recurso
   switch (tipo) {
+    case 'evaluacion':
+      prompt += `Genera un examen de opción múltiple de comprensión lectora para estudiantes de 2º grado con las siguientes características:
+- Título: ${opciones.titulo}
+- Tipo de texto: ${opciones.tipoTexto}
+- Tema: ${opciones.tema}
+- Longitud: ${opciones.longitud} palabras
+- Preguntas literales: ${opciones.numLiteral}
+
+Cada pregunta debe tener 4 opciones, indicando cuál es la correcta. El texto y las preguntas deben ser apropiados para niños de 7-8 años.
+
+Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin explicaciones, sin comentarios:
+
+{
+  "titulo": "Título del examen",
+  "texto": "Contenido del texto completo",
+  "preguntas": [
+    { "pregunta": "Pregunta 1", "opciones": ["Opción A","Opción B","Opción C","Opción D"], "respuesta": "Opción A" },
+    // ...preguntas pero solo tipo literal
+  ]
+}`;
+      break;
     case 'comprension':
       prompt += `Genera una ficha de comprensión lectora para estudiantes de 2º grado con las siguientes características:
 - Tipo de texto: ${opciones.tipoTexto}

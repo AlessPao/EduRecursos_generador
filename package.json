@@ -14,11 +14,14 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
+    "@types/uuid": "^10.0.0",
     "concurrently": "^8.2.1"
   },
   "dependencies": {
     "@auroratide/flip-card": "^0.1.0",
     "connect-pg-simple": "^10.0.0",
-    "react-simple-wysiwyg": "^3.2.2"
+    "nodemailer": "^7.0.3",
+    "react-simple-wysiwyg": "^3.2.2",
+    "uuid": "^11.1.0"
   }
 }

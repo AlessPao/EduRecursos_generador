@@ -13,6 +13,8 @@ import './models/associations.js';
 // Importar rutas
 import authRoutes from './routes/auth.routes.js';
 import recursosRoutes from './routes/recursos.routes.js';
+// Importar rutas de exámenes
+import examsRoutes from './routes/exams.routes.js';
 
 // Configuración
 dotenv.config();
@@ -46,6 +48,8 @@ app.use(morgan('dev'));
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/recursos', recursosRoutes);
+// Montar rutas de exámenes
+app.use('/api/exams', examsRoutes);
 
 // Manejo de errores
 app.use((err, req, res, next) => {

@@ -172,6 +172,87 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({ tipo, contenido }) =>
           </div>
         );
         
+      case 'drag_and_drop':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-bold text-gray-800">{contenido.titulo}</h3>
+              <p className="text-sm text-gray-600">
+                {contenido.actividades?.length} actividad{contenido.actividades?.length !== 1 ? 'es' : ''} interactiva{contenido.actividades?.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            
+            {contenido.actividades?.map((actividad: any, index: number) => (
+              <div key={index} className="bg-gray-50 rounded-lg p-4 border">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold text-gray-800">
+                    Actividad {index + 1}
+                  </h4>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    actividad.tipo === 'formar_oracion' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    {actividad.tipo === 'formar_oracion' ? 'Formar oración' : 'Completar oración'}
+                  </span>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Instrucción:</p>
+                    <p className="text-gray-800">{actividad.enunciado}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Palabras disponibles:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {actividad.opciones?.map((palabra: string, i: number) => (
+                        <span 
+                          key={i}
+                          className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm"
+                        >
+                          {palabra}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Respuesta correcta:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {actividad.respuesta?.map((palabra: string, i: number) => (
+                        <span 
+                          key={i}
+                          className={`px-3 py-1 rounded-md text-sm font-medium ${
+                            actividad.tipo === 'formar_oracion'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : 'bg-green-100 text-green-800 border border-green-200'
+                          }`}
+                        >
+                          {palabra}
+                        </span>
+                      ))}
+                    </div>
+                    {actividad.tipo === 'formar_oracion' && (
+                      <p className="text-xs text-gray-600 mt-1 italic">
+                        Oración formada: "{actividad.respuesta?.join(' ')}"
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800">
+                <strong>Nota:</strong> Los estudiantes podrán arrastrar y soltar las palabras, 
+                o hacer clic para seleccionarlas. Cada actividad incluye verificación automática 
+                con retroalimentación visual.
+              </p>
+            </div>
+          </div>
+        );
+        
       default:
         return (
           <div className="bg-gray-50 p-4 rounded-md">

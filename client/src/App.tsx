@@ -21,6 +21,7 @@ import EvaluationsList from './pages/EvaluationsList';
 import EvaluationForm from './pages/EvaluationForm';
 import ExamPublic from './pages/ExamPublic';
 import ExamDetail from './pages/ExamDetail'; // Detalle de examen para el docente
+import JuegosInteractivos from './pages/JuegosInteractivos';
 
 const App: React.FC = () => {
   return (
@@ -34,6 +35,7 @@ const App: React.FC = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         {/* Ruta pública de examen */}
         <Route path="/evaluaciones/:slug" element={<ExamPublic />} />
+        <Route path="/juegos/:id" element={<JuegosInteractivos />} />
         
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute />}>

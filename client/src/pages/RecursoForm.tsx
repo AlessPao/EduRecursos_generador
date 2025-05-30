@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { TIPOS_RECURSOS, OPCIONES_FORMULARIO, API_URL } from '../config';
+import { TIPOS_RECURSOS, OPCIONES_FORMULARIO, API_URL, OpcionesFormulario } from '../config';
 import ResourcePreview from '../components/ResourcePreview';
 import { formatTipoRecurso } from '../utils/formatters';
 import { Edit, Save, Download, ArrowLeft } from 'lucide-react';
@@ -35,17 +35,17 @@ const RecursoForm: React.FC = () => {
   
   // Título basado en la acción y tipo
   const tituloAccion = isCreating
-    ? `Generar ${formatTipoRecurso(tipoRecurso || '')}`
+    ? `Generar ${tipoRecurso === 'drag_and_drop' ? 'juegos interactivos' : formatTipoRecurso(tipoRecurso || '')}`
     : 'Editar Recurso';
   
   // Buscar la información del tipo de recurso
   const tipoInfo = TIPOS_RECURSOS.find(t => t.id === tipoRecurso);
   
   // Opciones del formulario según el tipo
-  const opcionesFormulario = tipoRecurso ? OPCIONES_FORMULARIO[tipoRecurso as keyof typeof OPCIONES_FORMULARIO] : {};
+  const opcionesFormulario = tipoRecurso ? OPCIONES_FORMULARIO[tipoRecurso as keyof OpcionesFormulario] || {} : {};
   
   // Configuración de React Hook Form
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<RecursoFormData>();
+  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<RecursoFormData>();
   
   // Cargar recurso si estamos editando
   useEffect(() => {
@@ -525,6 +525,96 @@ const RecursoForm: React.FC = () => {
                           disabled={generando}
                           {...register('opciones.instrucciones', { required: true })}
                         ></textarea>
+                      </div>
+                    </>
+                  )}
+                   {tipoRecurso === 'drag_and_drop' && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="numActividades" className="form-label">
+                          Número de actividades
+                        </label>
+                        <select
+                          id="numActividades"
+                          className="form-select"
+                          disabled={generando}
+                          {...register('opciones.numActividades', { required: true })}
+                        >
+                          <option value="">Selecciona el número de actividades</option>
+                          {opcionesFormulario.numActividades?.map((opcion: number) => (
+                            <option key={opcion} value={opcion}>
+                              {opcion} {opcion === 1 ? 'actividad' : 'actividades'}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="tipoActividad" className="form-label">
+                          Tipo de actividad
+                        </label>
+                        <select
+                          id="tipoActividad"
+                          className="form-select"
+                          disabled={generando}
+                          {...register('opciones.tipoActividad', { required: true })}
+                        >
+                          <option value="">Selecciona el tipo de actividad</option>
+                          <option value="formar_oracion">Formar oraciones correctas (arrastrar palabras en orden)</option>
+                          <option value="completar_oracion">Completar oraciones con palabras faltantes</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="longitudOracion" className="form-label">
+                          Longitud de oraciones
+                        </label>
+                        <select
+                          id="longitudOracion"
+                          className="form-select"
+                          disabled={generando}
+                          {...register('opciones.longitudOracion', { required: true })}
+                        >
+                          <option value="">Selecciona la longitud de oraciones</option>
+                          {opcionesFormulario.longitudOracion?.map((opcion: string) => (
+                            <option key={opcion} value={opcion}>
+                              {opcion}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="tema" className="form-label">
+                          Tema de las actividades
+                        </label>
+                        <select
+                          id="temaPredefinido"
+                          className="form-select mb-2"
+                          disabled={generando}
+                          {...register('opciones.temaPredefinido', { required: true })}
+                        >
+                          <option value="">Selecciona un tema</option>
+                          {opcionesFormulario.temasPredefinidos?.map((tema: string) => (
+                            <option key={tema} value={tema}>
+                              {tema}
+                            </option>
+                          ))}
+                        </select>
+                        
+                        {/* Campo personalizado cuando se selecciona "Otro" */}
+                        {watch('opciones.temaPredefinido') === 'Otro (personalizado)' && (
+                          <input
+                            id="temaPersonalizado"
+                            type="text"
+                            className="form-input mt-2"
+                            placeholder="Escribe tu tema personalizado (ej: Los medios de transporte, La naturaleza)"
+                            disabled={generando}
+                            {...register('opciones.temaPersonalizado', { 
+                              required: watch('opciones.temaPredefinido') === 'Otro (personalizado)' 
+                            })}
+                          />
+                        )}
                       </div>
                     </>
                   )}

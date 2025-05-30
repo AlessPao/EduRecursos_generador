@@ -26,11 +26,43 @@ export const TIPOS_RECURSOS = [
     nombre: 'Comunicación oral', 
     descripcion: 'Guiones y actividades para la expresión oral',
     icon: 'MessageCircle'
+  },
+  { 
+    id: 'drag_and_drop', 
+    nombre: 'Juegos interactivos', 
+    descripcion: 'Actividades de arrastrar y soltar: formar o completar oraciones',
+    icon: 'Puzzle' 
   }
 ];
 
+// Tipos para las opciones del formulario
+export interface OpcionesFormulario {
+  comprension?: {
+    tipoTexto: string[];
+    longitud: string[];
+  };
+  escritura?: {
+    tipoTexto: string[];
+    nivelAyuda: string[];
+  };
+  gramatica?: {
+    aspecto: string[];
+    tipoEjercicio: string[];
+  };
+  oral?: {
+    formato: string[];
+  };
+  drag_and_drop?: {
+    numActividades: number[];
+    tipoActividad: string[];
+    temasPredefinidos: string[];
+    longitudOracion: string[];
+  };
+  [key: string]: any;
+}
+
 // Opciones para los formularios según tipo
-export const OPCIONES_FORMULARIO = {
+export const OPCIONES_FORMULARIO: OpcionesFormulario = {
   comprension: {
     tipoTexto: ['narrativo', 'descriptivo', 'informativo', 'instructivo'],
     longitud: ['corto (100-150 palabras)', 'medio (150-250 palabras)', 'largo (250-350 palabras)']
@@ -45,5 +77,23 @@ export const OPCIONES_FORMULARIO = {
   },
   oral: {
     formato: ['diálogo', 'narración', 'exposición breve', 'dramatización']
+  },
+  drag_and_drop: {
+    numActividades: [1, 2, 3, 4, 5],
+    tipoActividad: ['formar_oracion', 'completar_oracion'],
+    longitudOracion: ['Corta (3-4 palabras)', 'Normal (4-5 palabras)', 'Larga (5-6 palabras)'],
+    temasPredefinidos: [
+      'La familia',
+      'La escuela', 
+      'Los animales',
+      'Las estaciones del año',
+      'Los alimentos',
+      'Los juguetes',
+      'La ciudad',
+      'El cuerpo humano',
+      'Los deportes',
+      'Las profesiones',
+      'Otro (personalizado)'
+    ]
   }
 };

@@ -379,6 +379,94 @@ function generateHtmlTemplate(recurso) {
         </div>
       `;
       break;
+
+    case 'ice_breakers':
+      htmlContent = `
+        <div class="container">
+          <h1>${titulo}</h1>
+          <div class="box">
+            <p><strong>Descripción:</strong> ${contenido.descripcion}</p>
+          </div>
+          
+          <h2>Objetivos</h2>
+          <div class="box">
+            <ul>
+              ${contenido.objetivos ? contenido.objetivos.map(objetivo => `<li>${objetivo}</li>`).join('') : '<li>Desarrollo de habilidades comunicativas</li>'}
+            </ul>
+          </div>
+          
+          ${contenido.actividades.map((actividad, index) => `
+            <h2>Actividad ${index + 1}: ${actividad.nombre}</h2>
+            <div class="box">
+              <p><strong>Duración:</strong> ${actividad.duracionMinutos} minutos</p>
+              <p><strong>Participantes:</strong> ${actividad.participantes}</p>
+              
+              <h3>Instrucciones para el Docente</h3>
+              <p>${actividad.instrucciones}</p>
+              
+              <h3>Desarrollo</h3>
+              <p>${actividad.desarrollo}</p>
+              
+              ${actividad.materiales ? `
+                <h3>Materiales</h3>
+                <ul>
+                  ${actividad.materiales.map(material => `<li>${material}</li>`).join('')}
+                </ul>
+              ` : ''}
+              
+              ${actividad.contenidoEspecifico ? `
+                <h3>Contenido Específico</h3>
+                <div class="box">
+                  ${actividad.contenidoEspecifico.pistas ? `
+                    <h4>Pistas:</h4>
+                    <ol>
+                      ${actividad.contenidoEspecifico.pistas.map(pista => `<li>${pista.pista}</li>`).join('')}
+                    </ol>
+                    <p><strong>Respuesta:</strong> ${actividad.contenidoEspecifico.respuesta}</p>
+                  ` : ''}
+                  
+                  ${actividad.contenidoEspecifico.descripcion ? `
+                    <h4>Descripción para dibujar:</h4>
+                    <p>${actividad.contenidoEspecifico.descripcion}</p>
+                    <h4>Elementos clave:</h4>
+                    <ul>
+                      ${actividad.contenidoEspecifico.elementosClave ? actividad.contenidoEspecifico.elementosClave.map(elemento => `<li>${elemento}</li>`).join('') : ''}
+                    </ul>
+                  ` : ''}
+                  
+                  ${actividad.contenidoEspecifico.frases ? `
+                    <h4>Plantillas de frases:</h4>
+                    ${actividad.contenidoEspecifico.frases.map(frase => `
+                      <p><strong>${frase.template}</strong></p>
+                      <p>Ejemplos: ${frase.ejemplos.join(', ')}</p>
+                    `).join('')}
+                  ` : ''}
+                  
+                  ${actividad.contenidoEspecifico.desafios ? `
+                    <h4>Desafíos de búsqueda:</h4>
+                    <ul>
+                      ${actividad.contenidoEspecifico.desafios.map(desafio => `
+                        <li><strong>Encuentra algo que ${desafio.criterio}</strong><br>
+                        Ejemplos: ${desafio.ejemplos.join(', ')}</li>
+                      `).join('')}
+                    </ul>
+                  ` : ''}
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+          
+          ${contenido.variaciones ? `
+            <h2>Variaciones</h2>
+            <div class="box">
+              <ul>
+                ${contenido.variaciones.map(variacion => `<li>${variacion}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      break;
       
     default:
       htmlContent = `

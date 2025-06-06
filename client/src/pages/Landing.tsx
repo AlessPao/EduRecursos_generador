@@ -33,6 +33,11 @@ const Landing: React.FC = () => {
       icon: <MessageCircle className="h-8 w-8 text-violet-600" />,
       title: 'Comunicación Oral',
       description: 'Guiones y actividades para fomentar la expresión oral de los estudiantes.'
+    },
+    {
+      icon: <span className="text-cyan-600 text-3xl">🧊</span>,
+      title: 'Ice Breakers',
+      description: 'Actividades dinámicas para crear un ambiente positivo y fomentar la participación.'
     }
   ];
   
@@ -92,7 +97,7 @@ const Landing: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={index}

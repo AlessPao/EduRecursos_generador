@@ -25,7 +25,8 @@ const ExamPublic: React.FC = () => {
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [score, setScore] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
   useEffect(() => {
     const fetchExam = async () => {
       try {
@@ -46,28 +47,57 @@ const ExamPublic: React.FC = () => {
     fetchExam();
   }, [slug]);
 
+  // Timer para medir el tiempo transcurrido
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (started && score === null && startTime) {
+      interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [started, score, startTime]);
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleStart = () => {
     if (!studentName.trim()) {
       toast.warn('Ingresa tu nombre para comenzar');
       return;
     }
+    const now = Date.now();
+    setStartTime(now);
     setStarted(true);
+    setElapsedTime(0);
   };
 
   const handleSelect = (index: number, option: string) => {
     setAnswers(prev => ({ ...prev, [index]: option }));
   };
-
   const handleSubmit = async () => {
     if (!exam) return;
     if (Object.keys(answers).length !== exam.preguntas.length) {
       toast.warn('Responde todas las preguntas');
       return;
     }
+    
+    const endTime = Date.now();
+    const totalTime = startTime ? Math.floor((endTime - startTime) / 1000) : 0;
+    
     try {
       setSubmitting(true);
       const payload = {
         studentName,
+        evalTime: totalTime,
         respuestas: Object.entries(answers).map(([idx, respuestaSeleccionada]) => ({
           preguntaIndex: parseInt(idx, 10),
           respuestaSeleccionada
@@ -117,10 +147,16 @@ const ExamPublic: React.FC = () => {
                 <span className="material-icons mr-2"></span>Comenzar
               </button>
             </div>
-          )}
-
-          {started && score === null && (
+          )}          {started && score === null && (
             <div className="space-y-8">
+              {/* Timer visible */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-center">
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-yellow-800 font-semibold">⏱️ Tiempo transcurrido:</span>
+                  <span className="text-yellow-900 font-bold text-lg">{formatTime(elapsedTime)}</span>
+                </div>
+              </div>
+              
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
                 <p className="text-gray-800 text-base whitespace-pre-line">{exam.texto}</p>
               </div>

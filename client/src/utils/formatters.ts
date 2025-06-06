@@ -29,6 +29,10 @@ export const formatTipoRecurso = (tipo: string): string => {
       return 'Gramática y ortografía';
     case 'oral':
       return 'Comunicación oral';
+    case 'drag_and_drop':
+      return 'Juegos interactivos';
+    case 'ice_breakers':
+      return 'Ice Breakers';
     default:
       return tipo;
   }

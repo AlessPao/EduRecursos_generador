@@ -18,6 +18,7 @@ interface Exam {
 interface Result {
   studentName: string;
   score: number;
+  evalTime: number;
 }
 
 const ExamDetail: React.FC = () => {
@@ -26,10 +27,17 @@ const ExamDetail: React.FC = () => {
   const [exam, setExam] = useState<Exam | null>(null);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingRes, setLoadingRes] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [loadingRes, setLoadingRes] = useState(true);  const [copied, setCopied] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);  const [showDeleteResultsConfirm, setShowDeleteResultsConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deletingResults, setDeletingResults] = useState(false);
+
+  const formatTime = (seconds: number): string => {
+    if (!seconds || seconds === 0) return 'N/A';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const fetchExam = async () => {
@@ -62,7 +70,6 @@ const ExamDetail: React.FC = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
   const handleDelete = async () => {
     if (!slug) return;
     
@@ -83,6 +90,29 @@ const ExamDetail: React.FC = () => {
     } finally {
       setDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleDeleteResults = async () => {
+    if (!slug) return;
+    
+    setDeletingResults(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.delete(`${API_URL}/exams/${slug}/results`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res.data.success) {
+        toast.success('Resultados eliminados correctamente');
+        setResults([]); // Limpiar la lista local
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Error al eliminar los resultados');
+    } finally {
+      setDeletingResults(false);
+      setShowDeleteResultsConfirm(false);
     }
   };
 
@@ -133,17 +163,28 @@ const ExamDetail: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-blue-100">
-          <h3 className="text-lg font-bold mb-4 text-blue-700">Resultados de los estudiantes</h3>
+        </div>        <div className="bg-white p-8 rounded-xl shadow-lg border border-blue-100">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-bold text-blue-700">Resultados de los estudiantes</h3>
+            {results.length > 0 && (
+              <button
+                onClick={() => setShowDeleteResultsConfirm(true)}
+                className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition flex items-center"
+                title="Eliminar todos los resultados"
+              >
+                <Trash2 size={14} className="mr-1" />
+                Limpiar resultados
+              </button>
+            )}
+          </div>
           {loadingRes ? (
             <div className="flex justify-center"><div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div></div>
-          ) : results.length > 0 ? (
-            <table className="w-full table-auto border-collapse rounded-lg overflow-hidden">
+          ) : results.length > 0 ? (            <table className="w-full table-auto border-collapse rounded-lg overflow-hidden">
               <thead>
                 <tr className="bg-blue-100">
                   <th className="border p-2 text-left">Alumno</th>
                   <th className="border p-2 text-left">Puntaje</th>
+                  <th className="border p-2 text-left">Tiempo</th>
                 </tr>
               </thead>
               <tbody>
@@ -151,6 +192,7 @@ const ExamDetail: React.FC = () => {
                   <tr key={i} className="hover:bg-blue-50">
                     <td className="border p-2">{r.studentName}</td>
                     <td className="border p-2 font-bold text-blue-700">{r.score} / 20</td>
+                    <td className="border p-2 text-gray-600">{formatTime(r.evalTime)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -158,9 +200,7 @@ const ExamDetail: React.FC = () => {
           ) : (
             <p className="text-gray-500">No hay resultados aún.</p>          )}
         </div>
-      </div>
-
-      {/* Modal de confirmación para eliminar */}
+      </div>      {/* Modal de confirmación para eliminar */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -188,6 +228,41 @@ const ExamDetail: React.FC = () => {
                   </>
                 ) : (
                   'Eliminar'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para eliminar resultados */}
+      {showDeleteResultsConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-orange-600 mb-4">Confirmar eliminación de resultados</h3>
+            <p className="text-gray-700 mb-6">
+              ¿Estás seguro de que quieres eliminar todos los resultados de este examen? Esta acción no se puede deshacer, pero el examen seguirá disponible para nuevos estudiantes.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteResultsConfirm(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                disabled={deletingResults}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteResults}
+                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition flex items-center"
+                disabled={deletingResults}
+              >
+                {deletingResults ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Eliminando...
+                  </>
+                ) : (
+                  'Eliminar resultados'
                 )}
               </button>
             </div>

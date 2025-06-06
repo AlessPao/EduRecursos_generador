@@ -37,10 +37,10 @@ const JuegosInteractivos: React.FC = () => {
     };
     fetchRecurso();
   }, [id, navigate]);
-
   // Funciones de drag and drop
   const handleDragStart = (e: React.DragEvent, palabra: string) => {
     setDraggedItem(palabra);
+    e.dataTransfer.setData('text/plain', JSON.stringify({ palabra, fromSentence: false }));
     e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -48,13 +48,63 @@ const JuegosInteractivos: React.FC = () => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
-
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (draggedItem && !verificado[actividadActual]) {
       agregarPalabra(draggedItem);
       setDraggedItem(null);
     }
+  };
+
+  // Funciones para reordenar palabras en "Tu oración"
+  const handleDragStartFromSentence = (e: React.DragEvent, palabra: string, index: number) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ palabra, fromSentence: true, index }));
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDropInSentence = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (verificado[actividadActual]) return;
+
+    const data = e.dataTransfer.getData('text/plain');
+    try {
+      const dragData = JSON.parse(data);
+      const { palabra, fromSentence, index: sourceIndex } = dragData;
+      
+      const nuevasRespuestas = [...respuestas];
+      const currentSentence = [...nuevasRespuestas[actividadActual]];
+      
+      if (fromSentence) {
+        // Reordenar dentro de la oración
+        if (sourceIndex !== targetIndex) {
+          const [removed] = currentSentence.splice(sourceIndex, 1);
+          currentSentence.splice(targetIndex, 0, removed);
+          nuevasRespuestas[actividadActual] = currentSentence;
+          setRespuestas(nuevasRespuestas);
+        }
+      } else {
+        // Agregar nueva palabra en posición específica
+        if (!currentSentence.includes(palabra)) {
+          currentSentence.splice(targetIndex, 0, palabra);
+          nuevasRespuestas[actividadActual] = currentSentence;
+          setRespuestas(nuevasRespuestas);
+        }
+      }
+    } catch (error) {
+      // Fallback al comportamiento original
+      if (draggedItem && !verificado[actividadActual]) {
+        agregarPalabra(draggedItem);
+        setDraggedItem(null);
+      }
+    }
+  };
+
+  const removerPalabraDeLaOracion = (index: number) => {
+    if (verificado[actividadActual]) return;
+    
+    const nuevasRespuestas = [...respuestas];
+    nuevasRespuestas[actividadActual] = nuevasRespuestas[actividadActual].filter((_, i) => i !== index);
+    setRespuestas(nuevasRespuestas);
   };
   const agregarPalabra = (palabra: string) => {
     const idx = actividadActual;
@@ -76,7 +126,6 @@ const JuegosInteractivos: React.FC = () => {
       setRespuestas(nuevas);
     }
   };
-
   // Verificar la actividad actual
   const verificarActividad = () => {
     if (!recurso) return;
@@ -98,6 +147,13 @@ const JuegosInteractivos: React.FC = () => {
     const nuevosVerificados = [...verificado];
     nuevosVerificados[actividadActual] = true;
     setVerificado(nuevosVerificados);
+
+    // Avance automático si la respuesta es correcta
+    if (esCorrecto && actividadActual < recurso.contenido.actividades.length - 1) {
+      setTimeout(() => {
+        setActividadActual(actividadActual + 1);
+      }, 2000); // Esperar 2 segundos para mostrar el feedback antes de avanzar
+    }
   };
 
   // Reiniciar la actividad actual
@@ -162,8 +218,7 @@ const JuegosInteractivos: React.FC = () => {
               ))}
             </div>
           </div>
-          
-          {/* Área de construcción de oración */}
+            {/* Área de construcción de oración */}
           <div>
             <div className="text-sm font-medium text-gray-600 mb-2">Tu oración:</div>
             <div 
@@ -177,17 +232,56 @@ const JuegosInteractivos: React.FC = () => {
             >
               <div className="flex flex-wrap gap-2">
                 {respuestas[idx].map((palabra: string, i: number) => (
-                  <span 
-                    key={i} 
-                    className="px-3 py-2 rounded-md bg-blue-100 border border-blue-300 text-blue-800 font-medium"
+                  <div
+                    key={i}
+                    className="relative group"
                   >
-                    {palabra}
-                  </span>
+                    <span 
+                      draggable={!verificado[idx]}
+                      onDragStart={(e) => handleDragStartFromSentence(e, palabra, i)}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDropInSentence(e, i)}
+                      className={`px-3 py-2 rounded-md border font-medium cursor-move transition-all ${
+                        verificado[idx]
+                          ? 'bg-blue-100 border-blue-300 text-blue-800 cursor-default'
+                          : 'bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 hover:shadow-md transform hover:scale-105'
+                      }`}
+                      title={verificado[idx] ? '' : 'Arrastra para reordenar o haz clic en × para quitar'}
+                    >
+                      {palabra}
+                      {!verificado[idx] && (
+                        <button
+                          onClick={() => removerPalabraDeLaOracion(i)}
+                          className="ml-2 text-red-500 hover:text-red-700 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Quitar palabra"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </span>
+                    {/* Zona de drop entre palabras */}
+                    {!verificado[idx] && (
+                      <div
+                        className="absolute top-0 -right-1 w-2 h-full"
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDropInSentence(e, i + 1)}
+                      />
+                    )}
+                  </div>
                 ))}
-                {respuestas[idx].length === 0 && (
-                  <span className="text-gray-400 italic flex items-center">
-                    {draggedItem ? '¡Suelta aquí la palabra!' : 'Arrastra las palabras aquí para formar la oración'}
-                  </span>
+                {/* Zona de drop al final */}
+                {!verificado[idx] && (
+                  <div
+                    className="min-w-[20px] h-[40px] flex items-center"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDropInSentence(e, respuestas[idx].length)}
+                  >
+                    {respuestas[idx].length === 0 && (
+                      <span className="text-gray-400 italic">
+                        {draggedItem ? '¡Suelta aquí la palabra!' : 'Arrastra las palabras aquí para formar la oración'}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -339,11 +433,17 @@ const JuegosInteractivos: React.FC = () => {
             }`}>
               <div className="flex items-center">
                 {resultados[actividadActual] ? (
-                  <>
-                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                  <>                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-sm">✓</span>
                     </div>
-                    <span className="text-green-800 font-semibold">¡Correcto! Excelente trabajo.</span>
+                    <div>
+                      <span className="text-green-800 font-semibold">¡Correcto! Excelente trabajo.</span>
+                      {actividadActual < totalActividades - 1 && (
+                        <div className="text-green-600 text-sm mt-1">
+                          Avanzando a la siguiente actividad...
+                        </div>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <>

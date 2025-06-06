@@ -36,6 +36,8 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         return <MessageCircle size={20} className="text-violet-600" />;
       case 'drag_and_drop':
         return <span role="img" aria-label="Puzzle" className="text-pink-600">🧩</span>;
+      case 'ice_breakers':
+        return <span role="img" aria-label="Ice Breaker" className="text-cyan-600">🧊</span>;
       default:
         return <BookOpen size={20} className="text-blue-600" />;
     }
@@ -54,6 +56,8 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         return 'bg-violet-100 text-violet-800';
       case 'drag_and_drop':
         return 'bg-pink-100 text-pink-800';
+      case 'ice_breakers':
+        return 'bg-cyan-100 text-cyan-800';
       default:
         return 'bg-blue-100 text-blue-800';
     }
@@ -72,6 +76,8 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         return 'Comunicación oral';
       case 'drag_and_drop':
         return 'Juegos interactivos';
+      case 'ice_breakers':
+        return 'Ice Breakers';
       default:
         return tipo;
     }

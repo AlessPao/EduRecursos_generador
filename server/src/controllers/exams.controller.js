@@ -53,25 +53,39 @@ export const getExam = async (req, res, next) => {
 export const submitExam = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const { studentName, respuestas } = req.body;
+    const { studentName, respuestas, evalTime } = req.body;
+    
     const exam = await Exam.findOne({ where: { slug } });
     if (!exam) return res.status(404).json({ success: false, message: 'Exam not found' });
+    
     const preguntas = exam.preguntas;
     let correct = 0;
-    const start = Date.now();
+    
     respuestas.forEach((resp) => {
       const idx = resp.preguntaIndex;
       if (preguntas[idx] && preguntas[idx].respuesta === resp.respuestaSeleccionada) {
         correct++;
       }
     });
+    
     const score = Math.round((correct / preguntas.length) * 20);
-    const evalTime = (Date.now() - start) / 1000;
+    
+    // Usar el tiempo enviado desde el frontend, o 0 si no se proporciona
+    const finalEvalTime = evalTime || 0;
+    
     // Si la calificación es 0, simular animación de carga
     if (score === 0) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    await ExamResult.create({ studentName, respuestas, score, examSlug: slug, evalTime });
+    
+    await ExamResult.create({ 
+      studentName, 
+      respuestas, 
+      score, 
+      examSlug: slug, 
+      evalTime: finalEvalTime 
+    });
+    
     res.json({ success: true, data: { score, total: preguntas.length } });
   } catch (err) {
     next(err);
@@ -94,14 +108,44 @@ export const getExamResults = async (req, res, next) => {
         message: 'Examen no encontrado o no tienes permisos para verlo' 
       });
     }
-    
-    const results = await ExamResult.findAll({ 
+      const results = await ExamResult.findAll({ 
       where: { examSlug: slug }, 
-      attributes: ['studentName', 'score', 'createdAt'], 
+      attributes: ['studentName', 'score', 'evalTime', 'createdAt'], 
       order: [['createdAt', 'DESC']] 
     });
     
-    res.json({ success: true, data: results });
+    res.json({ success: true, data: results });  } catch (err) {
+    next(err);
+  }
+};
+
+// Controller to delete all results for an exam (only if user owns the exam)
+export const deleteExamResults = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    
+    // Verificar que el examen pertenece al usuario autenticado
+    const exam = await Exam.findOne({ 
+      where: { slug, usuarioId: req.user.userId } 
+    });
+    
+    if (!exam) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Examen no encontrado o no tienes permisos para modificarlo' 
+      });
+    }
+    
+    // Eliminar todos los resultados del examen
+    const deletedCount = await ExamResult.destroy({ 
+      where: { examSlug: slug } 
+    });
+    
+    res.json({ 
+      success: true, 
+      message: `${deletedCount} resultados eliminados correctamente`,
+      deletedCount 
+    });
   } catch (err) {
     next(err);
   }

@@ -252,6 +252,165 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({ tipo, contenido }) =>
             </div>
           </div>
         );
+
+      case 'ice_breakers':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-bold text-gray-800">{contenido.titulo}</h3>
+              <p className="text-sm text-gray-600 mt-1">{contenido.descripcion}</p>
+            </div>
+
+            {/* Objetivos */}
+            {contenido.objetivos && (
+              <div>
+                <h4 className="font-semibold text-md mb-2 text-blue-800">🎯 Objetivos</h4>
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    {contenido.objetivos.map((objetivo: string, index: number) => (
+                      <li key={index} className="text-blue-900">{objetivo}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Actividades */}
+            {contenido.actividades?.map((actividad: any, index: number) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div className="mb-3">
+                  <h4 className="font-bold text-lg text-gray-800 mb-1">
+                    📋 Actividad {index + 1}: {actividad.nombre}
+                  </h4>
+                  <div className="flex flex-wrap gap-4 text-xs text-gray-600 mb-2">
+                    <span>⏱️ {actividad.duracionMinutos} min</span>
+                    <span>👥 {actividad.participantes}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <h5 className="font-semibold text-sm text-green-700 mb-1">👨‍🏫 Instrucciones para el docente:</h5>
+                    <p className="text-sm bg-green-50 p-2 rounded border border-green-200">{actividad.instrucciones}</p>
+                  </div>
+
+                  <div>
+                    <h5 className="font-semibold text-sm text-purple-700 mb-1">🔄 Desarrollo:</h5>
+                    <p className="text-sm bg-purple-50 p-2 rounded border border-purple-200">{actividad.desarrollo}</p>
+                  </div>
+
+                  {actividad.materiales && (
+                    <div>
+                      <h5 className="font-semibold text-sm text-orange-700 mb-1">📦 Materiales:</h5>
+                      <div className="bg-orange-50 p-2 rounded border border-orange-200">
+                        <ul className="list-disc list-inside text-sm">
+                          {actividad.materiales.map((material: string, idx: number) => (
+                            <li key={idx}>{material}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contenido específico según tipo */}
+                  {actividad.contenidoEspecifico && (
+                    <div>
+                      <h5 className="font-semibold text-sm text-indigo-700 mb-2">🎨 Contenido específico:</h5>
+                      <div className="bg-indigo-50 p-3 rounded border border-indigo-200 space-y-2">
+                        
+                        {/* Para "Adivina quién soy" */}
+                        {actividad.contenidoEspecifico.pistas && (
+                          <div>
+                            <p className="text-sm font-medium mb-1">🔍 Pistas:</p>
+                            <ol className="list-decimal list-inside text-sm space-y-1 ml-2">
+                              {actividad.contenidoEspecifico.pistas.map((pista: any, idx: number) => (
+                                <li key={idx}>{pista.pista}</li>
+                              ))}
+                            </ol>
+                            <p className="text-sm mt-2"><strong>✅ Respuesta:</strong> {actividad.contenidoEspecifico.respuesta}</p>
+                            {actividad.contenidoEspecifico.pistasFaciles && (
+                              <p className="text-sm mt-1"><strong>💡 Pistas adicionales:</strong> {actividad.contenidoEspecifico.pistasFaciles.join(', ')}</p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Para "Dibuja lo que digo" */}
+                        {actividad.contenidoEspecifico.descripcion && (
+                          <div>
+                            <p className="text-sm font-medium mb-1">🎨 Descripción para dibujar:</p>
+                            <p className="text-sm bg-white p-2 rounded border italic">"{actividad.contenidoEspecifico.descripcion}"</p>
+                            {actividad.contenidoEspecifico.elementosClave && (
+                              <div className="mt-2">
+                                <p className="text-sm font-medium">🔑 Elementos clave:</p>
+                                <ul className="list-disc list-inside text-sm ml-2">
+                                  {actividad.contenidoEspecifico.elementosClave.map((elemento: string, idx: number) => (
+                                    <li key={idx}>{elemento}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Para "Tres cosas sobre mí" */}
+                        {actividad.contenidoEspecifico.frases && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">💭 Plantillas de frases:</p>
+                            {actividad.contenidoEspecifico.frases.map((frase: any, idx: number) => (
+                              <div key={idx} className="mb-2 bg-white p-2 rounded border">
+                                <p className="text-sm font-medium">"{frase.template}"</p>
+                                <p className="text-xs text-gray-600">Ejemplos: {frase.ejemplos.join(', ')}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Para "Encuentra algo que..." */}
+                        {actividad.contenidoEspecifico.desafios && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">🔎 Desafíos de búsqueda:</p>
+                            {actividad.contenidoEspecifico.desafios.map((desafio: any, idx: number) => (
+                              <div key={idx} className="mb-2 bg-white p-2 rounded border">
+                                <p className="text-sm font-medium">Encuentra algo que {desafio.criterio}</p>
+                                <p className="text-xs text-gray-600">Ejemplos posibles: {desafio.ejemplos.join(', ')}</p>
+                              </div>
+                            ))}
+                            {actividad.contenidoEspecifico.limiteTiempo && (
+                              <p className="text-sm mt-2">⏰ <strong>Tiempo límite:</strong> {actividad.contenidoEspecifico.limiteTiempo} segundos</p>
+                            )}
+                          </div>
+                        )}
+
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Variaciones */}
+            {contenido.variaciones && (
+              <div>
+                <h4 className="font-semibold text-md mb-2 text-gray-700">🔄 Variaciones</h4>
+                <div className="bg-gray-100 p-3 rounded-lg border">
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    {contenido.variaciones.map((variacion: string, index: number) => (
+                      <li key={index}>{variacion}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800">
+                <strong>💡 Nota pedagógica:</strong> Los ice breakers están diseñados para crear un ambiente 
+                positivo y acogedor al inicio de las clases, fomentando la participación activa y el desarrollo 
+                de habilidades comunicativas en estudiantes de 2° grado.
+              </p>
+            </div>
+          </div>
+        );
         
       default:
         return (

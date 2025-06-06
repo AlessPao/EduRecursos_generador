@@ -164,6 +164,7 @@ const RecursosList: React.FC = () => {
               <option value="escritura">Producción escrita</option>
               <option value="gramatica">Gramática y ortografía</option>
               <option value="oral">Comunicación oral</option>
+              <option value="ice_breakers">Ice Breakers</option>
             </select>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { createExam,
          getExam,
          submitExam,
          getExamResults,
+         deleteExamResults,
          deleteExam } from '../controllers/exams.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
@@ -24,6 +25,9 @@ router.post('/:slug/submit', submitExam);
 
 // Obtener resultados de un examen (para docente) - Requiere autenticación
 router.get('/:slug/results', isAuthenticated, getExamResults);
+
+// Eliminar resultados de un examen (para docente) - Requiere autenticación
+router.delete('/:slug/results', isAuthenticated, deleteExamResults);
 
 // Eliminar un examen (para docente) - Requiere autenticación
 router.delete('/:slug', isAuthenticated, deleteExam);

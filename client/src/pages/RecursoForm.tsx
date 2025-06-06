@@ -613,14 +613,106 @@ const RecursoForm: React.FC = () => {
                             {...register('opciones.temaPersonalizado', { 
                               required: watch('opciones.temaPredefinido') === 'Otro (personalizado)' 
                             })}
-                          />
-                        )}
+                          />                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {tipoRecurso === 'ice_breakers' && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="tipoIceBreaker" className="form-label">
+                          Tipo de ice breaker
+                        </label>
+                        <select
+                          id="tipoIceBreaker"
+                          className="form-select"
+                          disabled={generando}
+                          {...register('opciones.tipoIceBreaker', { required: true })}
+                        >
+                          <option value="">Selecciona el tipo de actividad</option>
+                          <option value="adivina_quien_soy">🔍 Adivina quién soy</option>
+                          <option value="dibuja_lo_que_digo">🎨 Dibuja lo que digo</option>
+                          <option value="tres_cosas_sobre_mi">💭 Tres cosas sobre mí</option>
+                        </select>
+                      </div>
+
+                      {/* Solo mostrar tema si es "adivina_quien_soy" */}
+                      {watch('opciones.tipoIceBreaker') === 'adivina_quien_soy' && (
+                        <div className="form-group">
+                          <label htmlFor="tema" className="form-label">
+                            Tema de las actividades
+                          </label>
+                          <select
+                            id="tema"
+                            className="form-select"
+                            disabled={generando}
+                            {...register('opciones.tema', { 
+                              required: watch('opciones.tipoIceBreaker') === 'adivina_quien_soy' 
+                            })}
+                          >
+                            <option value="">Selecciona un tema</option>
+                            {opcionesFormulario.tema?.map((tema: string) => (
+                              <option key={tema} value={tema}>
+                                {tema.charAt(0).toUpperCase() + tema.slice(1).replace('_', ' ')}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Explicación para "tres_cosas_sobre_mi" */}
+                      {watch('opciones.tipoIceBreaker') === 'tres_cosas_sobre_mi' && (
+                        <div className="form-group">
+                          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <p className="text-sm text-blue-800">
+                              <strong>ℹ️ Información:</strong> Esta actividad se genera automáticamente con frases para completar como 
+                              "Me gusta...", "No me gusta...", "Mi color favorito es...", etc. No requiere selección de tema.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="form-group">
+                        <label htmlFor="numeroActividades" className="form-label">
+                          Número de actividades
+                        </label>
+                        <select
+                          id="numeroActividades"
+                          className="form-select"
+                          disabled={generando}
+                          {...register('opciones.numeroActividades', { required: true })}
+                        >
+                          <option value="">Selecciona el número</option>
+                          {opcionesFormulario.numeroActividades?.map((num: number) => (
+                            <option key={num} value={num}>
+                              {num} {num === 1 ? 'actividad' : 'actividades'}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="nivelInteraccion" className="form-label">
+                          Nivel de interacción
+                        </label>
+                        <select
+                          id="nivelInteraccion"
+                          className="form-select"
+                          disabled={generando}
+                          {...register('opciones.nivelInteraccion', { required: true })}
+                        >
+                          <option value="">Selecciona el nivel</option>
+                          <option value="bajo">Bajo - Actividades más individuales</option>
+                          <option value="medio">Medio - Participación moderada</option>
+                          <option value="alto">Alto - Mucha interacción grupal</option>
+                        </select>
                       </div>
                     </>
                   )}
                 </>
               )}
-
+              
               {/* Si estamos editando un recurso existente, mostrar campos editables para el contenido */}
               {!isCreating && isEditing && recurso && (
                 <div className="form-group mt-4">

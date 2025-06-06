@@ -16,7 +16,7 @@ const Recurso = sequelize.define('Recurso', {
     }
   },
   tipo: {
-    type: DataTypes.ENUM('comprension', 'escritura', 'gramatica', 'oral', 'drag_and_drop'),
+    type: DataTypes.ENUM('comprension', 'escritura', 'gramatica', 'oral', 'drag_and_drop', 'ice_breakers'),
     allowNull: false
   },
   titulo: {

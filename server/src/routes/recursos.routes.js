@@ -10,7 +10,7 @@ router.use(isAuthenticated);
 
 // Validaciones para crear y actualizar recursos
 const validateCreate = [
-  body('tipo').isIn(['comprension', 'escritura', 'gramatica', 'oral', 'drag_and_drop'])
+  body('tipo').isIn(['comprension', 'escritura', 'gramatica', 'oral', 'drag_and_drop', 'ice_breakers'])
     .withMessage('Tipo de recurso inválido'),
   body('titulo').notEmpty().withMessage('El título es obligatorio'),
   body('opciones').isObject().withMessage('Las opciones deben ser un objeto')

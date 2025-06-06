@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, PenTool, SpellCheck, MessageCircle, ArrowRight } from 'lucide-react';
+import { BookOpen, PenTool, SpellCheck, MessageCircle, ArrowRight, Snowflake, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Landing: React.FC = () => {
@@ -35,7 +35,12 @@ const Landing: React.FC = () => {
       description: 'Guiones y actividades para fomentar la expresión oral de los estudiantes.'
     },
     {
-      icon: <span className="text-cyan-600 text-3xl">🧊</span>,
+      icon: <Gamepad2 className="h-8 w-8 text-pink-600" />,
+      title: 'Juegos Interactivos',
+      description: 'Actividades de arrastrar y soltar: formar o completar oraciones.'
+    },
+    {
+      icon: <Snowflake className="h-8 w-8 text-cyan-600" />,
       title: 'Ice Breakers',
       description: 'Actividades dinámicas para crear un ambiente positivo y fomentar la participación.'
     }

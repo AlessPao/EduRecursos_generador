@@ -15,7 +15,9 @@ const Perfil: React.FC = () => {
     comprension: 0,
     escritura: 0,
     gramatica: 0,
-    oral: 0
+    oral: 0,
+    juegosInteractivos: 0,
+    iceBreakers: 0
   });
   
   // Cargar datos del perfil y estadísticas
@@ -41,7 +43,9 @@ const Perfil: React.FC = () => {
             comprension: recursos.filter((r: any) => r.tipo === 'comprension').length,
             escritura: recursos.filter((r: any) => r.tipo === 'escritura').length,
             gramatica: recursos.filter((r: any) => r.tipo === 'gramatica').length,
-            oral: recursos.filter((r: any) => r.tipo === 'oral').length
+            oral: recursos.filter((r: any) => r.tipo === 'oral').length,
+            juegosInteractivos: recursos.filter((r: any) => r.tipo === 'drag_and_drop').length,
+            iceBreakers: recursos.filter((r: any) => r.tipo === 'ice_breakers').length
           });
         }
       } catch (error) {
@@ -140,6 +144,16 @@ const Perfil: React.FC = () => {
                 <div className="bg-violet-50 p-3 rounded-lg border border-violet-100">
                   <div className="text-lg font-semibold text-violet-600">{stats.oral}</div>
                   <div className="text-xs text-gray-600">Comunicación oral</div>
+                </div>
+                
+                <div className="bg-pink-50 p-3 rounded-lg border border-pink-100">
+                  <div className="text-lg font-semibold text-pink-600">{stats.juegosInteractivos}</div>
+                  <div className="text-xs text-gray-600">Juegos interactivos</div>
+                </div>
+                
+                <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                  <div className="text-lg font-semibold text-indigo-600">{stats.iceBreakers}</div>
+                  <div className="text-xs text-gray-600">Ice breakers</div>
                 </div>
               </div>
             </div>

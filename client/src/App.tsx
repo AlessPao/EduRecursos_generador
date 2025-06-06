@@ -22,6 +22,7 @@ import EvaluationForm from './pages/EvaluationForm';
 import ExamPublic from './pages/ExamPublic';
 import ExamDetail from './pages/ExamDetail'; // Detalle de examen para el docente
 import JuegosInteractivos from './pages/JuegosInteractivos';
+import IceBreakerPresentation from './pages/IceBreakerPresentation';
 
 const App: React.FC = () => {
   return (
@@ -36,6 +37,7 @@ const App: React.FC = () => {
         {/* Ruta pública de examen */}
         <Route path="/evaluaciones/:slug" element={<ExamPublic />} />
         <Route path="/juegos/:id" element={<JuegosInteractivos />} />
+        <Route path="/ice-breakers/:id/presentacion" element={<IceBreakerPresentation />} />
         
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute />}>

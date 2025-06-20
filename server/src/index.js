@@ -28,6 +28,7 @@ const __dirname = path.dirname(__filename);
 // Middleware
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://edu-recursos-generador-frontend.vercel.app',
   'http://localhost:5173',
   'http://localhost:5000',  // Para Swagger UI local
   process.env.RENDER_EXTERNAL_URL  // Para Swagger UI en producción

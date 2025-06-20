@@ -22,8 +22,33 @@ const Register: React.FC = () => {
   // Configuración de React Hook Form
   const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>();
   
-  // Vigilar el campo de contraseña para validación en tiempo real
+  // Vigilar campos para validación en tiempo real
   const watchedPassword = watch('password', '');
+  const watchedNombre = watch('nombre', '');
+  const watchedEmail = watch('email', '');
+  
+  // Funciones de validación de nombre
+  const nombreValidations = {
+    notEmpty: watchedNombre.trim().length > 0,
+    minLength: watchedNombre.length >= 3,
+    maxLength: watchedNombre.length <= 50,
+    onlyValidChars: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(watchedNombre.trim()),
+    noNumbers: !/\d/.test(watchedNombre),
+    noSpecialChars: !/[!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(watchedNombre),
+    noScriptTags: !/<script|<\/script>/i.test(watchedNombre)
+  };
+  
+  const isNombreValid = Object.values(nombreValidations).every(Boolean);
+  
+  // Funciones de validación de email
+  const emailValidations = {
+    notEmpty: watchedEmail.trim().length > 0,
+    validFormat: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(watchedEmail),
+    noScriptTags: !/<script|<\/script>/i.test(watchedEmail),
+    commonDomains: /\.(com|edu|org|net|gov|co|pe)$/i.test(watchedEmail)
+  };
+  
+  const isEmailValid = Object.values(emailValidations).every(Boolean);
   
   // Funciones de validación de contraseña
   const passwordValidations = {
@@ -36,6 +61,8 @@ const Register: React.FC = () => {
   
   const isPasswordValid = Object.values(passwordValidations).every(Boolean);
   
+  const isFormValid = isNombreValid && isEmailValid && isPasswordValid;
+  
   // Redirigir al dashboard si ya está autenticado
   if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
@@ -43,9 +70,9 @@ const Register: React.FC = () => {
   
   // Manejar envío del formulario
   const onSubmit = async (data: RegisterFormData) => {
-    // Verificar que la contraseña cumpla con todos los requisitos
-    if (!isPasswordValid) {
-      toast.error('La contraseña debe cumplir con todos los requisitos de seguridad.');
+    // Verificar que todos los campos cumplan con los requisitos
+    if (!isFormValid) {
+      toast.error('Por favor, completa todos los campos correctamente.');
       return;
     }
 
@@ -99,19 +126,16 @@ const Register: React.FC = () => {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label htmlFor="nombre" className="form-label">
-                Nombre completo
+                🔒 Nombre completo
               </label>
               <input
                 id="nombre"
                 type="text"
                 autoComplete="name"
-                className={`form-input ${errors.nombre ? 'border-red-500' : ''}`}
+                className={`form-input ${errors.nombre ? 'border-red-500' : watchedNombre && isNombreValid ? 'border-green-500' : ''}`}
                 {...register('nombre', { 
                   required: 'El nombre es requerido',
-                  minLength: {
-                    value: 3,
-                    message: 'El nombre debe tener al menos 3 caracteres'
-                  }
+                  validate: () => isNombreValid || 'El nombre no cumple con los requisitos de seguridad'
                 })}
               />
               {errors.nombre && (
@@ -119,23 +143,84 @@ const Register: React.FC = () => {
                   {errors.nombre.message}
                 </p>
               )}
+              
+              {/* Validaciones visuales de nombre */}
+              {watchedNombre && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Requisitos de seguridad:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.notEmpty ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                        No debe estar vacío
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.minLength ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.minLength ? 'text-green-600' : 'text-red-600'}>
+                        Longitud mínima: 3 caracteres
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.noNumbers && nombreValidations.noSpecialChars && nombreValidations.noScriptTags ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.noNumbers && nombreValidations.noSpecialChars && nombreValidations.noScriptTags ? 'text-green-600' : 'text-red-600'}>
+                        No debe contener números ni símbolos extraños
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Indicador general de validez para nombre */}
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center text-xs">
+                      {isNombreValid ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-500 mr-2" />
+                          <span className="text-green-600 font-medium">
+                            ¡Nombre válido!
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 text-red-500 mr-2" />
+                          <span className="text-red-600 font-medium">
+                            Completa todos los requisitos
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div>
               <label htmlFor="email" className="form-label">
-                Correo electrónico
+                📧 Correo electrónico
               </label>
               <input
                 id="email"
                 type="email"
                 autoComplete="email"
-                className={`form-input ${errors.email ? 'border-red-500' : ''}`}
+                className={`form-input ${errors.email ? 'border-red-500' : watchedEmail && isEmailValid ? 'border-green-500' : ''}`}
                 {...register('email', { 
                   required: 'El correo electrónico es requerido',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Ingresa un correo electrónico válido'
-                  }
+                  validate: () => isEmailValid || 'El correo electrónico no es válido'
                 })}
               />
               {errors.email && (
@@ -143,17 +228,81 @@ const Register: React.FC = () => {
                   {errors.email.message}
                 </p>
               )}
+              
+              {/* Validaciones visuales de email */}
+              {watchedEmail && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Requisitos de email:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center text-xs">
+                      {emailValidations.notEmpty ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={emailValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                        No debe estar vacío
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {emailValidations.validFormat ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={emailValidations.validFormat ? 'text-green-600' : 'text-red-600'}>
+                        Formato de email válido
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {emailValidations.commonDomains ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={emailValidations.commonDomains ? 'text-green-600' : 'text-red-600'}>
+                        Dominio común (.com, .edu, .org, etc.)
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Indicador general de validez para email */}
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center text-xs">
+                      {isEmailValid ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-500 mr-2" />
+                          <span className="text-green-600 font-medium">
+                            ¡Email válido!
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 text-red-500 mr-2" />
+                          <span className="text-red-600 font-medium">
+                            Completa todos los requisitos
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div>
               <label htmlFor="password" className="form-label">
-                Contraseña
+                🔐 Contraseña
               </label>
               <input
                 id="password"
                 type="password"
                 autoComplete="new-password"
-                className={`form-input ${errors.password ? 'border-red-500' : ''}`}
+                className={`form-input ${errors.password ? 'border-red-500' : watchedPassword && isPasswordValid ? 'border-green-500' : ''}`}
                 {...register('password', { 
                   required: 'La contraseña es requerida',
                   validate: () => isPasswordValid || 'La contraseña no cumple con los requisitos de seguridad'
@@ -255,9 +404,9 @@ const Register: React.FC = () => {
             <div>
               <button
                 type="submit"
-                disabled={isSubmitting || !isPasswordValid}
+                disabled={isSubmitting || !isFormValid}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                  ${(isSubmitting || !isPasswordValid) 
+                  ${(isSubmitting || !isFormValid) 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-blue-600 hover:bg-blue-700'
                   } 

@@ -319,21 +319,6 @@ const RecursoForm: React.FC = () => {
                           />
                         </div>
                       </div>
-                      
-                      <div className="form-group">
-                        <div className="flex items-center">
-                          <input
-                            id="vocabulario"
-                            type="checkbox"
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            disabled={generando}
-                            {...register('opciones.vocabulario')}
-                          />
-                          <label htmlFor="vocabulario" className="ml-2 block text-sm text-gray-700">
-                            Incluir sección de vocabulario
-                          </label>
-                        </div>
-                      </div>
                     </>
                   )}
                   
@@ -369,39 +354,6 @@ const RecursoForm: React.FC = () => {
                           disabled={generando}
                           {...register('opciones.tema', { required: true })}
                         />
-                      </div>
-                      
-                      <div className="form-group">
-                        <label htmlFor="nivelAyuda" className="form-label">
-                          Nivel de ayuda
-                        </label>
-                        <select
-                          id="nivelAyuda"
-                          className="form-select"
-                          disabled={generando}
-                          {...register('opciones.nivelAyuda', { required: true })}
-                        >
-                          {opcionesFormulario.nivelAyuda?.map((opcion: string) => (
-                            <option key={opcion} value={opcion}>
-                              {opcion.charAt(0).toUpperCase() + opcion.slice(1)}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      
-                      <div className="form-group">
-                        <div className="flex items-center">
-                          <input
-                            id="conectores"
-                            type="checkbox"
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            disabled={generando}
-                            {...register('opciones.conectores')}
-                          />
-                          <label htmlFor="conectores" className="ml-2 block text-sm text-gray-700">
-                            Incluir banco de conectores
-                          </label>
-                        </div>
                       </div>
                     </>
                   )}
@@ -511,20 +463,6 @@ const RecursoForm: React.FC = () => {
                           disabled={generando}
                           {...register('opciones.tema', { required: true })}
                         />
-                      </div>
-                      
-                      <div className="form-group">
-                        <label htmlFor="instrucciones" className="form-label">
-                          Instrucciones específicas
-                        </label>
-                        <textarea
-                          id="instrucciones"
-                          rows={3}
-                          className="form-input"
-                          placeholder="Ej: Enfocarse en el uso de adjetivos, practicar descripciones"
-                          disabled={generando}
-                          {...register('opciones.instrucciones', { required: true })}
-                        ></textarea>
                       </div>
                     </>
                   )}
@@ -692,22 +630,6 @@ const RecursoForm: React.FC = () => {
                         </select>
                       </div>
 
-                      <div className="form-group">
-                        <label htmlFor="nivelInteraccion" className="form-label">
-                          Nivel de interacción
-                        </label>
-                        <select
-                          id="nivelInteraccion"
-                          className="form-select"
-                          disabled={generando}
-                          {...register('opciones.nivelInteraccion', { required: true })}
-                        >
-                          <option value="">Selecciona el nivel</option>
-                          <option value="bajo">Bajo - Actividades más individuales</option>
-                          <option value="medio">Medio - Participación moderada</option>
-                          <option value="alto">Alto - Mucha interacción grupal</option>
-                        </select>
-                      </div>
                     </>
                   )}
                 </>
@@ -751,33 +673,6 @@ const RecursoForm: React.FC = () => {
                           />
                         </div>
                       ))}
-                      {editableContenido?.vocabulario && (
-                        <>
-                          <label className="form-label mt-2">Vocabulario</label>
-                          {editableContenido.vocabulario.map((item: any, idx: number) => (
-                            <div key={idx} className="mb-2 flex gap-2">
-                              <input
-                                className="form-input"
-                                value={item.palabra}
-                                onChange={e => {
-                                  const vocabulario = [...editableContenido.vocabulario];
-                                  vocabulario[idx].palabra = e.target.value;
-                                  setEditableContenido({ ...editableContenido, vocabulario });
-                                }}
-                              />
-                              <input
-                                className="form-input flex-1"
-                                value={item.definicion}
-                                onChange={e => {
-                                  const vocabulario = [...editableContenido.vocabulario];
-                                  vocabulario[idx].definicion = e.target.value;
-                                  setEditableContenido({ ...editableContenido, vocabulario });
-                                }}
-                              />
-                            </div>
-                          ))}
-                        </>
-                      )}
                     </>
                   )}
                   {recurso.tipo === 'escritura' && (
@@ -803,16 +698,6 @@ const RecursoForm: React.FC = () => {
                         value={editableContenido?.estructuraPropuesta || ''}
                         onChange={e => setEditableContenido({ ...editableContenido, estructuraPropuesta: e.target.value })}
                       />
-                      {editableContenido?.conectores && (
-                        <>
-                          <label className="form-label">Conectores (separados por coma)</label>
-                          <input
-                            className="form-input"
-                            value={editableContenido.conectores.join(', ')}
-                            onChange={e => setEditableContenido({ ...editableContenido, conectores: e.target.value.split(',').map((s: string) => s.trim()) })}
-                          />
-                        </>
-                      )}
                       <label className="form-label">Lista de verificación (un ítem por línea)</label>
                       <textarea
                         className="form-input"

@@ -5,6 +5,13 @@ import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Autenticación
+ *   description: Endpoints para manejo de autenticación y usuarios
+ */
+
 // Validaciones para registro
 const validateRegister = [
   body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
@@ -32,6 +39,207 @@ const validatePasswordReset = [
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/)
     .withMessage('La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial')
 ];
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Registrar un nuevo usuario
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nombre
+ *               - email
+ *               - password
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 description: Nombre completo del usuario
+ *                 example: "Juan Pérez"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Correo electrónico único
+ *                 example: "juan@example.com"
+ *               password:
+ *                 type: string
+ *                 description: Contraseña (mínimo 8 caracteres)
+ *                 example: "MiPassword123!"
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       400:
+ *         description: Error de validación
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: El email ya está registrado
+ */
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Iniciar sesión
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "juan@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "MiPassword123!"
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Login exitoso"
+ *                 token:
+ *                   type: string
+ *                   description: JWT token
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Credenciales inválidas
+ *       400:
+ *         description: Error de validación
+ */
+
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Obtener perfil del usuario autenticado
+ *     tags: [Autenticación]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Perfil del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: No autorizado
+ */
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Cerrar sesión
+ *     tags: [Autenticación]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       401:
+ *         description: No autorizado
+ */
+
+/**
+ * @swagger
+ * /auth/request-password-reset:
+ *   post:
+ *     summary: Solicitar código de recuperación de contraseña
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "juan@example.com"
+ *     responses:
+ *       200:
+ *         description: Código enviado al email
+ *       404:
+ *         description: Email no encontrado
+ */
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Resetear contraseña con código
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - code
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "juan@example.com"
+ *               code:
+ *                 type: string
+ *                 description: Código de 6 dígitos
+ *                 example: "123456"
+ *               newPassword:
+ *                 type: string
+ *                 description: Nueva contraseña
+ *                 example: "NuevoPassword123!"
+ *     responses:
+ *       200:
+ *         description: Contraseña cambiada exitosamente
+ *       400:
+ *         description: Código inválido o expirado
+ */
 
 // Rutas de autenticación
 router.post('/register', validateRegister, authController.register);

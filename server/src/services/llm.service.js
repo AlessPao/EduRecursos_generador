@@ -287,7 +287,6 @@ Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin exp
 PARÁMETROS:
 - Tipo de ice breaker: ${tipoIceBreaker}
 ${tipoIceBreaker === 'adivina_quien_soy' ? `- Tema: ${temaIce}` : ''}
-- Nivel de interacción: ${opciones.nivelInteraccion || 'medio'}
 
 CARACTERÍSTICAS GENERALES:
 - Apropiadas para niños de 7-8 años
@@ -304,11 +303,27 @@ CARACTERÍSTICAS GENERALES:
           prompt += `TIPO: "Adivina quién soy"
 OBJETIVOS: Comprensión oral, inferencia, vocabulario
 
+IMPORTANTE - SELECCIÓN DE ELEMENTOS:
+${temaIce === 'animales' ? `
+Para el tema ANIMALES, usa ÚNICAMENTE animales simples y comunes que los niños de 2º grado conocen bien:
+- Animales domésticos: perro, gato, conejo, pez, pájaro, gallina, vaca, caballo, cerdo, oveja
+- Animales salvajes conocidos: león, elefante, jirafa, mono, oso, tigre, hipopótamo, cocodrilo
+- Evitar animales exóticos o poco conocidos
+- Usar características físicas y comportamientos evidentes y fáciles de identificar
+` : temaIce === 'alimentos' ? `
+Para el tema ALIMENTOS, usa comidas comunes y familiares para niños:
+- Frutas: manzana, plátano, naranja, uvas, fresa, piña
+- Verduras: zanahoria, tomate, lechuga, papa, cebolla
+- Otros: pan, leche, huevo, queso, arroz, pasta
+- Evitar alimentos poco comunes o regionales específicos
+` : ''}
+
 Para cada actividad genera:
 - 3-4 pistas progresivas (de más difícil a más fácil)
-- Respuesta clara y apropiada para el tema
+- Pistas que describan características físicas obvias, sonidos, hábitat y comportamientos
+- Respuesta clara usando el nombre común del animal/alimento
 - Pistas adicionales para estudiantes que necesiten más ayuda
-- Variaciones para mantener el interés
+- Vocabulario adecuado para la edad (evitar términos técnicos)
 
 ESTRUCTURA JSON REQUERIDA:
 {
@@ -341,11 +356,18 @@ ESTRUCTURA JSON REQUERIDA:
           prompt += `TIPO: "Dibuja lo que digo"
 OBJETIVOS: Comprensión auditiva, atención, vocabulario espacial
 
+IMPORTANTE - CONTENIDO APROPIADO:
+- Usar descripciones simples y claras que los niños puedan dibujar fácilmente
+- Incluir elementos familiares: casa, árbol, sol, nube, flores, personas, animales domésticos
+- Usar vocabulario espacial básico: arriba, abajo, al lado, dentro, fuera, grande, pequeño
+- Evitar detalles complicados o elementos que requieran habilidades artísticas avanzadas
+- Hacer descripciones paso a paso, construyendo la imagen gradualmente
+
 Para cada actividad genera:
 - Descripción clara y detallada apropiada para dibujar
-- Elementos clave que deben aparecer en el dibujo
-- Vocabulario objetivo (preposiciones, adjetivos)
-- Criterios simples de evaluación
+- Elementos clave que deben aparecer en el dibujo (máximo 5-6 elementos)
+- Vocabulario objetivo (preposiciones, adjetivos descriptivos básicos)
+- Criterios simples de evaluación (presencia de elementos principales)
 
 ESTRUCTURA JSON REQUERIDA:
 {
@@ -376,10 +398,26 @@ ESTRUCTURA JSON REQUERIDA:
           prompt += `TIPO: "Tres cosas sobre mí"
 OBJETIVOS: Expresión oral, autoconocimiento, escucha activa
 
-Esta actividad se genera automáticamente con plantillas de frases universales que no requieren tema específico.
+IMPORTANTE - PLANTILLAS APROPIADAS:
+Esta actividad se genera automáticamente con plantillas de frases universales y apropiadas para niños de 7-8 años.
+
+Para cada actividad genera plantillas que sean:
+- Simples y fáciles de completar
+- Apropiadas para la edad (gustos, preferencias, familia, juegos)
+- Que promuevan autoconocimiento positivo
+- Que no sean muy personales o íntimas
+- Que todos los niños puedan responder cómodamente
+
+Ejemplos de buenas plantillas:
+- "Me gusta..." (comida, color, juego, animal)
+- "Mi favorito es..." (juguete, cuento, deporte)
+- "En mi familia somos..." (número de personas, mascotas)
+- "Cuando tengo tiempo libre me gusta..." (actividades)
+- "Mi color/animal/comida favorita es..."
 
 Para cada actividad genera:
-- Plantillas de frases apropiadas para la edad (ej: "Me gusta...", "No me gusta...", "Mi favorito es...")
+- Plantillas de frases apropiadas para la edad
+- Ejemplos diversos para cada plantilla (sin ser repetitivos)
 - Ejemplos diversos para cada plantilla
 - Apoyo visual para estudiantes tímidos
 - Estrategias de participación gradual
@@ -426,8 +464,11 @@ ESTRUCTURA JSON REQUERIDA:
 - Todas las actividades deben ser del tipo "${tipoIceBreaker}"
 - Generar exactamente ${numActividadesIce} actividades
 - Tema: "${temaIce}"
-- Vocabulario y situaciones apropiados para 2º grado
-- Fomentar participación activa y ambiente positivo`;
+- Vocabulario y situaciones apropiados para 2º grado (niños de 7-8 años)
+- Contenido que sea natural, lógico y familiar para los niños
+- Evitar elementos complicados, exóticos o poco conocidos
+- Fomentar participación activa y ambiente positivo
+- Usar lenguaje claro y sencillo`;
       break;
     default:
       prompt += `Genera un recurso educativo para estudiantes de 2º grado sobre el tema ${opciones.tema || 'general'}.
@@ -529,13 +570,14 @@ function getDefaultResource(tipo, opciones) {
             contenidoEspecifico: {
               tema: "animales",
               pistas: [
-                {"orden": 1, "pista": "Tengo orejas muy largas"},
-                {"orden": 2, "pista": "Me gusta comer zanahorias"},
-                {"orden": 3, "pista": "Salto muy alto"}
+                {"orden": 1, "pista": "Tengo orejas muy largas y las muevo mucho"},
+                {"orden": 2, "pista": "Me gusta comer zanahorias y lechuga"},
+                {"orden": 3, "pista": "Salto muy alto con mis patas traseras fuertes"},
+                {"orden": 4, "pista": "Soy pequeño, suave y vivo en una conejera"}
               ],
               respuesta: "conejo",
-              pistasFaciles: ["Soy pequeño y suave"],
-              extension: "Los estudiantes pueden imitar al animal"
+              pistasFaciles: ["Hago sonidos como 'ñac ñac' cuando como"],
+              extension: "Los estudiantes pueden imitar cómo salta el animal"
             }
           }
         ],

@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpecs from './config/swagger.js';
 
 // Importar configuración y modelos
 import { sequelize } from './models/db.js';
@@ -26,12 +28,14 @@ const __dirname = path.dirname(__filename);
 // Middleware
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  'http://localhost:5173'
-];
+  'http://localhost:5173',
+  'http://localhost:5000',  // Para Swagger UI local
+  process.env.RENDER_EXTERNAL_URL  // Para Swagger UI en producción
+].filter(Boolean); // Eliminar valores undefined
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir requests sin origin (como Postman) o si está en la lista
+    // Permitir requests sin origin (como Postman, Swagger UI) o si está en la lista
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -50,6 +54,28 @@ app.use('/api/auth', authRoutes);
 app.use('/api/recursos', recursosRoutes);
 // Montar rutas de exámenes
 app.use('/api/exams', examsRoutes);
+
+// Configurar Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Sistema Educativo API'
+}));
+
+// Ruta de información de la API
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API del Sistema de Recursos Educativos',
+    version: '1.0.0',
+    documentation: `${req.protocol}://${req.get('host')}/api-docs`,
+    endpoints: {
+      auth: '/api/auth',
+      recursos: '/api/recursos',
+      exams: '/api/exams'
+    }
+  });
+});
 
 // Manejo de errores
 app.use((err, req, res, next) => {

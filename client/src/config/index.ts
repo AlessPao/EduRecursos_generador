@@ -49,7 +49,6 @@ export interface OpcionesFormulario {
   };
   escritura?: {
     tipoTexto: string[];
-    nivelAyuda: string[];
   };
   gramatica?: {
     aspecto: string[];
@@ -67,7 +66,6 @@ export interface OpcionesFormulario {
   ice_breakers?: {
     tipoIceBreaker: string[];
     tema: string[];
-    nivelInteraccion: string[];
     numeroActividades: number[];
   };
   [key: string]: any;
@@ -80,8 +78,7 @@ export const OPCIONES_FORMULARIO: OpcionesFormulario = {
     longitud: ['corto (100-150 palabras)', 'medio (150-250 palabras)', 'largo (250-350 palabras)']
   },
   escritura: {
-    tipoTexto: ['narrativo', 'descriptivo', 'informativo', 'instructivo'],
-    nivelAyuda: ['bajo', 'medio', 'alto']
+    tipoTexto: ['narrativo', 'descriptivo', 'informativo', 'instructivo']
   },
   gramatica: {
     aspecto: ['mayúsculas', 'punto final', 'signos de interrogación', 'signos de exclamación', 'separación de palabras'],
@@ -111,7 +108,6 @@ export const OPCIONES_FORMULARIO: OpcionesFormulario = {
   ice_breakers: {
     tipoIceBreaker: ['adivina_quien_soy', 'dibuja_lo_que_digo', 'tres_cosas_sobre_mi'],
     tema: ['animales', 'alimentos'], // Solo para "adivina_quien_soy"
-    nivelInteraccion: ['bajo', 'medio', 'alto'],
     numeroActividades: [1, 2, 3, 4]
   }
 };

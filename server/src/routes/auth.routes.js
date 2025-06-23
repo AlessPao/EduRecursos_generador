@@ -15,24 +15,103 @@ const router = express.Router();
 // Validaciones para registro
 const validateRegister = [
   body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-  body('email').isEmail().withMessage('Debe proporcionar un email válido'),
+  body('email')
+    .isEmail().withMessage('Debe proporcionar un email válido')
+    .custom(value => {
+      // No puede empezar con punto
+      if (value.startsWith('.')) {
+        throw new Error('El correo no puede empezar con punto');
+      }
+      // No puede tener puntos consecutivos
+      if (value.includes('..')) {
+        throw new Error('El correo no puede tener puntos consecutivos');
+      }
+      // Verificar que no empiece con símbolos antes del @
+      const localPart = value.split('@')[0];
+      if (localPart && !/^[a-zA-Z0-9]/.test(localPart)) {
+        throw new Error('El correo no puede empezar con símbolos antes del @');
+      }
+      // Verificar longitudes
+      if (value.length > 320) {
+        throw new Error('El correo es demasiado largo (máx. 320 caracteres)');
+      }
+      if (localPart && localPart.length > 64) {
+        throw new Error('La parte local del correo es demasiado larga (máx. 64 caracteres)');
+      }
+      const domain = value.split('@')[1];
+      if (domain && domain.length > 255) {
+        throw new Error('El dominio del correo es demasiado largo (máx. 255 caracteres)');
+      }
+      return true;
+    }),
   body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
 ];
 
 // Validaciones para login
 const validateLogin = [
-  body('email').isEmail().withMessage('Debe proporcionar un email válido'),
+  body('email')
+    .isEmail().withMessage('Debe proporcionar un email válido')
+    .custom(value => {
+      // No puede empezar con punto
+      if (value.startsWith('.')) {
+        throw new Error('El correo no puede empezar con punto');
+      }
+      // No puede tener puntos consecutivos
+      if (value.includes('..')) {
+        throw new Error('El correo no puede tener puntos consecutivos');
+      }
+      // Verificar que no empiece con símbolos antes del @
+      const localPart = value.split('@')[0];
+      if (localPart && !/^[a-zA-Z0-9]/.test(localPart)) {
+        throw new Error('El correo no puede empezar con símbolos antes del @');
+      }
+      return true;
+    }),
   body('password').notEmpty().withMessage('La contraseña es obligatoria')
 ];
 
 // Validaciones para solicitud de recuperación de contraseña
 const validatePasswordResetRequest = [
-  body('email').isEmail().withMessage('Debe proporcionar un email válido')
+  body('email')
+    .isEmail().withMessage('Debe proporcionar un email válido')
+    .custom(value => {
+      // No puede empezar con punto
+      if (value.startsWith('.')) {
+        throw new Error('El correo no puede empezar con punto');
+      }
+      // No puede tener puntos consecutivos
+      if (value.includes('..')) {
+        throw new Error('El correo no puede tener puntos consecutivos');
+      }
+      // Verificar que no empiece con símbolos antes del @
+      const localPart = value.split('@')[0];
+      if (localPart && !/^[a-zA-Z0-9]/.test(localPart)) {
+        throw new Error('El correo no puede empezar con símbolos antes del @');
+      }
+      return true;
+    })
 ];
 
 // Validaciones para resetear contraseña
 const validatePasswordReset = [
-  body('email').isEmail().withMessage('Debe proporcionar un email válido'),
+  body('email')
+    .isEmail().withMessage('Debe proporcionar un email válido')
+    .custom(value => {
+      // No puede empezar con punto
+      if (value.startsWith('.')) {
+        throw new Error('El correo no puede empezar con punto');
+      }
+      // No puede tener puntos consecutivos
+      if (value.includes('..')) {
+        throw new Error('El correo no puede tener puntos consecutivos');
+      }
+      // Verificar que no empiece con símbolos antes del @
+      const localPart = value.split('@')[0];
+      if (localPart && !/^[a-zA-Z0-9]/.test(localPart)) {
+        throw new Error('El correo no puede empezar con símbolos antes del @');
+      }
+      return true;
+    }),
   body('code').isLength({ min: 6, max: 6 }).withMessage('El código debe tener 6 dígitos'),
   body('newPassword')
     .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres')

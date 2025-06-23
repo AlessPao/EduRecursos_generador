@@ -119,12 +119,18 @@ const RequestPasswordReset: React.FC = () => {
               placeholder="tu-email@ejemplo.com"
               className={`mt-1 appearance-none relative block w-full px-3 py-3 border ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
-              } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors`}
-              {...register('email', {
+              } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors`}              {...register('email', {
                 required: 'El correo electrónico es requerido',
                 pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  value: /^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/i,
                   message: 'Ingresa un correo electrónico válido'
+                },
+                validate: {
+                  noStartWithDot: value => !value.startsWith('.') || 'El correo no puede empezar con punto',
+                  noConsecutiveDots: value => !value.includes('..') || 'El correo no puede tener puntos consecutivos',
+                  validLength: value => value.length <= 320 || 'El correo es demasiado largo (máx. 320 caracteres)',
+                  validLocalLength: value => value.split('@')[0]?.length <= 64 || 'La parte local del correo es demasiado larga',
+                  validDomainLength: value => value.split('@')[1]?.length <= 255 || 'El dominio del correo es demasiado largo'
                 }
               })}
             />

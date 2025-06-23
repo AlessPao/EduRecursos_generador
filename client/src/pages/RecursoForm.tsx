@@ -7,7 +7,7 @@ import axios from 'axios';
 import { TIPOS_RECURSOS, OPCIONES_FORMULARIO, API_URL, OpcionesFormulario } from '../config';
 import ResourcePreview from '../components/ResourcePreview';
 import { formatTipoRecurso } from '../utils/formatters';
-import { Edit, Save, Download, ArrowLeft } from 'lucide-react';
+import { Edit, Save, Download, ArrowLeft, Check, X } from 'lucide-react';
 
 // Tipo para los datos del formulario
 interface RecursoFormData {
@@ -44,8 +44,135 @@ const RecursoForm: React.FC = () => {
   // Opciones del formulario según el tipo
   const opcionesFormulario = tipoRecurso ? OPCIONES_FORMULARIO[tipoRecurso as keyof OpcionesFormulario] || {} : {};
   
+  
   // Configuración de React Hook Form
   const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<RecursoFormData>();
+  
+  // Vigilar campos para validación en tiempo real
+  const watchedTitulo = watch('titulo', '');
+  const watchedTema = watch('opciones.tema', '') as string;
+  const watchedTemaPersonalizado = watch('opciones.temaPersonalizado', '') as string;
+  const watchedContexto = watch('opciones.contexto', '') as string;
+  
+  // Función de validación robusta para temas
+  const validateTema = (value: string) => {
+    if (!value || value.trim().length === 0) return false;
+    
+    const trimmed = value.trim();
+    
+    // No puede ser muy corto
+    if (trimmed.length < 3) return false;
+    
+    // No puede ser muy largo  
+    if (trimmed.length > 100) return false;
+    
+    // Debe contener solo letras, espacios, acentos, ñ, comas y puntos
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,\.]+$/.test(trimmed)) return false;
+    
+    // No puede ser solo espacios, puntos o comas
+    if (/^[\s,\.]+$/.test(trimmed)) return false;
+    
+    // No puede empezar o terminar con espacios, comas o puntos
+    if (/^[\s,\.]|[\s,\.]$/.test(trimmed)) return false;
+    
+    // No puede tener espacios, comas o puntos consecutivos
+    if (/\s{2,}|,{2,}|\.{2,}/.test(trimmed)) return false;
+    
+    // No puede tener 3 letras iguales seguidas
+    if (/(.)\1{2,}/i.test(trimmed.replace(/[\s,\.]/g, ''))) return false;
+    
+    // Lista ampliada de palabras sin sentido y combinaciones de teclas aleatorias
+    const meaninglessWords = [
+      'nada', 'na', 'x', 'xx', 'xxx', 'xxxx', 'asdf', 'qwerty', 'hjkl', 'zxcv', 'bnm',
+      'aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff', 'ggg', 'hhh', 'iii', 'jjj', 'kkk',
+      'lll', 'mmm', 'nnn', 'ooo', 'ppp', 'qqq', 'rrr', 'sss', 'ttt', 'uuu', 'vvv',
+      'www', 'yyy', 'zzz', 'abc', 'abcd', 'abcde', 'qwe', 'wer', 'ert', 'rty', 'tyu',
+      'yui', 'uio', 'iop', 'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl', 'zxc',
+      'xcv', 'cvb', 'vbn', 'bnm', 'nm', 'wsdhgarergnhdrfgh', 'ksjdhfksjhf', 'alksjdlaskjd',
+      'aaaa', 'bbbb', 'cccc', 'dddd', 'eeee', 'ffff', 'ggggg', 'hhhh', 'iiii', 'jjjj',
+      'prueba', 'test', 'testing', 'ejemplo', 'ej', 'ejm', 'temp', 'temporal', 'tmp',
+      'agsdsre', 'dfghjk', 'poiuyt', 'lkjhgf', 'mnbvcx', 'qazwsx', 'edcrfv', 'tgbyhn',
+      'ujmik', 'olp', 'rewq', 'trewq', 'yuiop', 'ghjkl', 'vbnm', 'cxz', 'rtyuio'
+    ];
+    
+    // Verificar palabras sin sentido
+    const words = trimmed.toLowerCase().split(/[\s,\.]+/).filter(word => word.length > 0);
+    for (const word of words) {
+      if (meaninglessWords.includes(word)) return false;
+    }
+    
+    // Verificar patrones de teclado aleatorio mejorado
+    const cleanText = trimmed.toLowerCase().replace(/[\s,\.]/g, '');
+    
+    // Patrones de teclado QWERTY comunes
+    const keyboardPatterns = [
+      'qwerty', 'asdfgh', 'zxcvbn', 'qwertyui', 'asdfghjk', 'zxcvbnm',
+      'qazwsx', 'edcrfv', 'tgbyhn', 'ujmik', 'olp', 'poiuyt', 'lkjhgf'
+    ];
+    
+    for (const pattern of keyboardPatterns) {
+      if (cleanText.includes(pattern) || cleanText.includes(pattern.split('').reverse().join(''))) {
+        return false;
+      }
+    }
+    
+    // Verificar más de 4 consonantes seguidas sin vocales
+    if (/[bcdfghjklmnpqrstvwxyz]{5,}/i.test(cleanText)) return false;
+    
+    // Verificar que tenga al menos una vocal en cada palabra significativa
+    for (const word of words) {
+      if (word.length >= 3 && !/[aeiouáéíóúü]/i.test(word)) return false;
+    }
+    
+    // Verificar que no sea solo una secuencia alfabética
+    if (/^[a-z]{4,}$/.test(cleanText) && cleanText.split('').every((char, i, arr) => 
+      i === 0 || char.charCodeAt(0) - arr[i-1].charCodeAt(0) === 1)) return false;
+    
+    return true;
+  };
+  
+  // Validaciones en tiempo real para campos de tema
+  const temaValidations = {
+    isValid: validateTema(watchedTema),
+    hasMinLength: watchedTema.trim().length >= 3,
+    hasMaxLength: watchedTema.trim().length <= 100,
+    onlyValidChars: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,\.]*$/.test(watchedTema),
+    noRepeatedChars: !(/(.)\1{2,}/i.test(watchedTema.replace(/[\s,\.]/g, ''))),
+    noKeyboardPatterns: (() => {
+      const cleanText = watchedTema.toLowerCase().replace(/[\s,\.]/g, '');
+      const patterns = ['qwerty', 'asdfgh', 'zxcvbn', 'agsdsre', 'dfghjk'];
+      return !patterns.some(pattern => cleanText.includes(pattern) || cleanText.includes(pattern.split('').reverse().join('')));
+    })(),
+    notEmpty: watchedTema.trim().length > 0
+  };
+  
+  const temaPersonalizadoValidations = {
+    isValid: validateTema(watchedTemaPersonalizado),
+    hasMinLength: watchedTemaPersonalizado.trim().length >= 3,
+    hasMaxLength: watchedTemaPersonalizado.trim().length <= 100,
+    onlyValidChars: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,\.]*$/.test(watchedTemaPersonalizado),
+    noRepeatedChars: !(/(.)\1{2,}/i.test(watchedTemaPersonalizado.replace(/[\s,\.]/g, ''))),
+    noKeyboardPatterns: (() => {
+      const cleanText = watchedTemaPersonalizado.toLowerCase().replace(/[\s,\.]/g, '');
+      const patterns = ['qwerty', 'asdfgh', 'zxcvbn', 'agsdsre', 'dfghjk'];
+      return !patterns.some(pattern => cleanText.includes(pattern) || cleanText.includes(pattern.split('').reverse().join('')));
+    })(),
+    notEmpty: watchedTemaPersonalizado.trim().length > 0
+  };
+  
+  const contextoValidations = {
+    isValid: validateTema(watchedContexto),
+    hasMinLength: watchedContexto.trim().length >= 3,
+    hasMaxLength: watchedContexto.trim().length <= 100,
+    onlyValidChars: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,\.]*$/.test(watchedContexto),
+    noRepeatedChars: !(/(.)\1{2,}/i.test(watchedContexto.replace(/[\s,\.]/g, ''))),
+    noKeyboardPatterns: (() => {
+      const cleanText = watchedContexto.toLowerCase().replace(/[\s,\.]/g, '');
+      const patterns = ['qwerty', 'asdfgh', 'zxcvbn', 'agsdsre', 'dfghjk'];
+      return !patterns.some(pattern => cleanText.includes(pattern) || cleanText.includes(pattern.split('').reverse().join('')));
+    })(),
+    notEmpty: watchedContexto.trim().length > 0
+  };
   
   // Cargar recurso si estamos editando
   useEffect(() => {
@@ -236,11 +363,100 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="tema"
                           type="text"
-                          className="form-input"
-                          placeholder="Ej: Animales, amistad, la escuela"
+                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`}                          placeholder="Ej: Animales, amistad, la escuela"
                           disabled={generando}
-                          {...register('opciones.tema', { required: true })}
+                          {...register('opciones.tema', { 
+                            required: 'El tema es requerido',
+                            validate: (value) => validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
+                          })}
                         />
+                        {errors.opciones?.tema && (
+                          <p className="mt-1 text-sm text-red-600">{errors.opciones.tema.message}</p>
+                        )}
+                        
+                        {/* Tip cuando el campo está vacío */}
+                        {!watchedTema && (
+                          <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
+                            <div className="flex items-start">
+                              <div className="flex-shrink-0">
+                                <svg className="h-4 w-4 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <div className="ml-2">
+                                <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
+                                <p className="text-xs text-blue-600 mt-1">
+                                  Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                  Ejemplos: "Los ecosistemas acuáticos de América", "La historia de mi comunidad"
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Validaciones visuales del tema */}
+                        {watchedTema && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Requisitos del tema:
+                            </p>
+                            <div className="space-y-1">
+                              <div className="flex items-center text-xs">
+                                {temaValidations.notEmpty ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                                  No debe estar vacío
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'text-green-600' : 'text-red-600'}>
+                                  Entre 3 y 100 caracteres
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {temaValidations.onlyValidChars ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
+                                  Sin símbolos
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Indicador general de validez */}
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="flex items-center text-xs">
+                                {temaValidations.isValid ? (
+                                  <>
+                                    <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    <span className="text-green-600 font-medium">
+                                      ¡Tema válido!
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="h-3 w-3 text-red-500 mr-2" />
+                                    <span className="text-red-600 font-medium">
+                                      Completa todos los requisitos
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="form-group">
@@ -349,11 +565,100 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="tema"
                           type="text"
-                          className="form-input"
-                          placeholder="Ej: Mi mascota favorita, un día en el parque"
+                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`}                          placeholder="Ej: Mi mascota favorita, un día en el parque"
                           disabled={generando}
-                          {...register('opciones.tema', { required: true })}
+                          {...register('opciones.tema', { 
+                            required: 'El tema es requerido',
+                            validate: (value) => validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
+                          })}
                         />
+                        {errors.opciones?.tema && (
+                          <p className="mt-1 text-sm text-red-600">{errors.opciones.tema.message}</p>
+                        )}
+                        
+                        {/* Tip cuando el campo está vacío */}
+                        {!watchedTema && (
+                          <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
+                            <div className="flex items-start">
+                              <div className="flex-shrink-0">
+                                <svg className="h-4 w-4 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <div className="ml-2">
+                                <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
+                                <p className="text-xs text-blue-600 mt-1">
+                                  Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                  Ejemplos: "Una aventura en el bosque tropical", "Mi primer día en una escuela nueva"
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Validaciones visuales del tema */}
+                        {watchedTema && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Requisitos del tema:
+                            </p>
+                            <div className="space-y-1">
+                              <div className="flex items-center text-xs">
+                                {temaValidations.notEmpty ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                                  No debe estar vacío
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'text-green-600' : 'text-red-600'}>
+                                  Entre 3 y 100 caracteres
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {temaValidations.onlyValidChars ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
+                                  Sin símbolos
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Indicador general de validez */}
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="flex items-center text-xs">
+                                {temaValidations.isValid ? (
+                                  <>
+                                    <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    <span className="text-green-600 font-medium">
+                                      ¡Tema válido!
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="h-3 w-3 text-red-500 mr-2" />
+                                    <span className="text-red-600 font-medium">
+                                      Completa todos los requisitos
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </>
                   )}
@@ -422,11 +727,103 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="contexto"
                           type="text"
-                          className="form-input"
+                          className={`form-input ${errors.opciones?.contexto ? 'border-red-500' : watchedContexto && contextoValidations.isValid ? 'border-green-500' : watchedContexto && !contextoValidations.isValid ? 'border-red-500' : ''}`}
                           placeholder="Ej: Animales, juegos, familia"
                           disabled={generando}
-                          {...register('opciones.contexto', { required: true })}
+                          {...register('opciones.contexto', { 
+                            required: 'El contexto es requerido',
+                            validate: (value) => validateTema(value as string) || 'El contexto no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
+                          })}
                         />
+                        {errors.opciones?.contexto && (
+                          <p className="mt-1 text-sm text-red-600">{errors.opciones.contexto.message}</p>
+                        )}
+                        
+                        {/* Validaciones visuales del contexto */}
+                        {watchedContexto && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Requisitos del contexto:
+                            </p>
+                            <div className="space-y-1">
+                              <div className="flex items-center text-xs">
+                                {contextoValidations.notEmpty ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={contextoValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                                  No debe estar vacío
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {contextoValidations.hasMinLength && contextoValidations.hasMaxLength ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={contextoValidations.hasMinLength && contextoValidations.hasMaxLength ? 'text-green-600' : 'text-red-600'}>
+                                  Entre 3 y 100 caracteres
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {contextoValidations.onlyValidChars ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={contextoValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
+                                  Sin símbolos
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {contextoValidations.noRepeatedChars ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={contextoValidations.noRepeatedChars ? 'text-green-600' : 'text-red-600'}>
+                                  Sin letras repetidas 3 veces seguidas
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {contextoValidations.noKeyboardPatterns ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={contextoValidations.noKeyboardPatterns ? 'text-green-600' : 'text-red-600'}>
+                                  Sin combinaciones aleatorias de teclado
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Indicador general de validez */}
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="flex items-center text-xs">
+                                {contextoValidations.isValid ? (
+                                  <>
+                                    <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    <span className="text-green-600 font-medium">
+                                      ¡Contexto válido!
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="h-3 w-3 text-red-500 mr-2" />
+                                    <span className="text-red-600 font-medium">
+                                      Completa todos los requisitos
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </>
                   )}
@@ -458,11 +855,100 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="tema"
                           type="text"
-                          className="form-input"
-                          placeholder="Ej: Mi familia, mis juguetes favoritos"
+                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`}                          placeholder="Ej: Mi familia, mis juguetes favoritos"
                           disabled={generando}
-                          {...register('opciones.tema', { required: true })}
+                          {...register('opciones.tema', { 
+                            required: 'El tema es requerido',
+                            validate: (value) => validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
+                          })}
                         />
+                        {errors.opciones?.tema && (
+                          <p className="mt-1 text-sm text-red-600">{errors.opciones.tema.message}</p>
+                        )}
+                        
+                        {/* Tip cuando el campo está vacío */}
+                        {!watchedTema && (
+                          <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
+                            <div className="flex items-start">
+                              <div className="flex-shrink-0">
+                                <svg className="h-4 w-4 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <div className="ml-2">
+                                <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
+                                <p className="text-xs text-blue-600 mt-1">
+                                  Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                  Ejemplos: "La familia extendida y sus tradiciones", "Los juguetes tradicionales de mi país"
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Validaciones visuales del tema */}
+                        {watchedTema && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Requisitos del tema:
+                            </p>
+                            <div className="space-y-1">
+                              <div className="flex items-center text-xs">
+                                {temaValidations.notEmpty ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                                  No debe estar vacío
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'text-green-600' : 'text-red-600'}>
+                                  Entre 3 y 100 caracteres
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center text-xs">
+                                {temaValidations.onlyValidChars ? (
+                                  <Check className="h-3 w-3 text-green-500 mr-2" />
+                                ) : (
+                                  <X className="h-3 w-3 text-red-500 mr-2" />
+                                )}
+                                <span className={temaValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
+                                  Sin símbolos
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Indicador general de validez */}
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="flex items-center text-xs">
+                                {temaValidations.isValid ? (
+                                  <>
+                                    <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    <span className="text-green-600 font-medium">
+                                      ¡Tema válido!
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="h-3 w-3 text-red-500 mr-2" />
+                                    <span className="text-red-600 font-medium">
+                                      Completa todos los requisitos
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </>
                   )}
@@ -542,16 +1028,133 @@ const RecursoForm: React.FC = () => {
                         
                         {/* Campo personalizado cuando se selecciona "Otro" */}
                         {watch('opciones.temaPredefinido') === 'Otro (personalizado)' && (
-                          <input
-                            id="temaPersonalizado"
-                            type="text"
-                            className="form-input mt-2"
-                            placeholder="Escribe tu tema personalizado (ej: Los medios de transporte, La naturaleza)"
-                            disabled={generando}
-                            {...register('opciones.temaPersonalizado', { 
-                              required: watch('opciones.temaPredefinido') === 'Otro (personalizado)' 
-                            })}
-                          />                        )}
+                          <>
+                            <input
+                              id="temaPersonalizado"
+                              type="text"
+                              className={`form-input mt-2 ${errors.opciones?.temaPersonalizado ? 'border-red-500' : watchedTemaPersonalizado && temaPersonalizadoValidations.isValid ? 'border-green-500' : watchedTemaPersonalizado && !temaPersonalizadoValidations.isValid ? 'border-red-500' : ''}`}
+                              placeholder="Escribe tu tema personalizado (ej: Los medios de transporte, La naturaleza)"
+                              disabled={generando}
+                              {...register('opciones.temaPersonalizado', { 
+                                required: watch('opciones.temaPredefinido') === 'Otro (personalizado)' ? 'El tema personalizado es requerido' : false,
+                                validate: (value) => {
+                                  if (watch('opciones.temaPredefinido') === 'Otro (personalizado)') {
+                                    return validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido';
+                                  }
+                                  return true;
+                                }
+                              })}                            />
+                            {errors.opciones?.temaPersonalizado && (
+                              <p className="mt-1 text-sm text-red-600">{errors.opciones.temaPersonalizado.message}</p>
+                            )}
+                            
+                            {/* Tip cuando el campo está vacío */}
+                            {!watchedTemaPersonalizado && (
+                              <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
+                                <div className="flex items-start">
+                                  <div className="flex-shrink-0">
+                                    <svg className="h-4 w-4 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                  <div className="ml-2">
+                                    <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
+                                    <p className="text-xs text-blue-600 mt-1">
+                                      Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                      Ejemplos: "Los instrumentos musicales de viento", "Las profesiones que ayudan a mi comunidad"
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Validaciones visuales del tema personalizado */}
+                            {watchedTemaPersonalizado && (
+                              <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                                <p className="text-sm font-medium text-gray-700 mb-2">
+                                  Requisitos del tema personalizado:
+                                </p>
+                                <div className="space-y-1">
+                                  <div className="flex items-center text-xs">
+                                    {temaPersonalizadoValidations.notEmpty ? (
+                                      <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    ) : (
+                                      <X className="h-3 w-3 text-red-500 mr-2" />
+                                    )}
+                                    <span className={temaPersonalizadoValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                                      No debe estar vacío
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex items-center text-xs">
+                                    {temaPersonalizadoValidations.hasMinLength && temaPersonalizadoValidations.hasMaxLength ? (
+                                      <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    ) : (
+                                      <X className="h-3 w-3 text-red-500 mr-2" />
+                                    )}
+                                    <span className={temaPersonalizadoValidations.hasMinLength && temaPersonalizadoValidations.hasMaxLength ? 'text-green-600' : 'text-red-600'}>
+                                      Entre 3 y 100 caracteres
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex items-center text-xs">
+                                    {temaPersonalizadoValidations.onlyValidChars ? (
+                                      <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    ) : (
+                                      <X className="h-3 w-3 text-red-500 mr-2" />
+                                    )}
+                                    <span className={temaPersonalizadoValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
+                                      Sin símbolos
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex items-center text-xs">
+                                    {temaPersonalizadoValidations.noRepeatedChars ? (
+                                      <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    ) : (
+                                      <X className="h-3 w-3 text-red-500 mr-2" />
+                                    )}
+                                    <span className={temaPersonalizadoValidations.noRepeatedChars ? 'text-green-600' : 'text-red-600'}>
+                                      Sin letras repetidas 3 veces seguidas
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex items-center text-xs">
+                                    {temaPersonalizadoValidations.noKeyboardPatterns ? (
+                                      <Check className="h-3 w-3 text-green-500 mr-2" />
+                                    ) : (
+                                      <X className="h-3 w-3 text-red-500 mr-2" />
+                                    )}
+                                    <span className={temaPersonalizadoValidations.noKeyboardPatterns ? 'text-green-600' : 'text-red-600'}>
+                                      Sin combinaciones aleatorias de teclado
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                {/* Indicador general de validez */}
+                                <div className="mt-2 pt-2 border-t border-gray-200">
+                                  <div className="flex items-center text-xs">
+                                    {temaPersonalizadoValidations.isValid ? (
+                                      <>
+                                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                                        <span className="text-green-600 font-medium">
+                                          ¡Tema válido!
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <X className="h-3 w-3 text-red-500 mr-2" />
+                                        <span className="text-red-600 font-medium">
+                                          Completa todos los requisitos
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     </>
                   )}
@@ -874,3 +1477,4 @@ const RecursoForm: React.FC = () => {
 };
 
 export default RecursoForm;
+

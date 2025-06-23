@@ -1,5 +1,6 @@
 // filepath: e:\project\server\src\routes\exams.routes.js
 import { Router } from 'express';
+import { body } from 'express-validator';
 import { createExam,
          listExams,
          getExam,
@@ -10,6 +11,53 @@ import { createExam,
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = Router();
+
+// Validaciones para crear exámenes
+const validateCreateExam = [
+  body('titulo')
+    .notEmpty().withMessage('El título es obligatorio')
+    .isLength({ min: 2 }).withMessage('El título debe tener al menos 2 caracteres')
+    .custom(value => {
+      const trimmedValue = value.trim();
+      if (trimmedValue.length === 1) {
+        throw new Error('El título no puede ser un solo carácter');
+      }
+      if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9]/.test(trimmedValue)) {
+        throw new Error('El título debe contener letras o números, no solo símbolos');
+      }
+      if (/^\.+$/.test(trimmedValue)) {
+        throw new Error('El título no puede ser solo puntos');
+      }
+      const meaninglessWords = ['nada', 'na', 'x', 'xx', 'xxx', 'asdf', 'qwerty', '...', '..', '.', 'aaa', 'bbb', 'ccc'];
+      if (meaninglessWords.includes(trimmedValue.toLowerCase())) {
+        throw new Error('Por favor ingresa un título con sentido');
+      }
+      return true;
+    }),
+  body('tema')
+    .notEmpty().withMessage('El tema es obligatorio')
+    .isLength({ min: 2 }).withMessage('El tema debe tener al menos 2 caracteres')
+    .custom(value => {
+      const trimmedValue = value.trim();
+      if (trimmedValue.length === 1) {
+        throw new Error('El tema no puede ser un solo carácter');
+      }
+      if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9]/.test(trimmedValue)) {
+        throw new Error('El tema debe contener letras o números, no solo símbolos');
+      }
+      if (/^\.+$/.test(trimmedValue)) {
+        throw new Error('El tema no puede ser solo puntos');
+      }
+      const meaninglessWords = ['nada', 'na', 'x', 'xx', 'xxx', 'asdf', 'qwerty', '...', '..', '.', 'aaa', 'bbb', 'ccc'];
+      if (meaninglessWords.includes(trimmedValue.toLowerCase())) {
+        throw new Error('Por favor ingresa un tema con sentido');
+      }
+      return true;
+    }),
+  body('tipoTexto').optional(),
+  body('longitud').optional(),
+  body('numLiteral').optional().isInt({ min: 1, max: 10 }).withMessage('El número de preguntas literales debe estar entre 1 y 10')
+];
 
 /**
  * @swagger
@@ -284,7 +332,7 @@ const router = Router();
  */
 
 // Crear un nuevo examen (solo literal de comprensión) - Requiere autenticación
-router.post('/', isAuthenticated, createExam);
+router.post('/', isAuthenticated, validateCreateExam, createExam);
 
 // Listar todos los exámenes del usuario autenticado - Requiere autenticación
 router.get('/', isAuthenticated, listExams);

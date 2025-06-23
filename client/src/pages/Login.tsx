@@ -83,12 +83,18 @@ const Login: React.FC = () => {
                 id="email"
                 type="email"
                 autoComplete="email"
-                className={`form-input ${errors.email ? 'border-red-500' : ''}`}
-                {...register('email', { 
+                className={`form-input ${errors.email ? 'border-red-500' : ''}`}                {...register('email', { 
                   required: 'El correo electrónico es requerido',
                   pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    value: /^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/i,
                     message: 'Ingresa un correo electrónico válido'
+                  },
+                  validate: {
+                    noStartWithDot: value => !value.startsWith('.') || 'El correo no puede empezar con punto',
+                    noConsecutiveDots: value => !value.includes('..') || 'El correo no puede tener puntos consecutivos',
+                    validLength: value => value.length <= 320 || 'El correo es demasiado largo (máx. 320 caracteres)',
+                    validLocalLength: value => value.split('@')[0]?.length <= 64 || 'La parte local del correo es demasiado larga',
+                    validDomainLength: value => value.split('@')[1]?.length <= 255 || 'El dominio del correo es demasiado largo'
                   }
                 })}
               />

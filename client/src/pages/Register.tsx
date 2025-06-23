@@ -40,14 +40,60 @@ const Register: React.FC = () => {
   
   const isNombreValid = Object.values(nombreValidations).every(Boolean);
   
-  // Funciones de validación de email
+  // Validación mejorada de email
   const emailValidations = {
     notEmpty: watchedEmail.trim().length > 0,
-    validFormat: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(watchedEmail),
-    noScriptTags: !/<script|<\/script>/i.test(watchedEmail),
-    commonDomains: /\.(com|edu|org|net|gov|co|pe)$/i.test(watchedEmail)
+    validFormat: (() => {
+      if (!watchedEmail || watchedEmail.trim().length === 0) return false;
+      
+      const email = watchedEmail.trim();
+      
+      // Verificar longitud total (máx. 320 caracteres)
+      if (email.length > 320) return false;
+      
+      // Verificar que contiene exactamente un @
+      const atCount = email.split('@').length - 1;
+      if (atCount !== 1) return false;
+      
+      const [localPart, domain] = email.split('@');
+      
+      // Validar parte local
+      if (!localPart || localPart.length === 0 || localPart.length > 64) return false;
+      if (localPart.startsWith('.') || localPart.endsWith('.')) return false;
+      if (localPart.includes('..')) return false;
+      if (!/^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$/.test(localPart)) return false;
+      
+      // Validar dominio (MEJORADO)
+      if (!domain || domain.length === 0 || domain.length > 255) return false;
+      if (domain.startsWith('.') || domain.endsWith('.')) return false;
+      if (domain.startsWith('-') || domain.endsWith('-')) return false;
+      if (domain.includes('..')) return false;
+      if (domain.includes('--')) return false;
+      
+      // El dominio SOLO puede contener letras, números, puntos y guiones
+      // NO se permiten símbolos especiales como !, @, #, $, %, etc.
+      if (!/^[a-zA-Z0-9.-]+$/.test(domain)) return false;
+      
+      // Validar cada parte del dominio separada por puntos
+      const domainParts = domain.split('.');
+      if (domainParts.length < 2) return false;
+      
+      for (const part of domainParts) {
+        if (part.length === 0) return false;
+        if (part.startsWith('-') || part.endsWith('-')) return false;
+        // Cada parte solo puede contener letras, números y guiones (NO puntos)
+        if (!/^[a-zA-Z0-9-]+$/.test(part)) return false;
+      }
+      
+      // La última parte (TLD) debe tener al menos 2 caracteres y solo letras
+      const tld = domainParts[domainParts.length - 1];
+      if (tld.length < 2 || !/^[a-zA-Z]+$/.test(tld)) return false;
+      
+      return true;
+    })(),
+    commonDomains: /\.(com|edu|org|net|gov|co|pe|es|mx|ar|cl|uy|bo|ec|ve|py|cr|gt|hn|ni|pa|sv|do|cu|pr|info|biz|mil|int)$/i.test(watchedEmail)
   };
-  
+
   const isEmailValid = Object.values(emailValidations).every(Boolean);
   
   // Funciones de validación de contraseña
@@ -143,70 +189,6 @@ const Register: React.FC = () => {
                   {errors.nombre.message}
                 </p>
               )}
-              
-              {/* Validaciones visuales de nombre */}
-              {watchedNombre && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
-                  <p className="text-sm font-medium text-gray-700 mb-2">
-                    Requisitos de seguridad:
-                  </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center text-xs">
-                      {nombreValidations.notEmpty ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={nombreValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
-                        No debe estar vacío
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs">
-                      {nombreValidations.minLength ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={nombreValidations.minLength ? 'text-green-600' : 'text-red-600'}>
-                        Longitud mínima: 3 caracteres
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs">
-                      {nombreValidations.noNumbers && nombreValidations.noSpecialChars && nombreValidations.noScriptTags ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={nombreValidations.noNumbers && nombreValidations.noSpecialChars && nombreValidations.noScriptTags ? 'text-green-600' : 'text-red-600'}>
-                        No debe contener números ni símbolos extraños
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Indicador general de validez para nombre */}
-                  <div className="mt-2 pt-2 border-t border-gray-200">
-                    <div className="flex items-center text-xs">
-                      {isNombreValid ? (
-                        <>
-                          <Check className="h-3 w-3 text-green-500 mr-2" />
-                          <span className="text-green-600 font-medium">
-                            ¡Nombre válido!
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <X className="h-3 w-3 text-red-500 mr-2" />
-                          <span className="text-red-600 font-medium">
-                            Completa todos los requisitos
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
             
             <div>
@@ -229,7 +211,7 @@ const Register: React.FC = () => {
                 </p>
               )}
               
-              {/* Validaciones visuales de email */}
+              {/* Validaciones visuales de email - Solo las 3 solicitadas */}
               {watchedEmail && (
                 <div className="mt-3 p-3 bg-gray-50 rounded-md border">
                   <p className="text-sm font-medium text-gray-700 mb-2">
@@ -312,92 +294,6 @@ const Register: React.FC = () => {
                 <p className="mt-1 text-sm text-red-600">
                   {errors.password.message}
                 </p>
-              )}
-              
-              {/* Validaciones visuales de contraseña */}
-              {watchedPassword && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
-                  <p className="text-sm font-medium text-gray-700 mb-2">
-                    Requisitos de seguridad:
-                  </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center text-xs">
-                      {passwordValidations.minLength ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={passwordValidations.minLength ? 'text-green-600' : 'text-red-600'}>
-                        Al menos 8 caracteres
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs">
-                      {passwordValidations.hasUpperCase ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={passwordValidations.hasUpperCase ? 'text-green-600' : 'text-red-600'}>
-                        Una letra mayúscula
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs">
-                      {passwordValidations.hasLowerCase ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={passwordValidations.hasLowerCase ? 'text-green-600' : 'text-red-600'}>
-                        Una letra minúscula
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs">
-                      {passwordValidations.hasNumber ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={passwordValidations.hasNumber ? 'text-green-600' : 'text-red-600'}>
-                        Al menos un número
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center text-xs">
-                      {passwordValidations.hasSpecialChar ? (
-                        <Check className="h-3 w-3 text-green-500 mr-2" />
-                      ) : (
-                        <X className="h-3 w-3 text-red-500 mr-2" />
-                      )}
-                      <span className={passwordValidations.hasSpecialChar ? 'text-green-600' : 'text-red-600'}>
-                        Un carácter especial (!@#$%^&*(),.?":{}|&lt;&gt;)
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Indicador general de validez */}
-                  <div className="mt-2 pt-2 border-t border-gray-200">
-                    <div className="flex items-center text-xs">
-                      {isPasswordValid ? (
-                        <>
-                          <Check className="h-3 w-3 text-green-500 mr-2" />
-                          <span className="text-green-600 font-medium">
-                            ¡Contraseña segura!
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <X className="h-3 w-3 text-red-500 mr-2" />
-                          <span className="text-red-600 font-medium">
-                            Completa todos los requisitos
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
               )}
             </div>
             

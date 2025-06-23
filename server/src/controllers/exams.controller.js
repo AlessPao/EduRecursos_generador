@@ -1,5 +1,6 @@
 import pkg from 'uuid';
 const { v4: uuidv4 } = pkg;
+import { validationResult } from 'express-validator';
 import Exam from '../models/Exam.js';
 import ExamResult from '../models/ExamResult.js';
 import { generarRecurso } from '../services/llm.service.js';
@@ -7,6 +8,15 @@ import { generarRecurso } from '../services/llm.service.js';
 // Controller to create a new exam using LLM service
 export const createExam = async (req, res, next) => {
   try {
+    // Validar entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+
     const { titulo, tipoTexto, tema, longitud, numLiteral } = req.body;
     const opciones = { titulo, tipoTexto, tema, longitud, numLiteral };
     const result = await generarRecurso({ tipo: 'evaluacion', opciones });

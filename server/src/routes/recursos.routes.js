@@ -19,8 +19,90 @@ router.use(isAuthenticated);
 const validateCreate = [
   body('tipo').isIn(['comprension', 'escritura', 'gramatica', 'oral', 'drag_and_drop', 'ice_breakers'])
     .withMessage('Tipo de recurso inválido'),
-  body('titulo').notEmpty().withMessage('El título es obligatorio'),
-  body('opciones').isObject().withMessage('Las opciones deben ser un objeto')
+  body('titulo')
+    .notEmpty().withMessage('El título es obligatorio')
+    .isLength({ min: 2 }).withMessage('El título debe tener al menos 2 caracteres')
+    .custom(value => {
+      const trimmedValue = value.trim();
+      if (trimmedValue.length === 1) {
+        throw new Error('El título no puede ser un solo carácter');
+      }
+      if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9]/.test(trimmedValue)) {
+        throw new Error('El título debe contener letras o números, no solo símbolos');
+      }
+      if (/^\.+$/.test(trimmedValue)) {
+        throw new Error('El título no puede ser solo puntos');
+      }
+      const meaninglessWords = ['nada', 'na', 'x', 'xx', 'xxx', 'asdf', 'qwerty', '...', '..', '.', 'aaa', 'bbb', 'ccc'];
+      if (meaninglessWords.includes(trimmedValue.toLowerCase())) {
+        throw new Error('Por favor ingresa un título con sentido');
+      }
+      return true;
+    }),
+  body('opciones').isObject().withMessage('Las opciones deben ser un objeto'),
+  // Validar tema si existe en las opciones
+  body('opciones.tema').optional()
+    .isLength({ min: 2 }).withMessage('El tema debe tener al menos 2 caracteres')
+    .custom(value => {
+      if (!value) return true;
+      const trimmedValue = value.trim();
+      if (trimmedValue.length === 1) {
+        throw new Error('El tema no puede ser un solo carácter');
+      }
+      if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9]/.test(trimmedValue)) {
+        throw new Error('El tema debe contener letras o números, no solo símbolos');
+      }
+      if (/^\.+$/.test(trimmedValue)) {
+        throw new Error('El tema no puede ser solo puntos');
+      }
+      const meaninglessWords = ['nada', 'na', 'x', 'xx', 'xxx', 'asdf', 'qwerty', '...', '..', '.', 'aaa', 'bbb', 'ccc'];
+      if (meaninglessWords.includes(trimmedValue.toLowerCase())) {
+        throw new Error('Por favor ingresa un tema con sentido');
+      }
+      return true;
+    }),
+  // Validar contexto si existe en las opciones
+  body('opciones.contexto').optional()
+    .isLength({ min: 2 }).withMessage('El contexto debe tener al menos 2 caracteres')
+    .custom(value => {
+      if (!value) return true;
+      const trimmedValue = value.trim();
+      if (trimmedValue.length === 1) {
+        throw new Error('El contexto no puede ser un solo carácter');
+      }
+      if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9]/.test(trimmedValue)) {
+        throw new Error('El contexto debe contener letras o números, no solo símbolos');
+      }
+      if (/^\.+$/.test(trimmedValue)) {
+        throw new Error('El contexto no puede ser solo puntos');
+      }
+      const meaninglessWords = ['nada', 'na', 'x', 'xx', 'xxx', 'asdf', 'qwerty', '...', '..', '.', 'aaa', 'bbb', 'ccc'];
+      if (meaninglessWords.includes(trimmedValue.toLowerCase())) {
+        throw new Error('Por favor ingresa un contexto con sentido');
+      }
+      return true;
+    }),
+  // Validar tema personalizado si existe en las opciones
+  body('opciones.temaPersonalizado').optional()
+    .isLength({ min: 2 }).withMessage('El tema personalizado debe tener al menos 2 caracteres')
+    .custom(value => {
+      if (!value) return true;
+      const trimmedValue = value.trim();
+      if (trimmedValue.length === 1) {
+        throw new Error('El tema personalizado no puede ser un solo carácter');
+      }
+      if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9]/.test(trimmedValue)) {
+        throw new Error('El tema personalizado debe contener letras o números, no solo símbolos');
+      }
+      if (/^\.+$/.test(trimmedValue)) {
+        throw new Error('El tema personalizado no puede ser solo puntos');
+      }
+      const meaninglessWords = ['nada', 'na', 'x', 'xx', 'xxx', 'asdf', 'qwerty', '...', '..', '.', 'aaa', 'bbb', 'ccc'];
+      if (meaninglessWords.includes(trimmedValue.toLowerCase())) {
+        throw new Error('Por favor ingresa un tema personalizado con sentido');
+      }
+      return true;
+    })
 ];
 
 const validateUpdate = [

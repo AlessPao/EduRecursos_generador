@@ -189,6 +189,92 @@ const Register: React.FC = () => {
                   {errors.nombre.message}
                 </p>
               )}
+              
+              {/* Validaciones visuales de nombre completo */}
+              {watchedNombre && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Requisitos de nombre:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.notEmpty ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
+                        No debe estar vacío
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.minLength ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.minLength ? 'text-green-600' : 'text-red-600'}>
+                        Mínimo 3 caracteres
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.maxLength ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.maxLength ? 'text-green-600' : 'text-red-600'}>
+                        Máximo 50 caracteres
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.onlyValidChars ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
+                        Solo letras y espacios
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {nombreValidations.noNumbers ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={nombreValidations.noNumbers ? 'text-green-600' : 'text-red-600'}>
+                        Sin números
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Indicador general de validez para nombre */}
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center text-xs">
+                      {isNombreValid ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-500 mr-2" />
+                          <span className="text-green-600 font-medium">
+                            ¡Nombre válido!
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 text-red-500 mr-2" />
+                          <span className="text-red-600 font-medium">
+                            Completa todos los requisitos
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div>
@@ -294,6 +380,92 @@ const Register: React.FC = () => {
                 <p className="mt-1 text-sm text-red-600">
                   {errors.password.message}
                 </p>
+              )}
+              
+              {/* Validaciones visuales de contraseña */}
+              {watchedPassword && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Requisitos de contraseña:
+                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.minLength ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.minLength ? 'text-green-600' : 'text-red-600'}>
+                        Mínimo 8 caracteres
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasUpperCase ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasUpperCase ? 'text-green-600' : 'text-red-600'}>
+                        Al menos una mayúscula (A-Z)
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasLowerCase ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasLowerCase ? 'text-green-600' : 'text-red-600'}>
+                        Al menos una minúscula (a-z)
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasNumber ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasNumber ? 'text-green-600' : 'text-red-600'}>
+                        Al menos un número (0-9)
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs">
+                      {passwordValidations.hasSpecialChar ? (
+                        <Check className="h-3 w-3 text-green-500 mr-2" />
+                      ) : (
+                        <X className="h-3 w-3 text-red-500 mr-2" />
+                      )}
+                      <span className={passwordValidations.hasSpecialChar ? 'text-green-600' : 'text-red-600'}>
+                        Al menos un carácter especial (!@#$%^&*)
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Indicador general de validez para contraseña */}
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center text-xs">
+                      {isPasswordValid ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-500 mr-2" />
+                          <span className="text-green-600 font-medium">
+                            ¡Contraseña segura!
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 text-red-500 mr-2" />
+                          <span className="text-red-600 font-medium">
+                            Completa todos los requisitos
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             

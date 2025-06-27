@@ -17,6 +17,12 @@ import authRoutes from './routes/auth.routes.js';
 import recursosRoutes from './routes/recursos.routes.js';
 // Importar rutas de exámenes
 import examsRoutes from './routes/exams.routes.js';
+// Importar rutas de métricas
+import metricsRoutes from './routes/metrics.routes.js';
+// Importar rutas de semántica
+import semanticsRoutes from './routes/semantics.routes.js';
+// Importar rutas de análisis simple
+import simpleAnalysisRoutes from './routes/simple-analysis.routes.js';
 
 // Configuración
 dotenv.config();
@@ -55,6 +61,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/recursos', recursosRoutes);
 // Montar rutas de exámenes
 app.use('/api/exams', examsRoutes);
+// Montar rutas de métricas
+app.use('/api/metrics', metricsRoutes);
+// Montar rutas de semántica
+app.use('/api/semantics', semanticsRoutes);
+// Montar rutas de análisis simple
+app.use('/api/simple-analysis', simpleAnalysisRoutes);
 
 // Configurar Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
@@ -73,7 +85,10 @@ app.get('/api', (req, res) => {
     endpoints: {
       auth: '/api/auth',
       recursos: '/api/recursos',
-      exams: '/api/exams'
+      exams: '/api/exams',
+      metrics: '/api/metrics',
+      semantics: '/api/semantics',
+      simpleAnalysis: '/api/simple-analysis'
     }
   });
 });

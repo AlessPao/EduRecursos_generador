@@ -53,6 +53,8 @@ const Dashboard: React.FC = () => {
             />
           </motion.div>
         ))}
+        
+
       </motion.div>
       
       <div className="mt-12 bg-blue-50 rounded-lg p-6 border border-blue-100">
@@ -65,6 +67,7 @@ const Dashboard: React.FC = () => {
           <li>El sistema generará el recurso automáticamente</li>
           <li>Puedes guardar, editar o descargar el recurso generado</li>
           <li>Todos tus recursos guardados estarán disponibles en "Mis Recursos"</li>
+          <li><strong>Nuevo:</strong> Usa el "Análisis Semántico" para evaluar la calidad de tus recursos</li>
         </ol>
       </div>
     </div>

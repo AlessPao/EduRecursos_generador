@@ -2,9 +2,9 @@ import axios from 'axios';
 import { llm_base_url, offenrouter_api_key, llm_model } from '../config/index.js';
 
 /**
- * Genera un recurso educativo utilizando LLM
+ * 
  * @param {Object} params - Parámetros para generar el recurso
- * @returns {Promise<Object>} - Recurso generado
+ * @returns {Promise<Object>} 
  */
 export async function generarRecurso(params) {
   const prompt = crearPrompt(params);

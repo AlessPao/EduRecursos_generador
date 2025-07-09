@@ -103,7 +103,7 @@ const Perfil: React.FC = () => {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
-      doc.text('REPORTE DE ANÁLISIS SEMÁNTICO', 105, 17, { align: 'center' });
+      doc.text('REPORTE DE CALIDAD LINGÜÍSTICA', 105, 17, { align: 'center' });
       
       // Información del usuario
       doc.setTextColor(...secondaryColor);
@@ -114,7 +114,7 @@ const Perfil: React.FC = () => {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
       doc.text(`Nombre: ${profile?.nombre || 'N/A'}`, 20, 50);
-      doc.text(`Fecha de análisis: ${new Date().toLocaleDateString('es-ES', { 
+      doc.text(`Fecha de reporte: ${new Date().toLocaleDateString('es-ES', { 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric',
@@ -249,7 +249,7 @@ const Perfil: React.FC = () => {
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('ANÁLISIS POR TIPO DE RECURSO', 105, 17, { align: 'center' });
+        doc.text('CALIDAD POR TIPO DE RECURSO', 105, 17, { align: 'center' });
         
         doc.setTextColor(...secondaryColor);
         doc.setFontSize(14);
@@ -296,10 +296,10 @@ const Perfil: React.FC = () => {
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
         doc.text(`Página ${i} de ${pageCount}`, 105, 285, { align: 'center' });
-        doc.text('Sistema de Recursos Educativos - Análisis Semántico', 105, 290, { align: 'center' });
+        doc.text('Sistema de Recursos Educativos - Reporte de calidad lingüística', 105, 290, { align: 'center' });
       }
       
-      const fileName = `analisis-semantico-${profile?.nombre?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+      const fileName = `reporte-calidad-linguistica-${profile?.nombre?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
       
     } catch (error) {
@@ -314,12 +314,12 @@ const Perfil: React.FC = () => {
     if (!analysisData) return;
     
     const reportContent = `
-REPORTE DE ANÁLISIS SEMÁNTICO
+REPORTE DE CALIDAD LINGÜÍSTICA
 ==============================
 
 INFORMACIÓN DEL USUARIO:
 - Nombre: ${profile?.nombre || 'N/A'}
-- Fecha de análisis: ${new Date().toLocaleDateString('es-ES', { 
+- Fecha de reporte: ${new Date().toLocaleDateString('es-ES', { 
   year: 'numeric', 
   month: 'long', 
   day: 'numeric',
@@ -352,7 +352,7 @@ MÉTRICAS DETALLADAS:
 • Palabras únicas: ${analysisData.aggregatedMetrics.totalUniqueTypes}
 
 ==============================
-ANÁLISIS POR TIPO DE RECURSO:
+CALIDAD POR TIPO DE RECURSO:
 ==============================
 ${analysisData.resourceTypes ? Object.entries(analysisData.resourceTypes).map(([tipo, data]: [string, any]) => `
 ${tipo.toUpperCase().replace(/_/g, ' ')}:
@@ -378,14 +378,14 @@ INTERPRETACIÓN DE RESULTADOS:
 
 ==============================
 Reporte generado el ${new Date().toLocaleString('es-ES')}
-Sistema de Recursos Educativos - Análisis Semántico
+Sistema de Recursos Educativos - Reporte de calidad lingüística
     `;
     
     const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `analisis-semantico-${profile?.nombre?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `reporte-calidad-linguistica-${profile?.nombre?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -447,9 +447,9 @@ Sistema de Recursos Educativos - Análisis Semántico
               </div>
             </div>
             
-            {/* Sección de Análisis Semántico */}
+            {/* Sección de Reporte de calidad lingüística */}
             <div className="border-t mt-6 pt-6">
-              <h3 className="text-lg font-semibold mb-3">Análisis Semántico de mis Recursos</h3>
+              <h3 className="text-lg font-semibold mb-3">Reporte de calidad lingüística de mis Recursos</h3>
               <p className="text-gray-600 mb-4">
                 Analiza la calidad gramatical y riqueza léxica de todos tus recursos educativos.
               </p>
@@ -461,12 +461,12 @@ Sistema de Recursos Educativos - Análisis Semántico
                          text-white font-medium rounded-lg transition-colors duration-200"
               >
                 <BarChart3 size={20} className="mr-2" />
-                {analysisLoading ? 'Analizando...' : 'Realizar Análisis Semántico'}
+                {analysisLoading ? 'Analizando...' : 'Generar Reporte de Calidad'}
               </button>
               
               {stats.total === 0 && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Necesitas tener al menos un recurso para realizar el análisis.
+                  Necesitas tener al menos un recurso para generar el reporte.
                 </p>
               )}
             </div>
@@ -535,7 +535,7 @@ Sistema de Recursos Educativos - Análisis Semántico
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Análisis Semántico de tus Recursos
+                  Reporte de calidad lingüística de tus Recursos
                 </h2>
                 <button
                   onClick={() => setShowAnalysis(false)}
@@ -627,7 +627,7 @@ Sistema de Recursos Educativos - Análisis Semántico
                   {/* Análisis por Tipo de Recurso */}
                   {analysisData.resourceTypes && Object.keys(analysisData.resourceTypes).length > 0 && (
                     <div className="bg-green-50 rounded-lg p-6 border border-green-200">
-                      <h3 className="text-xl font-semibold text-green-900 mb-4">Análisis por Tipo de Recurso</h3>
+                      <h3 className="text-xl font-semibold text-green-900 mb-4">Calidad por Tipo de Recurso</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {Object.entries(analysisData.resourceTypes).map(([tipo, data]: [string, any]) => (
                           <div key={tipo} className="bg-white p-4 rounded-lg border">

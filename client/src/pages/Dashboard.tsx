@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
           <li>El sistema generará el recurso automáticamente</li>
           <li>Puedes guardar, editar o descargar el recurso generado</li>
           <li>Todos tus recursos guardados estarán disponibles en "Mis Recursos"</li>
-          <li><strong>Nuevo:</strong> Usa el "Análisis Semántico" para evaluar la calidad de tus recursos</li>
+          <li><strong>Nuevo:</strong> Usa el "Reporte de calidad lingüística" para evaluar la calidad de tus recursos</li>
         </ol>
       </div>
     </div>

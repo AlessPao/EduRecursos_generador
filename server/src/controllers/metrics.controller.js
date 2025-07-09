@@ -29,7 +29,7 @@ export const analyzeResourceMetrics = async (req, res, next) => {
     
     res.status(200).json({
       success: true,
-      message: 'Análisis semántico completado',
+      message: 'Reporte de calidad lingüística completado',
       analysis
     });
   } catch (error) {
@@ -78,7 +78,7 @@ export const analyzeBatchMetrics = async (req, res, next) => {
     
     res.status(200).json({
       success: true,
-      message: `Análisis semántico completado para ${recursos.length} recursos`,
+      message: `Reporte de calidad lingüística completado para ${recursos.length} recursos`,
       analysis: batchAnalysis
     });
   } catch (error) {

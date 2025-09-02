@@ -57,6 +57,17 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 // Rutas
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0',
+    service: 'Sistema de Recursos Educativos API'
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/recursos', recursosRoutes);
 // Montar rutas de exámenes

@@ -4,8 +4,5 @@ nixPkgs = ["nodejs_18"]
 [phases.install]
 cmds = ["npm install"]
 
-[phases.build]
-cmds = ["npm run migrate"]
-
 [start]
-cmd = "npm start"
+cmd = "npm run migrate && npm start"

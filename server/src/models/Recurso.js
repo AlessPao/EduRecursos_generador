@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from './db.js';
+import { formatearSoloHora } from '../utils/dateFormatter.js';
 
 const Recurso = sequelize.define('Recurso', {
   id: {
@@ -37,34 +38,24 @@ const Recurso = sequelize.define('Recurso', {
     allowNull: true
   },
   horaInicio: {
-    type: DataTypes.DATE,
-    allowNull: true
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Formato: DD/MM/YYYY HH:MM:SS'
   },
   horaFin: {
-    type: DataTypes.DATE,
-    allowNull: true
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Formato: DD/MM/YYYY HH:MM:SS'
   }
 }, {
   tableName: 'recursos',
   timestamps: true,
   getterMethods: {
     horaInicioFormato() {
-      if (!this.horaInicio) return null;
-      return this.horaInicio.toLocaleTimeString('es-PE', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
+      return formatearSoloHora(this.horaInicio);
     },
     horaFinFormato() {
-      if (!this.horaFin) return null;
-      return this.horaFin.toLocaleTimeString('es-PE', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
+      return formatearSoloHora(this.horaFin);
     }
   }
 });

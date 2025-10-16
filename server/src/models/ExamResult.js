@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from './db.js';
+import { formatearSoloHora } from '../utils/dateFormatter.js';
 
 // ExamResult model for storing student submissions
 export const ExamResult = sequelize.define('ExamResult', {
@@ -26,32 +27,22 @@ export const ExamResult = sequelize.define('ExamResult', {
   examSlug: { type: DataTypes.STRING, allowNull: false }, // Mantener por compatibilidad
   evalTime: { type: DataTypes.FLOAT, allowNull: true }, // tiempo en segundos
   horaInicio: { 
-    type: DataTypes.DATE, 
-    allowNull: true 
+    type: DataTypes.STRING(50), 
+    allowNull: true,
+    comment: 'Formato: DD/MM/YYYY HH:MM:SS'
   },
   horaFin: { 
-    type: DataTypes.DATE, 
-    allowNull: true 
+    type: DataTypes.STRING(50), 
+    allowNull: true,
+    comment: 'Formato: DD/MM/YYYY HH:MM:SS'
   }
 }, {
   getterMethods: {
     horaInicioFormato() {
-      if (!this.horaInicio) return null;
-      return this.horaInicio.toLocaleTimeString('es-PE', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
+      return formatearSoloHora(this.horaInicio);
     },
     horaFinFormato() {
-      if (!this.horaFin) return null;
-      return this.horaFin.toLocaleTimeString('es-PE', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
+      return formatearSoloHora(this.horaFin);
     }
   }
 });

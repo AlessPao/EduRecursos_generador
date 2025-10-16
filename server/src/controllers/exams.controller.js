@@ -5,6 +5,7 @@ import Exam from '../models/Exam.js';
 import ExamResult from '../models/ExamResult.js';
 import Usuario from '../models/Usuario.js';
 import { generarRecurso } from '../services/llm.service.js';
+import { formatearFechaHora } from '../utils/dateFormatter.js';
 
 // Controller to create a new exam using LLM service
 export const createExam = async (req, res, next) => {
@@ -21,8 +22,8 @@ export const createExam = async (req, res, next) => {
     const { titulo, tipoTexto, tema, longitud, numLiteral } = req.body;
     const opciones = { titulo, tipoTexto, tema, longitud, numLiteral };
     
-    // Registrar hora de inicio
-    const horaInicio = new Date();
+    // Registrar hora de inicio en hora de Perú (formato DD/MM/YYYY HH:MM:SS)
+    const horaInicio = formatearFechaHora(new Date());
     
     // Generar recurso con LLM
     const start = Date.now();
@@ -30,8 +31,8 @@ export const createExam = async (req, res, next) => {
     const end = Date.now();
     const tiempoGeneracionSegundos = (end - start) / 1000;
     
-    // Registrar hora de fin
-    const horaFin = new Date();
+    // Registrar hora de fin en hora de Perú (formato DD/MM/YYYY HH:MM:SS)
+    const horaFin = formatearFechaHora(new Date());
     
     const slug = uuidv4().substr(0, 8);
     const exam = await Exam.create({ 
@@ -112,8 +113,8 @@ export const submitExam = async (req, res, next) => {
       score, 
       examSlug: slug, 
       evalTime: finalEvalTime,
-      horaInicio: horaInicio ? new Date(horaInicio) : null,
-      horaFin: horaFin ? new Date(horaFin) : new Date()
+      horaInicio: horaInicio || null,
+      horaFin: horaFin || formatearFechaHora(new Date())
     });
     
     res.json({ success: true, data: { score, total: preguntas.length } });

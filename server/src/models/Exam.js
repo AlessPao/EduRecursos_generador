@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from './db.js';
+import { formatearSoloHora } from '../utils/dateFormatter.js';
 
 // Exam model for storing generated evaluations
 export const Exam = sequelize.define('Exam', {
@@ -20,32 +21,22 @@ export const Exam = sequelize.define('Exam', {
     allowNull: true
   },
   horaInicio: {
-    type: DataTypes.DATE,
-    allowNull: true
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Formato: DD/MM/YYYY HH:MM:SS'
   },
   horaFin: {
-    type: DataTypes.DATE,
-    allowNull: true
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Formato: DD/MM/YYYY HH:MM:SS'
   }
 }, {
   getterMethods: {
     horaInicioFormato() {
-      if (!this.horaInicio) return null;
-      return this.horaInicio.toLocaleTimeString('es-PE', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
+      return formatearSoloHora(this.horaInicio);
     },
     horaFinFormato() {
-      if (!this.horaFin) return null;
-      return this.horaFin.toLocaleTimeString('es-PE', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
+      return formatearSoloHora(this.horaFin);
     }
   }
 });

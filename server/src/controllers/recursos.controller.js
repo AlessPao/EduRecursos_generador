@@ -4,6 +4,7 @@ import { generarRecurso } from '../services/llm.service.js';
 import pdf from 'html-pdf';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { formatearFechaHora } from '../utils/dateFormatter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,8 +67,8 @@ export const createRecurso = async (req, res, next) => {
 
     const { tipo, titulo, opciones } = req.body;
 
-    // Registrar hora de inicio
-    const horaInicio = new Date();
+    // Registrar hora de inicio en hora de Perú (formato DD/MM/YYYY HH:MM:SS)
+    const horaInicio = formatearFechaHora(new Date());
     
     // Generar contenido con LLM
     const start = Date.now();
@@ -75,8 +76,8 @@ export const createRecurso = async (req, res, next) => {
     const end = Date.now();
     const tiempoGeneracionSegundos = (end - start) / 1000;
     
-    // Registrar hora de fin
-    const horaFin = new Date();
+    // Registrar hora de fin en hora de Perú (formato DD/MM/YYYY HH:MM:SS)
+    const horaFin = formatearFechaHora(new Date());
 
     // Guardar recurso en base de datos
     const recurso = await Recurso.create({

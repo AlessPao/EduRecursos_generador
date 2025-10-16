@@ -118,8 +118,12 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   try {
     // Sincronizar modelos con la base de datos
-    await sequelize.sync({ alter: true });
-    console.log('Base de datos sincronizada correctamente');
+    // NOTA: Comentado para usar migraciones manuales
+    // await sequelize.sync({ alter: true });
+    
+    // Solo verificar conexión
+    await sequelize.authenticate();
+    console.log('Conexión a la base de datos establecida correctamente');
     
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Servidor ejecutándose en http://0.0.0.0:${PORT}`);

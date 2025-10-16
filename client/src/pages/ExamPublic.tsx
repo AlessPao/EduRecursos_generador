@@ -98,6 +98,8 @@ const ExamPublic: React.FC = () => {
       const payload = {
         studentName,
         evalTime: totalTime,
+        horaInicio: startTime ? new Date(startTime).toISOString() : null,
+        horaFin: new Date(endTime).toISOString(),
         respuestas: Object.entries(answers).map(([idx, respuestaSeleccionada]) => ({
           preguntaIndex: parseInt(idx, 10),
           respuestaSeleccionada

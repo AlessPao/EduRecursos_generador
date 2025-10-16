@@ -3,6 +3,7 @@ const { v4: uuidv4 } = pkg;
 import { validationResult } from 'express-validator';
 import Exam from '../models/Exam.js';
 import ExamResult from '../models/ExamResult.js';
+import Usuario from '../models/Usuario.js';
 import { generarRecurso } from '../services/llm.service.js';
 
 // Controller to create a new exam using LLM service
@@ -19,14 +20,29 @@ export const createExam = async (req, res, next) => {
 
     const { titulo, tipoTexto, tema, longitud, numLiteral } = req.body;
     const opciones = { titulo, tipoTexto, tema, longitud, numLiteral };
+    
+    // Registrar hora de inicio
+    const horaInicio = new Date();
+    
+    // Generar recurso con LLM
+    const start = Date.now();
     const result = await generarRecurso({ tipo: 'evaluacion', opciones });
+    const end = Date.now();
+    const tiempoGeneracionSegundos = (end - start) / 1000;
+    
+    // Registrar hora de fin
+    const horaFin = new Date();
+    
     const slug = uuidv4().substr(0, 8);
     const exam = await Exam.create({ 
       usuarioId: req.user.userId,
       slug, 
       titulo: result.titulo, 
       texto: result.texto, 
-      preguntas: result.preguntas 
+      preguntas: result.preguntas,
+      tiempoGeneracionSegundos,
+      horaInicio,
+      horaFin
     });
     res.json({ success: true, data: exam });
   } catch (err) {
@@ -63,7 +79,7 @@ export const getExam = async (req, res, next) => {
 export const submitExam = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const { studentName, respuestas, evalTime } = req.body;
+    const { studentName, respuestas, evalTime, horaInicio, horaFin } = req.body;
     
     const exam = await Exam.findOne({ where: { slug } });
     if (!exam) return res.status(404).json({ success: false, message: 'Exam not found' });
@@ -89,11 +105,15 @@ export const submitExam = async (req, res, next) => {
     }
     
     await ExamResult.create({ 
+      examId: exam.id,
+      usuarioId: exam.usuarioId,
       studentName, 
       respuestas, 
       score, 
       examSlug: slug, 
-      evalTime: finalEvalTime 
+      evalTime: finalEvalTime,
+      horaInicio: horaInicio ? new Date(horaInicio) : null,
+      horaFin: horaFin ? new Date(horaFin) : new Date()
     });
     
     res.json({ success: true, data: { score, total: preguntas.length } });
@@ -118,9 +138,19 @@ export const getExamResults = async (req, res, next) => {
         message: 'Examen no encontrado o no tienes permisos para verlo' 
       });
     }
-      const results = await ExamResult.findAll({ 
-      where: { examSlug: slug }, 
-      attributes: ['studentName', 'score', 'evalTime', 'createdAt'], 
+    
+    const results = await ExamResult.findAll({ 
+      where: { examId: exam.id }, 
+      attributes: ['id', 'usuarioId', 'studentName', 'score', 'evalTime', 'horaInicio', 'horaFin', 'createdAt', 'examSlug'],
+      include: [{
+        model: Exam,
+        as: 'exam',
+        attributes: ['id', 'titulo', 'slug']
+      }, {
+        model: Usuario,
+        as: 'usuario',
+        attributes: ['id', 'nombre', 'email']
+      }],
       order: [['createdAt', 'DESC']] 
     });
     
@@ -148,7 +178,7 @@ export const deleteExamResults = async (req, res, next) => {
     
     // Eliminar todos los resultados del examen
     const deletedCount = await ExamResult.destroy({ 
-      where: { examSlug: slug } 
+      where: { examId: exam.id } 
     });
     
     res.json({ 
@@ -180,7 +210,7 @@ export const deleteExam = async (req, res, next) => {
     
     // Eliminar todos los resultados del examen
     await ExamResult.destroy({ 
-      where: { examSlug: slug } 
+      where: { examId: exam.id } 
     });
     
     // Eliminar el examen

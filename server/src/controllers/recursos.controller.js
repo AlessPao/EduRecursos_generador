@@ -66,11 +66,17 @@ export const createRecurso = async (req, res, next) => {
 
     const { tipo, titulo, opciones } = req.body;
 
+    // Registrar hora de inicio
+    const horaInicio = new Date();
+    
     // Generar contenido con LLM
     const start = Date.now();
     const contenidoGenerado = await generarRecurso({ tipo, opciones });
     const end = Date.now();
     const tiempoGeneracionSegundos = (end - start) / 1000;
+    
+    // Registrar hora de fin
+    const horaFin = new Date();
 
     // Guardar recurso en base de datos
     const recurso = await Recurso.create({
@@ -79,7 +85,9 @@ export const createRecurso = async (req, res, next) => {
       titulo,
       contenido: contenidoGenerado,
       meta: { opciones },
-      tiempoGeneracionSegundos
+      tiempoGeneracionSegundos,
+      horaInicio,
+      horaFin
     });
     
     res.status(201).json({

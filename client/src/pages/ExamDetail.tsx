@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { API_URL } from '../config';
-import { Clipboard, Trash2 } from 'lucide-react';
+import { Clipboard, Trash2, RefreshCw } from 'lucide-react';
 
 interface Question {
   pregunta: string;
@@ -31,12 +31,29 @@ const ExamDetail: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);  const [showDeleteResultsConfirm, setShowDeleteResultsConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deletingResults, setDeletingResults] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const formatTime = (seconds: number): string => {
     if (!seconds || seconds === 0) return 'N/A';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const fetchResults = async () => {
+    setRefreshing(true);
+    try {
+      const res = await axios.get(`${API_URL}/exams/${slug}/results`);
+      if (res.data.success) {
+        setResults(res.data.data);
+        toast.success('Resultados actualizados', { autoClose: 1500 });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Error al actualizar resultados');
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   useEffect(() => {
@@ -51,7 +68,7 @@ const ExamDetail: React.FC = () => {
         setLoading(false);
       }
     };
-    const fetchResults = async () => {
+    const loadResults = async () => {
       try {
         const res = await axios.get(`${API_URL}/exams/${slug}/results`);
         if (res.data.success) setResults(res.data.data);
@@ -62,7 +79,7 @@ const ExamDetail: React.FC = () => {
       }
     };
     fetchExam();
-    fetchResults();
+    loadResults();
   }, [slug]);
   const handleCopy = () => {
     const url = `${window.location.origin}/evaluaciones/${slug}`;
@@ -166,16 +183,27 @@ const ExamDetail: React.FC = () => {
         </div>        <div className="bg-white p-8 rounded-xl shadow-lg border border-blue-100">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-blue-700">Resultados de los estudiantes</h3>
-            {results.length > 0 && (
+            <div className="flex gap-2">
               <button
-                onClick={() => setShowDeleteResultsConfirm(true)}
-                className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition flex items-center"
-                title="Eliminar todos los resultados"
+                onClick={fetchResults}
+                disabled={refreshing}
+                className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Actualizar resultados"
               >
-                <Trash2 size={14} className="mr-1" />
-                Limpiar resultados
+                <RefreshCw size={14} className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Actualizando...' : 'Actualizar'}
               </button>
-            )}
+              {results.length > 0 && (
+                <button
+                  onClick={() => setShowDeleteResultsConfirm(true)}
+                  className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition flex items-center"
+                  title="Eliminar todos los resultados"
+                >
+                  <Trash2 size={14} className="mr-1" />
+                  Limpiar resultados
+                </button>
+              )}
+            </div>
           </div>
           {loadingRes ? (
             <div className="flex justify-center"><div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div></div>

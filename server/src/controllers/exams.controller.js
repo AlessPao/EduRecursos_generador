@@ -1,5 +1,4 @@
-import pkg from 'uuid';
-const { v4: uuidv4 } = pkg;
+import { v4 as uuidv4 } from 'uuid';
 import { validationResult } from 'express-validator';
 import Exam from '../models/Exam.js';
 import ExamResult from '../models/ExamResult.js';

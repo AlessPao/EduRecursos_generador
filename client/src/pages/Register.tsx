@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { BookOpen, AlertCircle, Check, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import PrivacyConsentModal from '../components/PrivacyConsentModal';
 
 // Tipo para los datos del formulario
 interface RegisterFormData {
@@ -18,6 +19,8 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState('');
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [formDataToSubmit, setFormDataToSubmit] = useState<RegisterFormData | null>(null);
   
   // Configuración de React Hook Form
   const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>();
@@ -122,22 +125,57 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Guardar los datos del formulario y mostrar el modal de consentimiento
+    setFormDataToSubmit(data);
+    setShowConsentModal(true);
+  };
+
+  // Manejar la aceptación del consentimiento desde el modal
+  const handleConsentAccept = async (consentTimestamp: string) => {
+    if (!formDataToSubmit) return;
+
     try {
       setIsSubmitting(true);
       clearError();
-      await registerUser(data.nombre, data.email, data.password);
+      
+      // Registrar usuario con el timestamp del consentimiento
+      await registerUser(
+        formDataToSubmit.nombre, 
+        formDataToSubmit.email, 
+        formDataToSubmit.password, 
+        consentTimestamp
+      );
+      
+      setShowConsentModal(false);
       toast.success('¡Registro exitoso! Ahora puedes iniciar sesión.');
       navigate('/login');
     } catch (err) {
       console.error('Error al registrarse:', err);
       toast.error('No se pudo completar el registro. Intenta de nuevo.');
+      setShowConsentModal(false);
     } finally {
       setIsSubmitting(false);
+      setFormDataToSubmit(null);
     }
+  };
+
+  // Manejar la cancelación del consentimiento
+  const handleConsentCancel = () => {
+    setShowConsentModal(false);
+    setIsSubmitting(false);
+    setFormDataToSubmit(null);
   };
   
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+      {/* Modal de Consentimiento */}
+      <PrivacyConsentModal
+        isOpen={showConsentModal}
+        onAccept={handleConsentAccept}
+        onCancel={handleConsentCancel}
+        isSubmitting={isSubmitting}
+      />
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Link to="/" className="flex items-center">

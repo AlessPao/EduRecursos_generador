@@ -139,3 +139,51 @@ export const formatearSegundos = (segundos) => {
   
   return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
 };
+
+/**
+ * Formatea una fecha ISO 8601 a formato timestamp de PostgreSQL con zona horaria de Perú
+ * Formato: YYYY-MM-DD HH:MM:SS.mmm-05 (similar a createdAt/updatedAt)
+ * @param {string} isoString - String en formato ISO 8601 (ej: 2025-11-03T22:52:05.496Z)
+ * @returns {string} Timestamp formateado (ej: 2025-11-03 17:52:05.496-05)
+ */
+export const formatearTimestampConsentimiento = (isoString) => {
+  if (!isoString) return null;
+  
+  const date = new Date(isoString);
+  
+  // Obtener la fecha/hora en formato UTC
+  const utcYear = date.getUTCFullYear();
+  const utcMonth = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const utcDay = String(date.getUTCDate()).padStart(2, '0');
+  const utcHour = date.getUTCHours();
+  const utcMinute = String(date.getUTCMinutes()).padStart(2, '0');
+  const utcSecond = String(date.getUTCSeconds()).padStart(2, '0');
+  const millisecond = String(date.getUTCMilliseconds()).padStart(3, '0');
+  
+  // Perú está en UTC-5 (sin horario de verano)
+  // Restar 5 horas a UTC
+  const peruHour = utcHour - 5;
+  
+  // Manejar cambio de día si la hora es negativa
+  let finalYear = utcYear;
+  let finalMonth = utcMonth;
+  let finalDay = utcDay;
+  let finalHour = peruHour;
+  
+  if (peruHour < 0) {
+    // Si la hora es negativa, retroceder un día
+    const tempDate = new Date(date);
+    tempDate.setUTCHours(tempDate.getUTCHours() - 5);
+    
+    finalYear = tempDate.getUTCFullYear();
+    finalMonth = String(tempDate.getUTCMonth() + 1).padStart(2, '0');
+    finalDay = String(tempDate.getUTCDate()).padStart(2, '0');
+    finalHour = tempDate.getUTCHours();
+  }
+  
+  const finalHourStr = String(finalHour).padStart(2, '0');
+  const timezone = '-05';
+  
+  // Formato: YYYY-MM-DD HH:MM:SS.mmm-05
+  return `${finalYear}-${finalMonth}-${finalDay} ${finalHourStr}:${utcMinute}:${utcSecond}.${millisecond}${timezone}`;
+};

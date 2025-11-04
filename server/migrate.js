@@ -1,6 +1,7 @@
 import { migrateExamResults } from './src/migrations/add-examId-to-examResults.js';
 import { addTimestampColumns } from './src/migrations/add-timestamp-columns.js';
 import { changeTimestampsToString } from './src/migrations/change-timestamps-to-string.js';
+import runPrivacyConsentMigration from './src/migrations/add-privacy-consent-timestamp.js';
 import { sequelize } from './src/models/db.js';
 
 async function runMigration() {
@@ -24,6 +25,11 @@ async function runMigration() {
     // Migración 3: Cambiar timestamps a string
     console.log('--- Migración 3: Timestamps a String ---');
     await changeTimestampsToString();
+    console.log('');
+    
+    // Migración 4: Agregar campo de consentimiento de privacidad
+    console.log('--- Migración 4: Privacy Consent Timestamp ---');
+    await runPrivacyConsentMigration();
     console.log('');
     
     console.log('\n✅ Todas las migraciones completadas');

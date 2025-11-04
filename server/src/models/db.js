@@ -4,7 +4,10 @@ import { dbUrl } from '../config/index.js';
 export const sequelize = new Sequelize(dbUrl, {
   dialect: 'postgres',
   logging: false,
-  timezone: '-05:00', // Zona horaria de Perú (UTC-5)
+  timezone: 'America/Lima', // Zona horaria de Perú (UTC-5)
+  dialectOptions: {
+    timezone: 'America/Lima',
+  },
   pool: {
     max: 5,
     min: 0,

@@ -4,17 +4,42 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import { formatDate } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
-import { User, BarChart3, Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, BarChart3, Download, FileText, FileSpreadsheet, Edit2, Trash2, X, Save, AlertTriangle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { useToast, ToastContainer } from '../components/Toast';
 
 const Perfil: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { toasts, addToast, removeToast, success, error, warning, info } = useToast();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  
+  // Estados para edición de perfil
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    nombre: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  
+  // Estados para eliminar cuenta
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showFinalConfirmation, setShowFinalConfirmation] = useState(false);
+  const [deleteForm, setDeleteForm] = useState({
+    password: '',
+    confirmationText: ''
+  });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  
   const [stats, setStats] = useState({
     total: 0,
     comprension: 0,
@@ -35,6 +60,14 @@ const Perfil: React.FC = () => {
         const profileRes = await axios.get(`${API_URL}/auth/profile`);
         if (profileRes.data.success) {
           setProfile(profileRes.data.usuario);
+          // Inicializar formulario de edición
+          setEditForm({
+            nombre: profileRes.data.usuario.nombre,
+            email: profileRes.data.usuario.email,
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          });
         }
         
         // Cargar recursos para estadísticas
@@ -63,6 +96,138 @@ const Perfil: React.FC = () => {
     fetchProfileData();
   }, []);
 
+  // Función para actualizar el perfil
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validaciones
+    if (editForm.newPassword && editForm.newPassword !== editForm.confirmPassword) {
+      error('Las contraseñas no coinciden');
+      return;
+    }
+    
+    if (editForm.newPassword && editForm.newPassword.length < 6) {
+      error('La nueva contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    
+    try {
+      setEditLoading(true);
+      
+      const dataToUpdate: any = {};
+      
+      // Solo incluir campos que cambiaron
+      if (editForm.nombre !== profile.nombre) {
+        dataToUpdate.nombre = editForm.nombre;
+      }
+      
+      if (editForm.email !== profile.email) {
+        dataToUpdate.email = editForm.email;
+      }
+      
+      if (editForm.newPassword) {
+        dataToUpdate.currentPassword = editForm.currentPassword;
+        dataToUpdate.newPassword = editForm.newPassword;
+      }
+      
+      // Si no hay cambios
+      if (Object.keys(dataToUpdate).length === 0) {
+        info('No hay cambios para guardar');
+        setIsEditing(false);
+        return;
+      }
+      
+      const response = await axios.put(`${API_URL}/auth/profile`, dataToUpdate);
+      
+      if (response.data.success) {
+        setProfile(response.data.usuario);
+        setEditForm({
+          nombre: response.data.usuario.nombre,
+          email: response.data.usuario.email,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+        setIsEditing(false);
+        success('Perfil actualizado correctamente', '¡Éxito!');
+      }
+    } catch (err: any) {
+      console.error('Error al actualizar perfil:', err);
+      const errorMsg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Error al actualizar el perfil';
+      error(errorMsg, 'Error');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  // Función para cancelar la edición
+  const handleCancelEdit = () => {
+    setEditForm({
+      nombre: profile.nombre,
+      email: profile.email,
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setIsEditing(false);
+  };
+
+  // Función para eliminar cuenta
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (deleteForm.confirmationText !== 'ELIMINAR MI CUENTA') {
+      error('Debe escribir exactamente "ELIMINAR MI CUENTA" para confirmar');
+      return;
+    }
+    
+    if (!deleteForm.password) {
+      error('Debe ingresar su contraseña');
+      return;
+    }
+    
+    // Mostrar confirmación final personalizada
+    setShowFinalConfirmation(true);
+  };
+
+  // Función para ejecutar la eliminación final
+  const confirmFinalDeletion = async () => {
+    try {
+      setDeleteLoading(true);
+      
+      const response = await axios.delete(`${API_URL}/auth/account`, {
+        data: {
+          password: deleteForm.password,
+          confirmationText: deleteForm.confirmationText
+        }
+      });
+      
+      if (response.data.success) {
+        // Cerrar modales
+        setShowFinalConfirmation(false);
+        setShowDeleteModal(false);
+        
+        // Mostrar mensaje de éxito
+        success(
+          'Todos tus datos han sido borrados permanentemente. Serás redirigido a la página de inicio.',
+          'Cuenta eliminada correctamente'
+        );
+        
+        // Esperar un momento antes de redirigir
+        setTimeout(() => {
+          logout();
+          navigate('/');
+        }, 2000);
+      }
+    } catch (err: any) {
+      console.error('Error al eliminar cuenta:', err);
+      const errorMsg = err.response?.data?.message || 'Error al eliminar la cuenta';
+      error(errorMsg, 'Error');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   // Función para realizar análisis semántico
   const handleSemanticAnalysis = async () => {
     try {
@@ -77,9 +242,10 @@ const Perfil: React.FC = () => {
       } else {
         throw new Error('Error en el análisis');
       }
-    } catch (error) {
-      console.error('Error al realizar análisis semántico:', error);
-      alert('Error al realizar el análisis. Por favor, intenta de nuevo.');
+    } catch (err) {
+      console.error('Error al realizar análisis semántico:', err);
+      error('Error al realizar el análisis. Por favor, intenta de nuevo.', 'Error');
+      setShowAnalysis(false);
     } finally {
       setAnalysisLoading(false);
     }
@@ -302,9 +468,9 @@ const Perfil: React.FC = () => {
       const fileName = `reporte-calidad-linguistica-${profile?.nombre?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
       
-    } catch (error) {
-      console.error('Error generando PDF:', error);
-      alert('Error al generar el PDF. Descargando como texto...');
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+      warning('Error al generar el PDF. Descargando como texto...', 'Advertencia');
       downloadReportTXT();
     }
   };
@@ -407,6 +573,8 @@ Sistema de Recursos Educativos - Reporte de calidad lingüística
   
   return (
     <div className="pt-20 pb-6">
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      
       <h1 className="text-2xl font-bold mb-6">Mi Perfil</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -418,34 +586,148 @@ Sistema de Recursos Educativos - Reporte de calidad lingüística
           className="lg:col-span-2"
         >
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-start mb-6">
-              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-                <User size={32} className="text-blue-600" />
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-start">
+                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                  <User size={32} className="text-blue-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">{profile?.nombre}</h2>
+                  <p className="text-gray-600">{profile?.email}</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Miembro desde {formatDate(profile?.createdAt)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold">{profile?.nombre}</h2>
-                <p className="text-gray-600">{profile?.email}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Miembro desde {formatDate(profile?.createdAt)}
-                </p>
-              </div>
+              
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 
+                           text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                >
+                  <Edit2 size={16} className="mr-2" />
+                  Editar perfil
+                </button>
+              )}
             </div>
             
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-semibold mb-3">Información de la cuenta</h3>
-              
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="text-sm text-gray-500">Nombre completo</div>
-                  <div>{profile?.nombre}</div>
-                </div>
+            {/* Formulario de edición */}
+            {isEditing ? (
+              <form onSubmit={handleUpdateProfile} className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-4">Editar información de la cuenta</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="text-sm text-gray-500">Correo electrónico</div>
-                  <div>{profile?.email}</div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nombre completo
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.nombre}
+                      onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Correo electrónico
+                    </label>
+                    <input
+                      type="email"
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="text-md font-semibold mb-3">Cambiar contraseña (opcional)</h4>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Contraseña actual
+                        </label>
+                        <input
+                          type="password"
+                          value={editForm.currentPassword}
+                          onChange={(e) => setEditForm({ ...editForm, currentPassword: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Dejar vacío si no deseas cambiar la contraseña"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nueva contraseña
+                        </label>
+                        <input
+                          type="password"
+                          value={editForm.newPassword}
+                          onChange={(e) => setEditForm({ ...editForm, newPassword: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Mínimo 6 caracteres"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Confirmar nueva contraseña
+                        </label>
+                        <input
+                          type="password"
+                          value={editForm.confirmPassword}
+                          onChange={(e) => setEditForm({ ...editForm, confirmPassword: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="submit"
+                      disabled={editLoading}
+                      className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 
+                               disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200"
+                    >
+                      <Save size={20} className="mr-2" />
+                      {editLoading ? 'Guardando...' : 'Guardar cambios'}
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      disabled={editLoading}
+                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 
+                               text-white font-medium rounded-lg transition-colors duration-200"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-semibold mb-3">Información de la cuenta</h3>
+                
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="text-sm text-gray-500">Nombre completo</div>
+                    <div>{profile?.nombre}</div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="text-sm text-gray-500">Correo electrónico</div>
+                    <div>{profile?.email}</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             
             {/* Sección de Reporte de calidad lingüística */}
             <div className="border-t mt-6 pt-6">
@@ -470,6 +752,28 @@ Sistema de Recursos Educativos - Reporte de calidad lingüística
                 </p>
               )}
             </div>
+            
+            {/* Sección de eliminar cuenta - ARCO */}
+            {!isEditing && (
+              <div className="border-t border-red-200 mt-6 pt-6 bg-red-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
+                <h3 className="text-lg font-semibold mb-2 text-red-900 flex items-center">
+                  <AlertTriangle size={20} className="mr-2" />
+                  Zona de peligro
+                </h3>
+                <p className="text-sm text-red-700 mb-4">
+                  Una vez eliminada tu cuenta, no hay vuelta atrás. Todos tus datos serán borrados permanentemente.
+                </p>
+                
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 
+                           text-white font-medium rounded-lg transition-colors duration-200"
+                >
+                  <Trash2 size={20} className="mr-2" />
+                  Eliminar mi cuenta
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
         
@@ -705,6 +1009,206 @@ Sistema de Recursos Educativos - Reporte de calidad lingüística
                   <p className="text-gray-600">No se pudo cargar el análisis. Intenta de nuevo.</p>
                 </div>
               )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+      
+      {/* Modal de confirmación para eliminar cuenta */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-lg shadow-xl max-w-md w-full"
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-red-600 flex items-center">
+                  <AlertTriangle size={28} className="mr-2" />
+                  Eliminar cuenta
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeleteForm({ password: '', confirmationText: '' });
+                  }}
+                  disabled={deleteLoading}
+                  className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800 font-semibold mb-2">
+                  ⚠️ ADVERTENCIA: Esta acción es irreversible
+                </p>
+                <p className="text-sm text-red-700">
+                  Al eliminar tu cuenta se borrarán permanentemente:
+                </p>
+                <ul className="text-sm text-red-700 list-disc list-inside mt-2 space-y-1">
+                  <li>Tu información personal</li>
+                  <li>Todos tus recursos educativos</li>
+                  <li>Todos tus exámenes creados</li>
+                  <li>Todos los resultados de exámenes</li>
+                </ul>
+              </div>
+              
+              <form onSubmit={handleDeleteAccount} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Para confirmar, escribe exactamente: <span className="font-bold">ELIMINAR MI CUENTA</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={deleteForm.confirmationText}
+                    onChange={(e) => setDeleteForm({ ...deleteForm, confirmationText: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="ELIMINAR MI CUENTA"
+                    disabled={deleteLoading}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ingresa tu contraseña para confirmar
+                  </label>
+                  <input
+                    type="password"
+                    value={deleteForm.password}
+                    onChange={(e) => setDeleteForm({ ...deleteForm, password: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    disabled={deleteLoading}
+                    required
+                  />
+                </div>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={deleteLoading || deleteForm.confirmationText !== 'ELIMINAR MI CUENTA'}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 
+                             disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors duration-200"
+                  >
+                    <Trash2 size={20} className="mr-2" />
+                    {deleteLoading ? 'Procesando...' : 'Continuar'}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeleteModal(false);
+                      setDeleteForm({ password: '', confirmationText: '' });
+                    }}
+                    disabled={deleteLoading}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 
+                             text-white font-medium rounded-lg transition-colors duration-200"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal de confirmación final */}
+      {showFinalConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60] p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg shadow-2xl max-w-lg w-full border-4 border-red-600"
+          >
+            <div className="p-8">
+              {/* Icono de advertencia animado */}
+              <div className="flex justify-center mb-6">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    rotate: [0, -5, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 0.5,
+                    repeat: Infinity,
+                    repeatDelay: 1
+                  }}
+                  className="bg-red-600 rounded-full p-4"
+                >
+                  <AlertTriangle size={48} className="text-white" />
+                </motion.div>
+              </div>
+
+              <h2 className="text-3xl font-bold text-red-900 text-center mb-4">
+                ⚠️ ADVERTENCIA FINAL ⚠️
+              </h2>
+              
+              <div className="bg-white rounded-lg p-6 mb-6 border-2 border-red-300">
+                <p className="text-lg font-semibold text-red-900 mb-3 text-center">
+                  Esta acción es IRREVERSIBLE
+                </p>
+                <p className="text-red-800 mb-3">
+                  Se eliminarán permanentemente:
+                </p>
+                <ul className="text-red-800 space-y-2">
+                  <li className="flex items-start">
+                    <span className="text-red-600 mr-2 font-bold">✗</span>
+                    <span>Tu cuenta de usuario</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-red-600 mr-2 font-bold">✗</span>
+                    <span>Todos tus recursos educativos</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-red-600 mr-2 font-bold">✗</span>
+                    <span>Todos tus exámenes</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-red-600 mr-2 font-bold">✗</span>
+                    <span>Todos los resultados asociados</span>
+                  </li>
+                </ul>
+                <p className="text-red-900 font-bold mt-4 text-center">
+                  NO HAY FORMA DE RECUPERAR ESTOS DATOS
+                </p>
+              </div>
+
+              <p className="text-center text-red-900 font-semibold mb-6 text-lg">
+                ¿Estás COMPLETAMENTE SEGURO de que deseas continuar?
+              </p>
+              
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowFinalConfirmation(false)}
+                  disabled={deleteLoading}
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 
+                           text-white font-bold rounded-lg transition-colors duration-200 text-lg"
+                >
+                  ← No, cancelar
+                </button>
+                <button
+                  onClick={confirmFinalDeletion}
+                  disabled={deleteLoading}
+                  className="flex-1 px-6 py-3 bg-red-700 hover:bg-red-800 disabled:bg-gray-400 
+                           text-white font-bold rounded-lg transition-colors duration-200 text-lg
+                           shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  {deleteLoading ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Eliminando...
+                    </span>
+                  ) : (
+                    'Sí, eliminar permanentemente →'
+                  )}
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

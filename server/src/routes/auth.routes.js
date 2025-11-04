@@ -119,6 +119,41 @@ const validatePasswordReset = [
     .withMessage('La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial')
 ];
 
+// Validaciones para actualizar perfil
+const validateUpdateProfile = [
+  body('nombre').optional().notEmpty().withMessage('El nombre no puede estar vacío'),
+  body('email')
+    .optional()
+    .isEmail().withMessage('Debe proporcionar un email válido')
+    .custom(value => {
+      if (value.startsWith('.')) {
+        throw new Error('El correo no puede empezar con punto');
+      }
+      if (value.includes('..')) {
+        throw new Error('El correo no puede tener puntos consecutivos');
+      }
+      const localPart = value.split('@')[0];
+      if (localPart && !/^[a-zA-Z0-9]/.test(localPart)) {
+        throw new Error('El correo no puede empezar con símbolos antes del @');
+      }
+      return true;
+    }),
+  body('currentPassword')
+    .optional()
+    .notEmpty().withMessage('La contraseña actual es obligatoria si desea cambiarla'),
+  body('newPassword')
+    .optional()
+    .isLength({ min: 6 }).withMessage('La nueva contraseña debe tener al menos 6 caracteres')
+];
+
+// Validaciones para eliminar cuenta
+const validateDeleteAccount = [
+  body('password').notEmpty().withMessage('La contraseña es obligatoria'),
+  body('confirmationText')
+    .notEmpty().withMessage('Debe escribir el texto de confirmación')
+    .equals('ELIMINAR MI CUENTA').withMessage('Debe escribir exactamente "ELIMINAR MI CUENTA"')
+];
+
 /**
  * @swagger
  * /auth/register:
@@ -325,6 +360,8 @@ router.post('/register', validateRegister, authController.register);
 router.post('/login', validateLogin, authController.login);
 router.post('/logout', isAuthenticated, authController.logout);
 router.get('/profile', isAuthenticated, authController.getProfile);
+router.put('/profile', isAuthenticated, validateUpdateProfile, authController.updateProfile);
+router.delete('/account', isAuthenticated, validateDeleteAccount, authController.deleteAccount);
 
 // Rutas de recuperación de contraseña
 router.post('/request-password-reset', validatePasswordResetRequest, authController.requestPasswordReset);

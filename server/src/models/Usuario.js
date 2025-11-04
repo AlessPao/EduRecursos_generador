@@ -26,6 +26,11 @@ const Usuario = sequelize.define('Usuario', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  privacyConsentTimestamp: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Fecha y hora en que el usuario otorgó su consentimiento para el tratamiento de datos personales (ISO 8601)'
   }
 }, {
   tableName: 'usuarios',

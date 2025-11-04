@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { API_URL } from '../config';
 import { Trash2 } from 'lucide-react';
+import DeleteConfirmation from '../components/DeleteConfirmation';
 
 interface ExamItem {
   id: string;
@@ -15,6 +16,7 @@ const EvaluationsList: React.FC = () => {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [examToDelete, setExamToDelete] = useState<{ slug: string; titulo: string } | null>(null);
   const navigate = useNavigate();
   const fetchExams = async () => {
     try {
@@ -35,11 +37,15 @@ const EvaluationsList: React.FC = () => {
   };
 
   const handleDelete = async (slug: string, titulo: string) => {
-    if (!confirm(`¿Estás seguro de que quieres eliminar el examen "${titulo}"?`)) {
-      return;
-    }
+    setExamToDelete({ slug, titulo });
+  };
+
+  const confirmDelete = async () => {
+    if (!examToDelete) return;
     
+    const { slug } = examToDelete;
     setDeletingId(slug);
+    
     try {
       const token = localStorage.getItem('token');
       const res = await axios.delete(`${API_URL}/exams/${slug}`, {
@@ -55,6 +61,7 @@ const EvaluationsList: React.FC = () => {
       toast.error('Error al eliminar el examen');
     } finally {
       setDeletingId(null);
+      setExamToDelete(null);
     }
   };
 
@@ -125,6 +132,16 @@ const EvaluationsList: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Modal de confirmación de eliminación */}
+      {examToDelete && (
+        <DeleteConfirmation
+          isOpen={!!examToDelete}
+          onClose={() => setExamToDelete(null)}
+          onConfirm={confirmDelete}
+          title={examToDelete.titulo}
+        />
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import RecoveryCode from '../models/RecoveryCode.js';
 import jwt from 'jsonwebtoken';
 import { sendRecoveryCode } from '../services/email.service.js';
 import { Op } from 'sequelize';
+import { formatearTimestampConsentimiento } from '../utils/dateFormatter.js';
 
 // Registrar un nuevo usuario
 export const register = async (req, res, next) => {
@@ -17,7 +18,18 @@ export const register = async (req, res, next) => {
       });
     }
 
-    const { nombre, email, password } = req.body;
+    const { nombre, email, password, privacyConsentTimestamp } = req.body;
+
+    // Validar que se haya proporcionado el timestamp del consentimiento
+    if (!privacyConsentTimestamp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Se requiere el consentimiento de privacidad para registrarse'
+      });
+    }
+
+    // Formatear el timestamp a formato PostgreSQL con zona horaria de Perú
+    const formattedTimestamp = formatearTimestampConsentimiento(privacyConsentTimestamp);
 
     // Verificar si el email ya está en uso
     const existeUsuario = await Usuario.findOne({ where: { email } });
@@ -28,11 +40,12 @@ export const register = async (req, res, next) => {
       });
     }
 
-    // Crear nuevo usuario
+    // Crear nuevo usuario con el timestamp del consentimiento formateado
     const usuario = await Usuario.create({
       nombre,
       email,
-      password
+      password,
+      privacyConsentTimestamp: formattedTimestamp
     });
 
     // Responder sin incluir la contraseña
@@ -42,7 +55,8 @@ export const register = async (req, res, next) => {
       usuario: {
         id: usuario.id,
         nombre: usuario.nombre,
-        email: usuario.email
+        email: usuario.email,
+        privacyConsentTimestamp: usuario.privacyConsentTimestamp
       }
     });
   } catch (error) {
@@ -136,6 +150,154 @@ export const getProfile = async (req, res, next) => {
       usuario
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+// Actualizar perfil del usuario (nombre, email, contraseña)
+export const updateProfile = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+
+    const userId = req.user.userId;
+    const { nombre, email, currentPassword, newPassword } = req.body;
+
+    // Buscar el usuario
+    const usuario = await Usuario.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Si se quiere cambiar el email, verificar que no esté en uso
+    if (email && email !== usuario.email) {
+      const emailExiste = await Usuario.findOne({ where: { email } });
+      if (emailExiste) {
+        return res.status(400).json({
+          success: false,
+          message: 'El correo electrónico ya está en uso'
+        });
+      }
+      usuario.email = email;
+    }
+
+    // Si se proporciona un nombre, actualizarlo
+    if (nombre && nombre.trim() !== '') {
+      usuario.nombre = nombre;
+    }
+
+    // Si se quiere cambiar la contraseña, verificar la contraseña actual
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Debe proporcionar la contraseña actual para cambiarla'
+        });
+      }
+
+      // Verificar la contraseña actual
+      const passwordValida = await usuario.validarPassword(currentPassword);
+      if (!passwordValida) {
+        return res.status(401).json({
+          success: false,
+          message: 'La contraseña actual es incorrecta'
+        });
+      }
+
+      // Actualizar la contraseña (el hook beforeUpdate se encarga del hash)
+      usuario.password = newPassword;
+    }
+
+    // Guardar los cambios
+    await usuario.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Perfil actualizado correctamente',
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        createdAt: usuario.createdAt
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Eliminar cuenta del usuario (ARCO - Derecho de Cancelación)
+export const deleteAccount = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+
+    const userId = req.user.userId;
+    const { password, confirmationText } = req.body;
+
+    // Verificar que se proporcionó el texto de confirmación
+    if (confirmationText !== 'ELIMINAR MI CUENTA') {
+      return res.status(400).json({
+        success: false,
+        message: 'Debe escribir exactamente "ELIMINAR MI CUENTA" para confirmar'
+      });
+    }
+
+    // Buscar el usuario
+    const usuario = await Usuario.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar la contraseña
+    const passwordValida = await usuario.validarPassword(password);
+    if (!passwordValida) {
+      return res.status(401).json({
+        success: false,
+        message: 'Contraseña incorrecta'
+      });
+    }
+
+    // Importar modelos relacionados dinámicamente para evitar dependencias circulares
+    const { default: Recurso } = await import('../models/Recurso.js');
+    const { default: Exam } = await import('../models/Exam.js');
+    const { default: ExamResult } = await import('../models/ExamResult.js');
+
+    // Eliminar todos los datos relacionados del usuario
+    // 1. Eliminar resultados de exámenes (tanto como estudiante que realizó exámenes)
+    await ExamResult.destroy({ where: { usuarioId: userId } });
+
+    // 2. Eliminar exámenes creados por el usuario
+    await Exam.destroy({ where: { usuarioId: userId } });
+
+    // 3. Eliminar recursos creados por el usuario
+    await Recurso.destroy({ where: { usuarioId: userId } });
+
+    // 4. Finalmente eliminar el usuario
+    await usuario.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: 'Cuenta eliminada correctamente. Todos tus datos han sido borrados permanentemente.'
+    });
+  } catch (error) {
+    console.error('Error al eliminar cuenta:', error);
     next(error);
   }
 };

@@ -15,7 +15,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null; // Añadir token al contexto
   login: (email: string, password: string) => Promise<void>;
-  register: (nombre: string, email: string, password: string) => Promise<void>;
+  register: (nombre: string, email: string, password: string, consentTimestamp: string) => Promise<void>;
   logout: () => Promise<void>;
   error: string | null;
   clearError: () => void;
@@ -106,13 +106,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Registrar nuevo usuario
-  const register = async (nombre: string, email: string, password: string) => {
+  const register = async (nombre: string, email: string, password: string, consentTimestamp: string) => {
     try {
       setLoading(true);
       setError(null);
       
-      // No se espera token aquí, solo registro
-      await axios.post(`${API_URL}/auth/register`, { nombre, email, password });
+      // Enviar el timestamp del consentimiento junto con los datos de registro
+      await axios.post(`${API_URL}/auth/register`, { 
+        nombre, 
+        email, 
+        password, 
+        privacyConsentTimestamp: consentTimestamp 
+      });
       // Podrías querer llamar a login() aquí si el backend devuelve un token al registrar
       // o simplemente mostrar un mensaje de éxito para que el usuario inicie sesión.
     } catch (err: any) {

@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator';
 import Recurso from '../models/Recurso.js';
 import { generarRecurso } from '../services/llm.service.js';
-import pdf from 'html-pdf';
+import puppeteer from 'puppeteer';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { formatearFechaHora } from '../utils/dateFormatter.js';
@@ -178,6 +178,7 @@ export const deleteRecurso = async (req, res, next) => {
 
 // Generar PDF del recurso
 export const generatePdf = async (req, res, next) => {
+  let browser = null;
   try {
     const recurso = await Recurso.findOne({
       where: { 
@@ -196,38 +197,61 @@ export const generatePdf = async (req, res, next) => {
     // Generar HTML según el tipo de recurso
     const html = generateHtmlTemplate(recurso);
     
-    // Configuración para la generación del PDF
-    const options = {
+    // Detectar el ejecutable de Chromium según el entorno
+    const chromiumPath = process.env.PUPPETEER_EXECUTABLE_PATH || 
+                         process.env.CHROMIUM_PATH || 
+                         '/usr/bin/chromium' || 
+                         '/usr/bin/chromium-browser';
+    
+    // Configuración de Puppeteer para Railway/producción
+    const puppeteerOptions = {
+      headless: true,
+      executablePath: chromiumPath,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+      ]
+    };
+
+    // Lanzar navegador
+    browser = await puppeteer.launch(puppeteerOptions);
+    const page = await browser.newPage();
+    
+    // Establecer el contenido HTML
+    await page.setContent(html, {
+      waitUntil: 'networkidle0'
+    });
+    
+    // Generar PDF con opciones
+    const pdfBuffer = await page.pdf({
       format: 'A4',
-      border: {
+      margin: {
         top: '1cm',
         right: '1cm',
         bottom: '1cm',
         left: '1cm'
       },
-      header: {
-        height: '1cm'
-      },
-      footer: {
-        height: '1cm',
-        contents: {
-          default: '<span style="font-size: 10px; text-align: center; width: 100%; display: block">Página {{page}} de {{pages}}</span>'
-        }
-      }
-    };
-    
-    // Generar PDF
-    pdf.create(html, options).toBuffer((err, buffer) => {
-      if (err) {
-        return next(err);
-      }
-      
-      // Enviar PDF al cliente
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${recurso.titulo.replace(/\s+/g, '_')}.pdf"`);
-      res.send(buffer);
+      printBackground: true,
+      displayHeaderFooter: true,
+      headerTemplate: '<div></div>',
+      footerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%;"><span class="pageNumber"></span> de <span class="totalPages"></span></div>'
     });
+    
+    // Cerrar navegador
+    await browser.close();
+    browser = null;
+    
+    // Enviar PDF al cliente
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${recurso.titulo.replace(/\s+/g, '_')}.pdf"`);
+    res.send(pdfBuffer);
   } catch (error) {
+    // Asegurarse de cerrar el navegador en caso de error
+    if (browser) {
+      await browser.close();
+    }
     next(error);
   }
 };

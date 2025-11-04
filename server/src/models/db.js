@@ -1,13 +1,30 @@
 import { Sequelize } from 'sequelize';
-import { dbUrl } from '../config/index.js';
+import { dbUrl, nodeEnv } from '../config/index.js';
+
+// Validar que tenemos una URL de base de datos
+if (!dbUrl) {
+  console.error('ERROR: No se encontró DATABASE_URL o db_url en las variables de entorno');
+  process.exit(1);
+}
+
+// Configuración de dialectOptions basada en el entorno
+const dialectOptions = {
+  timezone: 'America/Lima',
+};
+
+// En producción (Railway), habilitar SSL
+if (nodeEnv === 'production') {
+  dialectOptions.ssl = {
+    require: true,
+    rejectUnauthorized: false // Railway requiere esto
+  };
+}
 
 export const sequelize = new Sequelize(dbUrl, {
   dialect: 'postgres',
   logging: false,
   timezone: 'America/Lima', // Zona horaria de Perú (UTC-5)
-  dialectOptions: {
-    timezone: 'America/Lima',
-  },
+  dialectOptions,
   pool: {
     max: 5,
     min: 0,

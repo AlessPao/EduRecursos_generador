@@ -2,7 +2,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const dbUrl = process.env.db_url;
+// Railway usa DATABASE_URL por defecto, pero también soportamos db_url
+export const dbUrl = process.env.DATABASE_URL || process.env.db_url;
 export const port = process.env.PORT || 5000;
 export const sessionSecret = process.env.SESSION_SECRET;
 export const llm_base_url = process.env.llm_base_url;

@@ -23,6 +23,8 @@ import metricsRoutes from './routes/metrics.routes.js';
 import semanticsRoutes from './routes/semantics.routes.js';
 // Importar rutas de análisis simple
 import simpleAnalysisRoutes from './routes/simple-analysis.routes.js';
+// Importar middleware de sanitización
+import { sanitizeMiddleware } from './utils/sanitizer.js';
 
 // Configuración
 dotenv.config();
@@ -55,6 +57,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan('dev'));
+// Sanitización contra XSS - aplicar DESPUÉS de parsear el body
+app.use(sanitizeMiddleware);
 
 // Rutas
 // Health check endpoint

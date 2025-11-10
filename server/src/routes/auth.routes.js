@@ -44,7 +44,8 @@ const validateRegister = [
       }
       return true;
     }),
-  body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
+  body('password')
+    .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres')
 ];
 
 // Validaciones para login
@@ -115,8 +116,6 @@ const validatePasswordReset = [
   body('code').isLength({ min: 6, max: 6 }).withMessage('El código debe tener 6 dígitos'),
   body('newPassword')
     .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/)
-    .withMessage('La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial')
 ];
 
 // Validaciones para actualizar perfil
@@ -143,7 +142,7 @@ const validateUpdateProfile = [
     .notEmpty().withMessage('La contraseña actual es obligatoria si desea cambiarla'),
   body('newPassword')
     .optional()
-    .isLength({ min: 6 }).withMessage('La nueva contraseña debe tener al menos 6 caracteres')
+    .isLength({ min: 8 }).withMessage('La nueva contraseña debe tener al menos 8 caracteres')
 ];
 
 // Validaciones para eliminar cuenta

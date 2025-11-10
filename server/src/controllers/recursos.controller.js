@@ -197,16 +197,9 @@ export const generatePdf = async (req, res, next) => {
     // Generar HTML según el tipo de recurso
     const html = generateHtmlTemplate(recurso);
     
-    // Detectar el ejecutable de Chromium según el entorno
-    const chromiumPath = process.env.PUPPETEER_EXECUTABLE_PATH || 
-                         process.env.CHROMIUM_PATH || 
-                         '/usr/bin/chromium' || 
-                         '/usr/bin/chromium-browser';
-    
-    // Configuración de Puppeteer para Railway/producción
+    // Configuración de Puppeteer
     const puppeteerOptions = {
       headless: true,
-      executablePath: chromiumPath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -214,6 +207,18 @@ export const generatePdf = async (req, res, next) => {
         '--disable-gpu',
       ]
     };
+
+    // Solo establecer executablePath en producción (Linux)
+    // En desarrollo (Windows/Mac), Puppeteer usa Chrome automáticamente
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+      puppeteerOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    } else if (process.env.NODE_ENV === 'production') {
+      // Rutas comunes en Linux para producción
+      const chromiumPath = process.env.CHROMIUM_PATH || 
+                           '/usr/bin/chromium' || 
+                           '/usr/bin/chromium-browser';
+      puppeteerOptions.executablePath = chromiumPath;
+    }
 
     // Lanzar navegador
     browser = await puppeteer.launch(puppeteerOptions);

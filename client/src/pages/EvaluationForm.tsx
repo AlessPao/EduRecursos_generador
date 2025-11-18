@@ -263,8 +263,12 @@ const EvaluationForm: React.FC = () => {
           <label className="block">Longitud (palabras)</label>
           <select value={longitud} onChange={e => setLongitud(e.target.value)} className="form-select w-full">
             <option value="100">100 palabras</option>
+            <option value="150">150 palabras</option>
             <option value="200">200 palabras</option>
+            <option value="250">250 palabras</option>
             <option value="300">300 palabras</option>
+            <option value="350">350 palabras</option>
+            <option value="400">400 palabras</option>
           </select>
         </div>        <div>
           <label className="block">Número de preguntas literales</label>

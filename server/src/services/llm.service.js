@@ -19,14 +19,14 @@ export async function generarRecurso(params) {
       {
         role: "system",
         content:
-          "Eres un docente experto en comunicación para estudiantes de 2º grado que crea materiales didácticos alineados con el Currículo Nacional peruano.",
+          "Eres un docente experto en comunicación para estudiantes de 2º grado (niños de 7-8 años) que crea materiales didácticos excepcionales alineados con el Currículo Nacional peruano.\n\nPRINCIPIOS FUNDAMENTALES PARA TODO CONTENIDO:\n\n1. ADAPTACIÓN PEDAGÓGICA PARA NIÑOS DE 7-8 AÑOS:\n   - Sin importar qué tan complejo sea el tema (ciencia, historia, conceptos abstractos), SIEMPRE adapta el contenido al nivel de comprensión de niños de 2º grado\n   - Usa EJEMPLOS CONCRETOS de la vida cotidiana que los niños conozcan (familia, escuela, juegos, naturaleza cercana)\n   - Emplea ANALOGÍAS SIMPLES para explicar conceptos difíciles (comparar con cosas que pueden ver, tocar o experimentar)\n   - Relaciona temas complejos con experiencias familiares: 'Es como cuando tú...'\n\n2. LENGUAJE Y ESTILO:\n   - Vocabulario sencillo y cotidiano, apropiado para la edad\n   - Oraciones cortas y claras (máximo 10-12 palabras)\n   - Evita términos técnicos; si son necesarios, explícalos con palabras simples\n   - Usa lenguaje afectivo y cercano que motive al niño\n\n3. CALIDAD Y COHERENCIA DEL CONTENIDO:\n   - Textos completos, coherentes y bien estructurados\n   - Desarrollo lógico de ideas con inicio, desarrollo y cierre\n   - Detalles suficientes para crear imágenes mentales claras\n   - Historias con sentido completo, personajes definidos y secuencia temporal clara\n   - NO omitir información importante ni dejar ideas incompletas\n\n4. ELEMENTOS PEDAGÓGICOS:\n   - Incorpora elementos visuales descriptivos (colores, tamaños, formas)\n   - Incluye acciones y emociones que los niños puedan identificar\n   - Fomenta la curiosidad y el asombro apropiado para la edad\n   - Refuerza valores positivos de manera natural\n\n5. EJEMPLOS DE ADAPTACIÓN:\n   - Tema complejo (fotosíntesis) → 'Las plantas comen luz del sol, como tú comes tus alimentos'\n   - Tema complejo (ciclo del agua) → 'El agua viaja como en un juego: sube al cielo, forma nubes y vuelve a bajar'\n   - Tema simple (paseo familiar) → Narración rica en detalles sensoriales, emociones y secuencia clara\n\nRECUERDA: Tu objetivo es que CUALQUIER tema sea accesible, interesante y memorable para niños de 7-8 años, manteniendo siempre alta calidad narrativa y coherencia.",
       },
       {
         role: "user",
         content: prompt,
       },
     ],
-    temperature: 0.7,
+    temperature: 0.75,
     response_format: { type: "json_object" },
   };
 
@@ -208,16 +208,41 @@ function crearPrompt({ tipo, opciones }) {
 - Longitud: ${opciones.longitud} palabras
 - Preguntas literales: ${opciones.numLiteral}
 
-Cada pregunta debe tener 4 opciones, indicando cuál es la correcta. El texto y las preguntas deben ser apropiados para niños de 7-8 años.
+REQUISITOS CRÍTICOS PARA EL TEXTO DEL EXAMEN:
+
+1. ADAPTACIÓN DEL TEMA A NIÑOS DE 7-8 AÑOS:
+   - Tema complejo (ciencia, historia, conceptos abstractos):
+     * Explica usando COMPARACIONES con cosas conocidas
+     * Usa EJEMPLOS DE LA VIDA DIARIA del niño
+     * Simplifica sin perder exactitud: 'es como...', 'parecido a...'
+   - Tema simple (historias, familia, naturaleza cercana):
+     * Desarrolla con RICOS DETALLES sensoriales y emocionales
+     * Crea NARRATIVA COMPLETA con secuencia clara
+     * Incluye descripciones vívidas que el niño pueda imaginar
+
+2. CALIDAD DEL TEXTO:
+   - Texto COMPLETO, COHERENTE y bien ESTRUCTURADO
+   - Oraciones cortas (8-12 palabras)
+   - Vocabulario apropiado para 2º grado
+   - Desarrollo lógico: inicio, desarrollo y cierre
+   - Detalles suficientes para comprensión clara
+   - NO omitir información importante
+
+3. PREGUNTAS Y OPCIONES:
+   - Preguntas literales claras sobre información explícita
+   - Cada pregunta con 4 opciones de respuesta
+   - Opciones claramente diferenciadas
+   - Distractores plausibles pero incorrectos
+   - Lenguaje simple en preguntas y opciones
 
 Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin explicaciones, sin comentarios:
 
 {
   "titulo": "Título del examen",
-  "texto": "Contenido del texto completo",
+  "texto": "Contenido del texto completo, coherente y detallado",
   "preguntas": [
     { "pregunta": "Pregunta 1", "opciones": ["Opción A","Opción B","Opción C","Opción D"], "respuesta": "Opción A" },
-    // ...preguntas pero solo tipo literal
+    { "pregunta": "Pregunta 2", "opciones": ["Opción A","Opción B","Opción C","Opción D"], "respuesta": "Opción B" }
   ]
 }`;
       break;
@@ -231,25 +256,60 @@ Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin exp
 - Preguntas críticas: ${opciones.numCritica}
 ${
   opciones.vocabulario
-    ? "- Incluir sección de vocabulario con 5 palabras clave y sus definiciones"
+    ? "- Incluir sección de vocabulario con 5 palabras clave y sus definiciones apropiadas para niños"
     : ""
 }
 
-El texto debe ser apropiado para niños de 7-8 años, con vocabulario sencillo y oraciones cortas.
+REQUISITOS CRÍTICOS PARA EL TEXTO:
+
+1. ADAPTACIÓN DEL TEMA (CRUCIAL):
+   - Si el tema es complejo (ciencia, tecnología, historia, conceptos abstractos):
+     * Usa EJEMPLOS CONCRETOS de la vida del niño
+     * Emplea ANALOGÍAS SIMPLES: compara con cosas conocidas
+     * Relaciona con experiencias cotidianas (familia, escuela, juegos, naturaleza)
+   - Si el tema es simple (historias cotidianas, paseos, animales domésticos):
+     * Desarrolla con DETALLES SENSORIALES (colores, sonidos, olores, texturas)
+     * Incluye EMOCIONES y ACCIONES que los niños reconozcan
+     * Crea SECUENCIA CLARA con inicio, desarrollo y final bien definido
+
+2. CALIDAD DEL TEXTO:
+   - Texto COMPLETO y COHERENTE (no omitir información)
+   - Oraciones cortas (8-12 palabras máximo)
+   - Vocabulario sencillo y apropiado para 7-8 años
+   - Estructura clara: introducción, desarrollo y cierre
+   - Personajes o elementos bien descritos
+   - NO dejar ideas incompletas o vagas
+
+3. ELEMENTOS NARRATIVOS:
+   - Usar conectores temporales simples: primero, después, luego, finalmente
+   - Incluir detalles que ayuden a visualizar (colores, tamaños, formas)
+   - Incorporar diálogos simples si es pertinente
+   - Mantener consistencia en tiempo verbal (preferir presente o pasado simple)
+
+4. PREGUNTAS:
+   - Literales: sobre información explícita en el texto
+   - Inferenciales: que requieran deducción simple basada en el texto
+   - Críticas: que inviten a opinar o relacionar con experiencias personales
+   - Todas deben ser claras y apropiadas para la edad
+
+5. VOCABULARIO (si aplica):
+   - Palabras clave del texto que puedan ser nuevas
+   - Definiciones en lenguaje simple que un niño de 7-8 años entienda
+   - Usar ejemplos en las definiciones cuando sea posible
 
 Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin explicaciones, sin comentarios:
 
 {
-  "titulo": "Título de la ficha",
-  "texto": "Contenido del texto completo",
+  "titulo": "Título atractivo y claro de la ficha",
+  "texto": "Contenido del texto completo, coherente y detallado",
   "preguntas": [
     {"tipo": "literal", "pregunta": "Pregunta 1", "respuesta": "Respuesta 1"},
     {"tipo": "inferencial", "pregunta": "Pregunta 2", "respuesta": "Respuesta 2"},
     {"tipo": "critica", "pregunta": "Pregunta 3", "respuesta": "Respuesta 3"}
   ],
   "vocabulario": [
-    {"palabra": "Palabra 1", "definicion": "Definición 1"},
-    {"palabra": "Palabra 2", "definicion": "Definición 2"}
+    {"palabra": "Palabra 1", "definicion": "Definición simple con ejemplo"},
+    {"palabra": "Palabra 2", "definicion": "Definición simple con ejemplo"}
   ]
 }`;
       break;
@@ -258,19 +318,46 @@ Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin exp
 - Tipo de texto: ${opciones.tipoTexto}
 - Tema: ${opciones.tema}
 - Nivel de ayuda: ${opciones.nivelAyuda}
-${opciones.conectores ? "- Incluir banco de conectores apropiados" : ""}
+${opciones.conectores ? "- Incluir banco de conectores apropiados para niños" : ""}
 
-La actividad debe incluir instrucciones claras y sencillas apropiadas para niños de 7-8 años.
+REQUISITOS PARA LA ACTIVIDAD:
+
+1. ADAPTACIÓN DEL TEMA:
+   - Si el tema es complejo o abstracto:
+     * Proporciona EJEMPLOS CONCRETOS que el niño conozca
+     * Usa ANALOGÍAS SIMPLES para explicar el concepto
+     * Relaciona con experiencias personales del niño
+   - Si el tema es cotidiano:
+     * Guía para incluir DETALLES SENSORIALES (qué vieron, oyeron, sintieron)
+     * Sugiere incluir EMOCIONES y REACCIONES personales
+     * Estructura clara de secuencia temporal
+
+2. INSTRUCCIONES:
+   - Lenguaje claro y directo para niños de 7-8 años
+   - Pasos numerados y específicos
+   - Ejemplos concretos cuando sea necesario
+   - Motivación positiva para escribir
+
+3. ESTRUCTURA Y APOYO:
+   - Estructura propuesta adaptada al tipo de texto y tema
+   - Conectores simples apropiados para la edad (primero, después, luego, finalmente, también, porque)
+   - Lista de verificación con criterios que el niño pueda entender y revisar
+
+4. ANDAMIAJE PEDAGÓGICO:
+   - Considerar el nivel de ayuda solicitado
+   - Proporcionar modelos o ejemplos si el nivel es alto
+   - Preguntas guía para inspirar ideas
+   - Vocabulario útil relacionado con el tema
 
 Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin explicaciones, sin comentarios:
 
 {
-  "titulo": "Título de la actividad",
-  "descripcion": "Breve descripción de la actividad",
-  "instrucciones": "Instrucciones paso a paso",
-  "estructuraPropuesta": "Estructura sugerida para el texto",
-  "conectores": ["Conector 1", "Conector 2", "Conector 3"],
-  "listaVerificacion": ["Punto 1", "Punto 2", "Punto 3"]
+  "titulo": "Título atractivo de la actividad",
+  "descripcion": "Breve descripción motivadora de la actividad",
+  "instrucciones": "Instrucciones paso a paso claras y sencillas",
+  "estructuraPropuesta": "Estructura sugerida para el texto con ejemplos",
+  "conectores": ["Primero", "Después", "Luego", "Finalmente", "También", "Porque"],
+  "listaVerificacion": ["Criterio 1 que el niño entienda", "Criterio 2 verificable", "Criterio 3 claro"]
 }`;
       break;
     case "gramatica":
@@ -329,14 +416,22 @@ Responde ÚNICAMENTE con un objeto JSON que siga esta estructura exacta, sin exp
         temaFinal = opciones.temaPersonalizado;
       }
 
-      // Determinar parámetros
-      const longitudOracion =
-        opciones.longitudOracion || "Normal (4-5 palabras)";
+      // Determinar parámetros de longitud automáticamente según el tipo de actividad
+      let longitudOracion;
+      if (tipoActividad === "completar_oracion") {
+        // Para completar oraciones, usar oraciones más largas para que tenga sentido
+        longitudOracion = "Larga (5-6 palabras)";
+      } else if (tipoActividad === "formar_oracion") {
+        // Para formar oraciones, usar la selección del usuario o valor por defecto
+        longitudOracion = opciones.longitudOracion || "Normal (4-5 palabras)";
+      } else {
+        longitudOracion = opciones.longitudOracion || "Normal (4-5 palabras)";
+      }
 
       if (tipoActividad === "formar_oracion") {
-        prompt += `El título de este recurso es "Juegos interactivos - Formar oraciones".\n\nGenera exactamente ${opciones.numActividades} actividades de tipo "formar_oracion" para estudiantes de 2º grado de primaria sobre el tema "${temaFinal}".\n\nPARÁMETROS DE CONFIGURACIÓN:\n- Tema: ${temaFinal}\n- Longitud de oraciones: ${longitudOracion}\n\nCARACTERÍSTICAS CRÍTICAS para oraciones NATURALES:\n- TODAS las actividades deben ser tipo "formar_oracion"\n- Para cada actividad:\n  - Crea oraciones con FLUJO NATURAL que los niños usarían al hablar\n  - Respetar la longitud especificada: ${longitudOracion}\n  - La primera palabra DEBE empezar con MAYÚSCULA\n  - Presenta las palabras mezcladas aleatoriamente\n  - Usar VERBOS DE ACCIÓN y DESCRIPTORES naturales\n  - Incorporar CONTEXTOS FAMILIARES para los niños\n  - Evitar construcciones artificiales o repetitivas\n  - Cada oración debe tener sentido completo y ser agradable de leer\n  - Vocabulario apropiado para 2º grado (7-8 años)\n\nEJEMPLOS MEJORADOS por tema:\n\n🏠 FAMILIA:\n✅ "Mi hermana canta hermoso" → ["canta", "hermana", "Mi", "hermoso"]\n✅ "Papá prepara desayuno rico" → ["rico", "prepara", "Papá", "desayuno"]\n✅ "Abuela cuenta cuentos divertidos" → ["divertidos", "cuenta", "Abuela", "cuentos"]\n\n🐾 ANIMALES:\n✅ "El perro corre alegre" → ["alegre", "perro", "corre", "El"]\n✅ "Los gatos duermen tranquilos" → ["tranquilos", "gatos", "duermen", "Los"]\n✅ "Mi pájaro canta bonito" → ["bonito", "pájaro", "canta", "Mi"]\n\n🏫 ESCUELA:\n✅ "Los niños juegan juntos" → ["juntos", "niños", "juegan", "Los"]\n✅ "Maestra explica muy bien" → ["bien", "explica", "Maestra", "muy"]\n✅ "Mis amigos estudian mucho" → ["mucho", "amigos", "estudian", "Mis"]\n\n❌ EVITAR (oraciones artificiales):\n- "La madre hace comida" (muy robótico)\n- "El niño tiene lápiz" (sin naturalidad)\n- "Los estudiantes en escuela" (incompleta)\n\nEstructura JSON requerida:\n\n{\n  "titulo": "Juegos interactivos - Formar oraciones",\n  "actividades": [\n    {\n      "tipo": "formar_oracion",\n      "enunciado": "Arrastra las palabras para formar la oración correcta sobre ${temaFinal}.",\n      "opciones": ["palabra1", "palabra2", "palabra3", "palabra4"],\n      "respuesta": ["Palabra1", "palabra2", "palabra3", "palabra4"]\n    }\n  ]\n}`;
+        prompt += `El título de este recurso es "Juegos interactivos - Formar oraciones".\n\nGenera exactamente ${opciones.numActividades} actividades de tipo "formar_oracion" para estudiantes de 2º grado de primaria sobre el tema "${temaFinal}".\n\nPARÁMETROS DE CONFIGURACIÓN:\n- Tema: ${temaFinal}\n- Longitud de oraciones: ${longitudOracion}\n\nREGLAS CRÍTICAS PARA ORACIONES GRAMATICALMENTE PERFECTAS:\n\n1. ESTRUCTURA GRAMATICAL OBLIGATORIA:\n   - TODAS las oraciones DEBEN incluir ARTÍCULOS cuando sean necesarios (el, la, los, las, un, una)\n   - SIEMPRE verificar que la oración esté gramaticalmente COMPLETA\n   - Incluir PREPOSICIONES necesarias (en, de, con, a, por, para)\n   - NO omitir ninguna palabra funcional (artículos, preposiciones, conjunciones)\n\n2. VALIDACIÓN DE COHERENCIA:\n   - Lee la oración completa ANTES de generar las palabras\n   - Verifica que tenga: SUJETO + VERBO + COMPLEMENTO (si es necesario)\n   - Asegúrate que suene NATURAL cuando un niño la dice en voz alta\n   - Debe ser una oración que encuentres en libros infantiles\n\n3. CARACTERÍSTICAS DE CALIDAD:\n   - Flujo natural que los niños usarían al hablar\n   - Respetar la longitud especificada: ${longitudOracion}\n   - Primera palabra DEBE empezar con MAYÚSCULA\n   - Palabras mezcladas aleatoriamente en "opciones"\n   - Verbos de acción y descriptores naturales\n   - Contextos familiares para los niños\n   - Vocabulario apropiado para 2º grado (7-8 años)\n\nEJEMPLOS CORRECTOS CON ESTRUCTURA COMPLETA:\n\n🏖️ PLAYA/VERANO:\n✅ "Los niños juegan en la playa" → ["juegan", "Los", "en", "niños", "la", "playa"]\n✅ "En el verano hace calor" → ["el", "hace", "En", "verano", "calor"]\n✅ "Mi familia va a la playa" → ["familia", "la", "Mi", "playa", "va", "a"]\n✅ "El sol brilla en verano" → ["El", "brilla", "verano", "sol", "en"]\n\n🏠 FAMILIA:\n✅ "Mi hermana canta muy bonito" → ["canta", "hermana", "Mi", "muy", "bonito"]\n✅ "Papá prepara el desayuno rico" → ["rico", "prepara", "Papá", "el", "desayuno"]\n✅ "La abuela cuenta cuentos lindos" → ["lindos", "cuenta", "La", "abuela", "cuentos"]\n\n🐾 ANIMALES:\n✅ "El perro corre muy rápido" → ["muy", "perro", "corre", "El", "rápido"]\n✅ "Los gatos duermen en casa" → ["en", "gatos", "duermen", "Los", "casa"]\n✅ "Mi pájaro canta de día" → ["de", "pájaro", "canta", "Mi", "día"]\n\n🏫 ESCUELA:\n✅ "Los niños juegan en el patio" → ["patio", "niños", "juegan", "Los", "en", "el"]\n✅ "La maestra explica muy bien" → ["bien", "explica", "La", "maestra", "muy"]\n✅ "Mis amigos estudian con alegría" → ["con", "amigos", "estudian", "Mis", "alegría"]\n\n❌ EVITAR ESTOS ERRORES COMUNES:\n- ❌ "Los niños juegan en playa" (falta artículo "la")\n- ❌ "Los niños juegan playa verano" (falta preposición "en" y artículo)\n- ❌ "La madre hace comida" (muy robótico, mejor: "Mamá cocina comida rica")\n- ❌ "El niño tiene lápiz" (falta artículo, mejor: "El niño tiene un lápiz")\n- ❌ "Los estudiantes escuela" (falta verbo y preposición)\n- ❌ "Perro corre rápido" (falta artículo "El")\n\nPROCESO DE VERIFICACIÓN OBLIGATORIO:\n1. Escribe la oración completa con TODAS las palabras necesarias\n2. Lee la oración en voz alta mentalmente\n3. Verifica que tenga artículos, preposiciones y estructura completa\n4. Confirma que suena natural para un niño de 7-8 años\n5. SOLO ENTONCES genera el array de "opciones" mezcladas y "respuesta" ordenada\n\nEstructura JSON requerida:\n\n{\n  "titulo": "Juegos interactivos - Formar oraciones",\n  "actividades": [\n    {\n      "tipo": "formar_oracion",\n      "enunciado": "Arrastra las palabras para formar la oración correcta sobre ${temaFinal}.",\n      "opciones": ["palabra1", "palabra2", "palabra3", "palabra4", "palabra5"],\n      "respuesta": ["Palabra1", "palabra2", "palabra3", "palabra4", "palabra5"]\n    }\n  ]\n}`;
       } else if (tipoActividad === "completar_oracion") {
-        prompt += `El título de este recurso es "Juegos interactivos - Completar oraciones".\n\nGenera exactamente ${opciones.numActividades} actividades de tipo "completar_oracion" para estudiantes de 2º grado de primaria sobre el tema "${temaFinal}".\n\nPARÁMETROS DE CONFIGURACIÓN:\n- Tema: ${temaFinal}\n- Longitud de oraciones: ${longitudOracion}\n\nCARACTERÍSTICAS CRÍTICAS - MUY IMPORTANTE:\n- TODAS las actividades deben ser tipo "completar_oracion"\n- Para cada actividad:\n  - El campo "enunciado" DEBE contener EXACTAMENTE 5 guiones bajos seguidos: _____\n  - NUNCA incluir la respuesta completa en el enunciado\n  - La oración debe sonar como algo que un niño diría naturalmente\n  - Primera letra MAYÚSCULA, punto final\n  - Exactamente 4 opciones: 1 correcta + 3 claramente incorrectas\n  - Las opciones incorrectas NO deben tener sentido en el contexto\n  - Usar vocabulario familiar y cotidiano apropiado para 2º grado\n  - Contextos que los niños reconozcan fácilmente\n\nEJEMPLOS CORRECTOS (SIGUE ESTE FORMATO EXACTO):\n\n🏠 FAMILIA:\n✅ "Mi mamá cocina muy _____." \n   Opciones: ["rico", "mesa", "libro", "zapato"] → Respuesta: ["rico"]\n✅ "El bebé llora cuando tiene _____." \n   Opciones: ["hambre", "lápiz", "silla", "pared"] → Respuesta: ["hambre"]\n✅ "Mi papá trabaja muy _____." \n   Opciones: ["duro", "flor", "pez", "silla"] → Respuesta: ["duro"]\n\n🐾 ANIMALES:\n✅ "El perro mueve la _____ cuando está feliz." \n   Opciones: ["cola", "mesa", "casa", "lápiz"] → Respuesta: ["cola"]\n✅ "Los peces viven en el _____." \n   Opciones: ["agua", "árbol", "cielo", "libro"] → Respuesta: ["agua"]\n✅ "Mi gato duerme en la _____." \n   Opciones: ["cama", "comida", "pelota", "árbol"] → Respuesta: ["cama"]\n\n🏫 ESCUELA:\n✅ "Los niños escriben con el _____." \n   Opciones: ["lápiz", "perro", "comida", "árbol"] → Respuesta: ["lápiz"]\n✅ "En el recreo jugamos en el _____." \n   Opciones: ["patio", "refrigerador", "cama", "televisión"] → Respuesta: ["patio"]\n✅ "La maestra explica en la _____." \n   Opciones: ["pizarra", "cocina", "carro", "flor"] → Respuesta: ["pizarra"]\n\n❌ EVITAR COMPLETAMENTE:\n- "Mi papá trabaja duro." (NO debe mostrar la respuesta completa)\n- "El niño come." (muy simple, sin _____ )\n- Opciones múltiples correctas: "Mi _____ me quiere" ["mamá", "papá", "hermana"]\n- Oraciones artificiales: "El objeto está en lugar"\n\nEstructura JSON requerida (FORMATO OBLIGATORIO):\n\n{\n  "titulo": "Juegos interactivos - Completar oraciones",\n  "actividades": [\n    {\n      "tipo": "completar_oracion",\n      "enunciado": "Mi mamá cocina muy _____.",\n      "opciones": ["rico", "mesa", "libro", "zapato"],\n      "respuesta": ["rico"]\n    }\n  ]\n}`;
+        prompt += `El título de este recurso es "Juegos interactivos - Completar oraciones".\n\nGenera exactamente ${opciones.numActividades} actividades de tipo "completar_oracion" para estudiantes de 2º grado de primaria sobre el tema "${temaFinal}".\n\nPARÁMETROS DE CONFIGURACIÓN:\n- Tema: ${temaFinal}\n- Longitud de oraciones: ${longitudOracion} (ajustada automáticamente para oraciones completas)\n\nCARACTERÍSTICAS CRÍTICAS - MUY IMPORTANTE:\n- TODAS las actividades deben ser tipo "completar_oracion"\n- Para cada actividad:\n  - El campo "enunciado" DEBE contener EXACTAMENTE 5 guiones bajos seguidos: _____\n  - NUNCA incluir la respuesta completa en el enunciado\n  - La oración debe ser más larga (5-6 palabras) para que tenga sentido completarla\n  - La oración debe sonar como algo que un niño diría naturalmente\n  - Primera letra MAYÚSCULA, punto final\n  - Exactamente 4 opciones: 1 correcta + 3 claramente incorrectas\n  - Las opciones incorrectas NO deben tener sentido en el contexto\n  - Usar vocabulario familiar y cotidiano apropiado para 2º grado\n  - Contextos que los niños reconozcan fácilmente\n  - La palabra que falta debe ser significativa (sustantivo, adjetivo o verbo importante)\n  - Evitar que falten artículos o preposiciones (deben faltar palabras con contenido)\n\nEJEMPLOS CORRECTOS (SIGUE ESTE FORMATO EXACTO):\n\n🏠 FAMILIA:\n✅ "Mi mamá cocina un pastel muy _____." \n   Opciones: ["rico", "mesa", "libro", "zapato"] → Respuesta: ["rico"]\n✅ "El bebé llora cuando tiene mucha _____." \n   Opciones: ["hambre", "lápiz", "silla", "pared"] → Respuesta: ["hambre"]\n✅ "Mi papá trabaja en la oficina muy _____." \n   Opciones: ["duro", "flor", "pez", "silla"] → Respuesta: ["duro"]\n✅ "La abuela me cuenta historias muy _____." \n   Opciones: ["lindas", "carro", "puerta", "ventana"] → Respuesta: ["lindas"]\n\n🐾 ANIMALES:\n✅ "El perro mueve la _____ cuando está feliz." \n   Opciones: ["cola", "mesa", "casa", "lápiz"] → Respuesta: ["cola"]\n✅ "Los peces nadan en el _____ del parque." \n   Opciones: ["agua", "árbol", "cielo", "libro"] → Respuesta: ["agua"]\n✅ "Mi gato duerme en la cama muy _____." \n   Opciones: ["tranquilo", "comida", "pelota", "árbol"] → Respuesta: ["tranquilo"]\n✅ "Las mariposas vuelan por el jardín con _____." \n   Opciones: ["gracia", "piedra", "silla", "reloj"] → Respuesta: ["gracia"]\n\n🏫 ESCUELA:\n✅ "Los niños escriben con el _____ azul." \n   Opciones: ["lápiz", "perro", "comida", "árbol"] → Respuesta: ["lápiz"]\n✅ "En el recreo jugamos en el patio con _____." \n   Opciones: ["alegría", "refrigerador", "cama", "televisión"] → Respuesta: ["alegría"]\n✅ "La maestra explica en la _____ grande." \n   Opciones: ["pizarra", "cocina", "carro", "flor"] → Respuesta: ["pizarra"]\n✅ "Mis amigos comparten sus juguetes con mucha _____." \n   Opciones: ["generosidad", "mesa", "ventana", "puerta"] → Respuesta: ["generosidad"]\n\n🌞 NATURALEZA:\n✅ "El sol brilla en el cielo muy _____." \n   Opciones: ["brillante", "zapato", "cuchara", "camión"] → Respuesta: ["brillante"]\n✅ "Las flores del jardín son muy _____." \n   Opciones: ["bonitas", "silla", "plato", "techo"] → Respuesta: ["bonitas"]\n✅ "Los pájaros cantan en el árbol todas las _____." \n   Opciones: ["mañanas", "carro", "pared", "mesa"] → Respuesta: ["mañanas"]\n\n❌ EVITAR COMPLETAMENTE:\n- "Mi papá trabaja duro." (NO debe mostrar la respuesta completa)\n- "El niño come _____." (muy simple, oración debe ser más larga)\n- Opciones múltiples correctas: "Mi _____ me quiere" ["mamá", "papá", "hermana"]\n- Oraciones artificiales: "El objeto está en lugar"\n- Que falten artículos o preposiciones: "Los niños juegan en _____" ["el", "la", "un"] ❌\n- Oraciones demasiado cortas (menos de 5 palabras)\n\nEstructura JSON requerida (FORMATO OBLIGATORIO):\n\n{\n  "titulo": "Juegos interactivos - Completar oraciones",\n  "actividades": [\n    {\n      "tipo": "completar_oracion",\n      "enunciado": "Mi mamá cocina un pastel muy _____.",\n      "opciones": ["rico", "mesa", "libro", "zapato"],\n      "respuesta": ["rico"]\n    }\n  ]\n}`;
       } else {
         prompt += `Error: Tipo de actividad no válido. Debe ser "formar_oracion" o "completar_oracion".`;
       }

@@ -75,7 +75,7 @@ export interface OpcionesFormulario {
 export const OPCIONES_FORMULARIO: OpcionesFormulario = {
   comprension: {
     tipoTexto: ['narrativo', 'descriptivo', 'informativo', 'instructivo'],
-    longitud: ['corto (100-150 palabras)', 'medio (150-250 palabras)', 'largo (250-350 palabras)']
+    longitud: ['100 palabras', '150 palabras', '200 palabras', '250 palabras', '300 palabras', '350 palabras', '400 palabras']
   },
   escritura: {
     tipoTexto: ['narrativo', 'descriptivo', 'informativo', 'instructivo']

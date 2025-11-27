@@ -15,48 +15,67 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   description,
   onClick
 }) => {
-  // Seleccionar el icono según el tipo
-  const getIcon = () => {
+  // Seleccionar el icono y colores según el tipo
+  const getTheme = () => {
     switch (id) {
       case 'comprension':
-        return <BookOpen size={32} className="text-blue-600" />;
+        return {
+          icon: <BookOpen size={28} className="text-indigo-600" />,
+          bg: 'bg-indigo-50',
+          border: 'border-indigo-100',
+          hover: 'group-hover:bg-indigo-100'
+        };
       case 'escritura':
-        return <PenTool size={32} className="text-green-600" />;
+        return {
+          icon: <PenTool size={28} className="text-emerald-600" />,
+          bg: 'bg-emerald-50',
+          border: 'border-emerald-100',
+          hover: 'group-hover:bg-emerald-100'
+        };
       case 'gramatica':
-        return <SpellCheck size={32} className="text-orange-600" />;
+        return {
+          icon: <SpellCheck size={28} className="text-amber-600" />,
+          bg: 'bg-amber-50',
+          border: 'border-amber-100',
+          hover: 'group-hover:bg-amber-100'
+        };
       case 'oral':
-        return <MessageCircle size={32} className="text-violet-600" />;
+        return {
+          icon: <MessageCircle size={28} className="text-violet-600" />,
+          bg: 'bg-violet-50',
+          border: 'border-violet-100',
+          hover: 'group-hover:bg-violet-100'
+        };
       default:
-        return <BookOpen size={32} className="text-blue-600" />;
+        return {
+          icon: <BookOpen size={28} className="text-slate-600" />,
+          bg: 'bg-slate-50',
+          border: 'border-slate-100',
+          hover: 'group-hover:bg-slate-100'
+        };
     }
   };
-  
-  // Obtener el color de fondo según el tipo
-  const getBgColor = () => {
-    switch (id) {
-      case 'comprension':
-        return 'bg-blue-50 border-blue-200';
-      case 'escritura':
-        return 'bg-green-50 border-green-200';
-      case 'gramatica':
-        return 'bg-orange-50 border-orange-200';
-      case 'oral':
-        return 'bg-violet-50 border-violet-200';
-      default:
-        return 'bg-blue-50 border-blue-200';
-    }
-  };
-  
+
+  const theme = getTheme();
+
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
+      whileHover={{ y: -5 }}
       whileTap={{ scale: 0.98 }}
-      className={`cursor-pointer rounded-xl border ${getBgColor()} p-6 transition-all duration-200 shadow-sm hover:shadow-md`}
+      className={`group cursor-pointer h-full bg-white rounded-2xl border ${theme.border} p-6 shadow-sm hover:shadow-xl transition-all duration-300`}
       onClick={onClick}
     >
-      <div className="mb-4">{getIcon()}</div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm">{description}</p>
+      <div className={`w-14 h-14 rounded-2xl ${theme.bg} ${theme.hover} flex items-center justify-center mb-5 transition-colors duration-300`}>
+        {theme.icon}
+      </div>
+
+      <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">
+        {title}
+      </h3>
+
+      <p className="text-slate-500 text-sm leading-relaxed">
+        {description}
+      </p>
     </motion.div>
   );
 };

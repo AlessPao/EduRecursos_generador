@@ -26,61 +26,61 @@ const RecursoForm: React.FC = () => {
   const [recurso, setRecurso] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editableContenido, setEditableContenido] = useState<any>(null);
-  
+
   // Determinar si estamos editando o creando
   const isCreating = !id;
-  
+
   // Tipo de recurso a generar
   const tipoRecurso = isCreating ? tipo : recurso?.tipo;
-  
+
   // Título basado en la acción y tipo
   const tituloAccion = isCreating
     ? `Generar ${tipoRecurso === 'drag_and_drop' ? 'juegos interactivos' : formatTipoRecurso(tipoRecurso || '')}`
     : 'Editar Recurso';
-  
+
   // Buscar la información del tipo de recurso
   const tipoInfo = TIPOS_RECURSOS.find(t => t.id === tipoRecurso);
-  
+
   // Opciones del formulario según el tipo
   const opcionesFormulario = tipoRecurso ? OPCIONES_FORMULARIO[tipoRecurso as keyof OpcionesFormulario] || {} : {};
-  
-  
+
+
   // Configuración de React Hook Form
   const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<RecursoFormData>();
-  
+
   // Vigilar campos para validación en tiempo real
   const watchedTitulo = watch('titulo', '');
   const watchedTema = watch('opciones.tema', '') as string;
   const watchedTemaPersonalizado = watch('opciones.temaPersonalizado', '') as string;
   const watchedContexto = watch('opciones.contexto', '') as string;
-  
+
   // Función de validación robusta para temas
   const validateTema = (value: string) => {
     if (!value || value.trim().length === 0) return false;
-    
+
     const trimmed = value.trim();
-    
+
     // No puede ser muy corto
     if (trimmed.length < 3) return false;
-    
+
     // No puede ser muy largo  
     if (trimmed.length > 100) return false;
-    
+
     // Debe contener solo letras, espacios, acentos, ñ, comas y puntos
     if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,\.]+$/.test(trimmed)) return false;
-    
+
     // No puede ser solo espacios, puntos o comas
     if (/^[\s,\.]+$/.test(trimmed)) return false;
-    
+
     // No puede empezar o terminar con espacios, comas o puntos
     if (/^[\s,\.]|[\s,\.]$/.test(trimmed)) return false;
-    
+
     // No puede tener espacios, comas o puntos consecutivos
     if (/\s{2,}|,{2,}|\.{2,}/.test(trimmed)) return false;
-    
+
     // No puede tener 3 letras iguales seguidas
     if (/(.)\1{2,}/i.test(trimmed.replace(/[\s,\.]/g, ''))) return false;
-    
+
     // Lista ampliada de palabras sin sentido y combinaciones de teclas aleatorias
     const meaninglessWords = [
       'nada', 'na', 'x', 'xx', 'xxx', 'xxxx', 'asdf', 'qwerty', 'hjkl', 'zxcv', 'bnm',
@@ -94,43 +94,43 @@ const RecursoForm: React.FC = () => {
       'agsdsre', 'dfghjk', 'poiuyt', 'lkjhgf', 'mnbvcx', 'qazwsx', 'edcrfv', 'tgbyhn',
       'ujmik', 'olp', 'rewq', 'trewq', 'yuiop', 'ghjkl', 'vbnm', 'cxz', 'rtyuio'
     ];
-    
+
     // Verificar palabras sin sentido
     const words = trimmed.toLowerCase().split(/[\s,\.]+/).filter(word => word.length > 0);
     for (const word of words) {
       if (meaninglessWords.includes(word)) return false;
     }
-    
+
     // Verificar patrones de teclado aleatorio mejorado
     const cleanText = trimmed.toLowerCase().replace(/[\s,\.]/g, '');
-    
+
     // Patrones de teclado QWERTY comunes
     const keyboardPatterns = [
       'qwerty', 'asdfgh', 'zxcvbn', 'qwertyui', 'asdfghjk', 'zxcvbnm',
       'qazwsx', 'edcrfv', 'tgbyhn', 'ujmik', 'olp', 'poiuyt', 'lkjhgf'
     ];
-    
+
     for (const pattern of keyboardPatterns) {
       if (cleanText.includes(pattern) || cleanText.includes(pattern.split('').reverse().join(''))) {
         return false;
       }
     }
-    
+
     // Verificar más de 4 consonantes seguidas sin vocales
     if (/[bcdfghjklmnpqrstvwxyz]{5,}/i.test(cleanText)) return false;
-    
+
     // Verificar que tenga al menos una vocal en cada palabra significativa
     for (const word of words) {
       if (word.length >= 3 && !/[aeiouáéíóúü]/i.test(word)) return false;
     }
-    
+
     // Verificar que no sea solo una secuencia alfabética
-    if (/^[a-z]{4,}$/.test(cleanText) && cleanText.split('').every((char, i, arr) => 
-      i === 0 || char.charCodeAt(0) - arr[i-1].charCodeAt(0) === 1)) return false;
-    
+    if (/^[a-z]{4,}$/.test(cleanText) && cleanText.split('').every((char, i, arr) =>
+      i === 0 || char.charCodeAt(0) - arr[i - 1].charCodeAt(0) === 1)) return false;
+
     return true;
   };
-  
+
   // Validaciones en tiempo real para campos de tema
   const temaValidations = {
     isValid: validateTema(watchedTema),
@@ -145,7 +145,7 @@ const RecursoForm: React.FC = () => {
     })(),
     notEmpty: watchedTema.trim().length > 0
   };
-  
+
   const temaPersonalizadoValidations = {
     isValid: validateTema(watchedTemaPersonalizado),
     hasMinLength: watchedTemaPersonalizado.trim().length >= 3,
@@ -159,7 +159,7 @@ const RecursoForm: React.FC = () => {
     })(),
     notEmpty: watchedTemaPersonalizado.trim().length > 0
   };
-  
+
   const contextoValidations = {
     isValid: validateTema(watchedContexto),
     hasMinLength: watchedContexto.trim().length >= 3,
@@ -173,7 +173,7 @@ const RecursoForm: React.FC = () => {
     })(),
     notEmpty: watchedContexto.trim().length > 0
   };
-  
+
   // Cargar recurso si estamos editando
   useEffect(() => {
     if (id) {
@@ -183,7 +183,7 @@ const RecursoForm: React.FC = () => {
           const res = await axios.get(`${API_URL}/recursos/${id}`);
           if (res.data.success) {
             setRecurso(res.data.recurso);
-            
+
             // Inicializar formulario con datos existentes
             reset({
               titulo: res.data.recurso.titulo,
@@ -199,7 +199,7 @@ const RecursoForm: React.FC = () => {
           setLoading(false);
         }
       };
-      
+
       fetchRecurso();
     }
   }, [id, reset, navigate]);
@@ -210,12 +210,12 @@ const RecursoForm: React.FC = () => {
       setEditableContenido(JSON.parse(JSON.stringify(recurso.contenido)));
     }
   }, [isEditing, recurso]);
-  
+
   // Manejar envío del formulario
   const onSubmit = async (data: RecursoFormData) => {
     try {
       setGenerando(true);
-      
+
       if (isCreating) {
         // Generar nuevo recurso
         const res = await axios.post(`${API_URL}/recursos`, {
@@ -223,7 +223,7 @@ const RecursoForm: React.FC = () => {
           titulo: data.titulo,
           opciones: data.opciones
         });
-        
+
         if (res.data.success) {
           setRecurso(res.data.recurso);
           toast.success('Recurso generado correctamente');
@@ -234,7 +234,7 @@ const RecursoForm: React.FC = () => {
           titulo: data.titulo,
           contenido: editableContenido
         });
-        
+
         if (res.data.success) {
           setRecurso(res.data.recurso);
           setIsEditing(false);
@@ -248,7 +248,7 @@ const RecursoForm: React.FC = () => {
       setGenerando(false);
     }
   };
-  
+
   // Descargar recurso como PDF
   const handleDownload = async () => {
     try {
@@ -256,11 +256,11 @@ const RecursoForm: React.FC = () => {
         toast.error('Primero debe guardar el recurso');
         return;
       }
-      
+
       const response = await axios.get(`${API_URL}/recursos/${id}/pdf`, {
         responseType: 'blob'
       });
-      
+
       // Crear URL del blob y descargar
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -269,14 +269,14 @@ const RecursoForm: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       toast.success('Descarga iniciada');
     } catch (error) {
       console.error('Error al descargar el PDF:', error);
       toast.error('No se pudo descargar el PDF');
     }
   };
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -284,9 +284,9 @@ const RecursoForm: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
-    <div className="pt-20 pb-6">
+    <div className="pb-6">
       <div className="flex items-center mb-6">
         <button
           onClick={() => navigate(-1)}
@@ -296,7 +296,7 @@ const RecursoForm: React.FC = () => {
         </button>
         <h1 className="text-2xl font-bold">{tituloAccion}</h1>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Formulario */}
         <div>
@@ -323,7 +323,7 @@ const RecursoForm: React.FC = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.titulo.message}</p>
                 )}
               </div>
-              
+
               {isCreating && (
                 <>
                   <div className="form-group">
@@ -332,9 +332,9 @@ const RecursoForm: React.FC = () => {
                       {tipoInfo?.nombre || formatTipoRecurso(tipoRecurso || '')}
                     </p>
                   </div>
-                  
+
                   <h3 className="text-lg font-semibold mb-4">Opciones específicas</h3>
-                  
+
                   {/* Opciones dinámicas según el tipo de recurso */}
                   {tipoRecurso === 'comprension' && (
                     <>
@@ -355,7 +355,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="tema" className="form-label">
                           Tema del texto
@@ -363,9 +363,9 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="tema"
                           type="text"
-                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`}                          placeholder="Ej: Animales, amistad, la escuela"
+                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`} placeholder="Ej: Animales, amistad, la escuela"
                           disabled={generando}
-                          {...register('opciones.tema', { 
+                          {...register('opciones.tema', {
                             required: 'El tema es requerido',
                             validate: (value) => validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
                           })}
@@ -373,7 +373,7 @@ const RecursoForm: React.FC = () => {
                         {errors.opciones?.tema && (
                           <p className="mt-1 text-sm text-red-600">{errors.opciones.tema.message}</p>
                         )}
-                        
+
                         {/* Tip cuando el campo está vacío */}
                         {!watchedTema && (
                           <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
@@ -386,14 +386,14 @@ const RecursoForm: React.FC = () => {
                               <div className="ml-2">
                                 <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
                                 <p className="text-xs text-blue-600 mt-1">
-                                  Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                  Entre más detalles específicos incluyas, mejor será el contenido generado.
                                   Ejemplos: "Los ecosistemas acuáticos de América", "La historia de mi comunidad"
                                 </p>
                               </div>
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Validaciones visuales del tema */}
                         {watchedTema && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-md border">
@@ -411,7 +411,7 @@ const RecursoForm: React.FC = () => {
                                   No debe estar vacío
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -422,7 +422,7 @@ const RecursoForm: React.FC = () => {
                                   Entre 3 y 100 caracteres
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {temaValidations.onlyValidChars ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -434,7 +434,7 @@ const RecursoForm: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-                            
+
                             {/* Indicador general de validez */}
                             <div className="mt-2 pt-2 border-t border-gray-200">
                               <div className="flex items-center text-xs">
@@ -458,7 +458,7 @@ const RecursoForm: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="longitud" className="form-label">
                           Longitud del texto
@@ -476,7 +476,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-4">
                         <div className="form-group">
                           <label htmlFor="numLiteral" className="form-label">
@@ -489,14 +489,14 @@ const RecursoForm: React.FC = () => {
                             max="5"
                             className="form-input"
                             disabled={generando}
-                            {...register('opciones.numLiteral', { 
+                            {...register('opciones.numLiteral', {
                               required: true,
                               min: 1,
                               max: 5
                             })}
                           />
                         </div>
-                        
+
                         <div className="form-group">
                           <label htmlFor="numInferencial" className="form-label">
                             Preguntas inferenciales
@@ -508,14 +508,14 @@ const RecursoForm: React.FC = () => {
                             max="5"
                             className="form-input"
                             disabled={generando}
-                            {...register('opciones.numInferencial', { 
+                            {...register('opciones.numInferencial', {
                               required: true,
                               min: 1,
                               max: 5
                             })}
                           />
                         </div>
-                        
+
                         <div className="form-group">
                           <label htmlFor="numCritica" className="form-label">
                             Preguntas críticas
@@ -527,7 +527,7 @@ const RecursoForm: React.FC = () => {
                             max="5"
                             className="form-input"
                             disabled={generando}
-                            {...register('opciones.numCritica', { 
+                            {...register('opciones.numCritica', {
                               required: true,
                               min: 1,
                               max: 5
@@ -537,7 +537,7 @@ const RecursoForm: React.FC = () => {
                       </div>
                     </>
                   )}
-                  
+
                   {tipoRecurso === 'escritura' && (
                     <>
                       <div className="form-group">
@@ -557,7 +557,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="tema" className="form-label">
                           Tema o situación comunicativa
@@ -565,9 +565,9 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="tema"
                           type="text"
-                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`}                          placeholder="Ej: Mi mascota favorita, un día en el parque"
+                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`} placeholder="Ej: Mi mascota favorita, un día en el parque"
                           disabled={generando}
-                          {...register('opciones.tema', { 
+                          {...register('opciones.tema', {
                             required: 'El tema es requerido',
                             validate: (value) => validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
                           })}
@@ -575,7 +575,7 @@ const RecursoForm: React.FC = () => {
                         {errors.opciones?.tema && (
                           <p className="mt-1 text-sm text-red-600">{errors.opciones.tema.message}</p>
                         )}
-                        
+
                         {/* Tip cuando el campo está vacío */}
                         {!watchedTema && (
                           <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
@@ -588,14 +588,14 @@ const RecursoForm: React.FC = () => {
                               <div className="ml-2">
                                 <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
                                 <p className="text-xs text-blue-600 mt-1">
-                                  Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                  Entre más detalles específicos incluyas, mejor será el contenido generado.
                                   Ejemplos: "Una aventura en el bosque tropical", "Mi primer día en una escuela nueva"
                                 </p>
                               </div>
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Validaciones visuales del tema */}
                         {watchedTema && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-md border">
@@ -613,7 +613,7 @@ const RecursoForm: React.FC = () => {
                                   No debe estar vacío
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -624,7 +624,7 @@ const RecursoForm: React.FC = () => {
                                   Entre 3 y 100 caracteres
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {temaValidations.onlyValidChars ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -636,7 +636,7 @@ const RecursoForm: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-                            
+
                             {/* Indicador general de validez */}
                             <div className="mt-2 pt-2 border-t border-gray-200">
                               <div className="flex items-center text-xs">
@@ -662,7 +662,7 @@ const RecursoForm: React.FC = () => {
                       </div>
                     </>
                   )}
-                  
+
                   {tipoRecurso === 'gramatica' && (
                     <>
                       <div className="form-group">
@@ -682,7 +682,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="tipoEjercicio" className="form-label">
                           Tipo de ejercicio
@@ -700,7 +700,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="numItems" className="form-label">
                           Número de ítems
@@ -712,14 +712,14 @@ const RecursoForm: React.FC = () => {
                           max="15"
                           className="form-input"
                           disabled={generando}
-                          {...register('opciones.numItems', { 
+                          {...register('opciones.numItems', {
                             required: true,
                             min: 5,
                             max: 15
                           })}
                         />
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="contexto" className="form-label">
                           Contexto o tema
@@ -730,7 +730,7 @@ const RecursoForm: React.FC = () => {
                           className={`form-input ${errors.opciones?.contexto ? 'border-red-500' : watchedContexto && contextoValidations.isValid ? 'border-green-500' : watchedContexto && !contextoValidations.isValid ? 'border-red-500' : ''}`}
                           placeholder="Ej: Animales, juegos, familia"
                           disabled={generando}
-                          {...register('opciones.contexto', { 
+                          {...register('opciones.contexto', {
                             required: 'El contexto es requerido',
                             validate: (value) => validateTema(value as string) || 'El contexto no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
                           })}
@@ -738,7 +738,7 @@ const RecursoForm: React.FC = () => {
                         {errors.opciones?.contexto && (
                           <p className="mt-1 text-sm text-red-600">{errors.opciones.contexto.message}</p>
                         )}
-                        
+
                         {/* Validaciones visuales del contexto */}
                         {watchedContexto && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-md border">
@@ -756,7 +756,7 @@ const RecursoForm: React.FC = () => {
                                   No debe estar vacío
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {contextoValidations.hasMinLength && contextoValidations.hasMaxLength ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -767,7 +767,7 @@ const RecursoForm: React.FC = () => {
                                   Entre 3 y 100 caracteres
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {contextoValidations.onlyValidChars ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -778,7 +778,7 @@ const RecursoForm: React.FC = () => {
                                   Sin símbolos
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {contextoValidations.noRepeatedChars ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -789,7 +789,7 @@ const RecursoForm: React.FC = () => {
                                   Sin letras repetidas 3 veces seguidas
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {contextoValidations.noKeyboardPatterns ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -801,7 +801,7 @@ const RecursoForm: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-                            
+
                             {/* Indicador general de validez */}
                             <div className="mt-2 pt-2 border-t border-gray-200">
                               <div className="flex items-center text-xs">
@@ -827,7 +827,7 @@ const RecursoForm: React.FC = () => {
                       </div>
                     </>
                   )}
-                  
+
                   {tipoRecurso === 'oral' && (
                     <>
                       <div className="form-group">
@@ -847,7 +847,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="tema" className="form-label">
                           Tema o situación comunicativa
@@ -855,9 +855,9 @@ const RecursoForm: React.FC = () => {
                         <input
                           id="tema"
                           type="text"
-                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`}                          placeholder="Ej: Mi familia, mis juguetes favoritos"
+                          className={`form-input ${errors.opciones?.tema ? 'border-red-500' : watchedTema && temaValidations.isValid ? 'border-green-500' : watchedTema && !temaValidations.isValid ? 'border-red-500' : ''}`} placeholder="Ej: Mi familia, mis juguetes favoritos"
                           disabled={generando}
-                          {...register('opciones.tema', { 
+                          {...register('opciones.tema', {
                             required: 'El tema es requerido',
                             validate: (value) => validateTema(value as string) || 'El tema no es válido. Debe ser educativo, sin símbolos ni combinaciones sin sentido'
                           })}
@@ -865,7 +865,7 @@ const RecursoForm: React.FC = () => {
                         {errors.opciones?.tema && (
                           <p className="mt-1 text-sm text-red-600">{errors.opciones.tema.message}</p>
                         )}
-                        
+
                         {/* Tip cuando el campo está vacío */}
                         {!watchedTema && (
                           <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
@@ -878,14 +878,14 @@ const RecursoForm: React.FC = () => {
                               <div className="ml-2">
                                 <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
                                 <p className="text-xs text-blue-600 mt-1">
-                                  Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                  Entre más detalles específicos incluyas, mejor será el contenido generado.
                                   Ejemplos: "La familia extendida y sus tradiciones", "Los juguetes tradicionales de mi país"
                                 </p>
                               </div>
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Validaciones visuales del tema */}
                         {watchedTema && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-md border">
@@ -903,7 +903,7 @@ const RecursoForm: React.FC = () => {
                                   No debe estar vacío
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -914,7 +914,7 @@ const RecursoForm: React.FC = () => {
                                   Entre 3 y 100 caracteres
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center text-xs">
                                 {temaValidations.onlyValidChars ? (
                                   <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -926,7 +926,7 @@ const RecursoForm: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-                            
+
                             {/* Indicador general de validez */}
                             <div className="mt-2 pt-2 border-t border-gray-200">
                               <div className="flex items-center text-xs">
@@ -952,7 +952,7 @@ const RecursoForm: React.FC = () => {
                       </div>
                     </>
                   )}
-                   {tipoRecurso === 'drag_and_drop' && (
+                  {tipoRecurso === 'drag_and_drop' && (
                     <>
                       <div className="form-group">
                         <label htmlFor="numActividades" className="form-label">
@@ -1007,7 +1007,7 @@ const RecursoForm: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="tema" className="form-label">
                           Tema de las actividades
@@ -1025,7 +1025,7 @@ const RecursoForm: React.FC = () => {
                             </option>
                           ))}
                         </select>
-                        
+
                         {/* Campo personalizado cuando se selecciona "Otro" */}
                         {watch('opciones.temaPredefinido') === 'Otro (personalizado)' && (
                           <>
@@ -1035,7 +1035,7 @@ const RecursoForm: React.FC = () => {
                               className={`form-input mt-2 ${errors.opciones?.temaPersonalizado ? 'border-red-500' : watchedTemaPersonalizado && temaPersonalizadoValidations.isValid ? 'border-green-500' : watchedTemaPersonalizado && !temaPersonalizadoValidations.isValid ? 'border-red-500' : ''}`}
                               placeholder="Escribe tu tema personalizado (ej: Los medios de transporte, La naturaleza)"
                               disabled={generando}
-                              {...register('opciones.temaPersonalizado', { 
+                              {...register('opciones.temaPersonalizado', {
                                 required: watch('opciones.temaPredefinido') === 'Otro (personalizado)' ? 'El tema personalizado es requerido' : false,
                                 validate: (value) => {
                                   if (watch('opciones.temaPredefinido') === 'Otro (personalizado)') {
@@ -1043,11 +1043,11 @@ const RecursoForm: React.FC = () => {
                                   }
                                   return true;
                                 }
-                              })}                            />
+                              })} />
                             {errors.opciones?.temaPersonalizado && (
                               <p className="mt-1 text-sm text-red-600">{errors.opciones.temaPersonalizado.message}</p>
                             )}
-                            
+
                             {/* Tip cuando el campo está vacío */}
                             {!watchedTemaPersonalizado && (
                               <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
@@ -1060,14 +1060,14 @@ const RecursoForm: React.FC = () => {
                                   <div className="ml-2">
                                     <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
                                     <p className="text-xs text-blue-600 mt-1">
-                                      Entre más detalles específicos incluyas, mejor será el contenido generado. 
+                                      Entre más detalles específicos incluyas, mejor será el contenido generado.
                                       Ejemplos: "Los instrumentos musicales de viento", "Las profesiones que ayudan a mi comunidad"
                                     </p>
                                   </div>
                                 </div>
                               </div>
                             )}
-                            
+
                             {/* Validaciones visuales del tema personalizado */}
                             {watchedTemaPersonalizado && (
                               <div className="mt-3 p-3 bg-gray-50 rounded-md border">
@@ -1085,7 +1085,7 @@ const RecursoForm: React.FC = () => {
                                       No debe estar vacío
                                     </span>
                                   </div>
-                                  
+
                                   <div className="flex items-center text-xs">
                                     {temaPersonalizadoValidations.hasMinLength && temaPersonalizadoValidations.hasMaxLength ? (
                                       <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -1096,7 +1096,7 @@ const RecursoForm: React.FC = () => {
                                       Entre 3 y 100 caracteres
                                     </span>
                                   </div>
-                                  
+
                                   <div className="flex items-center text-xs">
                                     {temaPersonalizadoValidations.onlyValidChars ? (
                                       <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -1107,7 +1107,7 @@ const RecursoForm: React.FC = () => {
                                       Sin símbolos
                                     </span>
                                   </div>
-                                  
+
                                   <div className="flex items-center text-xs">
                                     {temaPersonalizadoValidations.noRepeatedChars ? (
                                       <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -1118,7 +1118,7 @@ const RecursoForm: React.FC = () => {
                                       Sin letras repetidas 3 veces seguidas
                                     </span>
                                   </div>
-                                  
+
                                   <div className="flex items-center text-xs">
                                     {temaPersonalizadoValidations.noKeyboardPatterns ? (
                                       <Check className="h-3 w-3 text-green-500 mr-2" />
@@ -1130,7 +1130,7 @@ const RecursoForm: React.FC = () => {
                                     </span>
                                   </div>
                                 </div>
-                                
+
                                 {/* Indicador general de validez */}
                                 <div className="mt-2 pt-2 border-t border-gray-200">
                                   <div className="flex items-center text-xs">
@@ -1188,8 +1188,8 @@ const RecursoForm: React.FC = () => {
                             id="tema"
                             className="form-select"
                             disabled={generando}
-                            {...register('opciones.tema', { 
-                              required: watch('opciones.tipoIceBreaker') === 'adivina_quien_soy' 
+                            {...register('opciones.tema', {
+                              required: watch('opciones.tipoIceBreaker') === 'adivina_quien_soy'
                             })}
                           >
                             <option value="">Selecciona un tema</option>
@@ -1207,7 +1207,7 @@ const RecursoForm: React.FC = () => {
                         <div className="form-group">
                           <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                             <p className="text-sm text-blue-800">
-                              <strong>ℹ️ Información:</strong> Esta actividad se genera automáticamente con frases para completar como 
+                              <strong>ℹ️ Información:</strong> Esta actividad se genera automáticamente con frases para completar como
                               "Me gusta...", "No me gusta...", "Mi color favorito es...", etc. No requiere selección de tema.
                             </p>
                           </div>
@@ -1237,7 +1237,7 @@ const RecursoForm: React.FC = () => {
                   )}
                 </>
               )}
-              
+
               {/* Si estamos editando un recurso existente, mostrar campos editables para el contenido */}
               {!isCreating && isEditing && recurso && (
                 <div className="form-group mt-4">
@@ -1392,7 +1392,7 @@ const RecursoForm: React.FC = () => {
                   )}
                 </div>
               )}
-              
+
               <div className="mt-6 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                 {isCreating ? (
                   <button
@@ -1446,7 +1446,7 @@ const RecursoForm: React.FC = () => {
             </form>
           </motion.div>
         </div>
-        
+
         {/* Vista previa */}
         <div>
           {recurso ? (

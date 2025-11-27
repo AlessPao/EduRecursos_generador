@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { API_URL } from '../config';
-import { Clipboard, Trash2, RefreshCw } from 'lucide-react';
+import { Clipboard, Trash2, RefreshCw, ArrowLeft, CheckCircle, Clock, User } from 'lucide-react';
 
 interface Question {
   pregunta: string;
@@ -27,8 +27,10 @@ const ExamDetail: React.FC = () => {
   const [exam, setExam] = useState<Exam | null>(null);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingRes, setLoadingRes] = useState(true);  const [copied, setCopied] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);  const [showDeleteResultsConfirm, setShowDeleteResultsConfirm] = useState(false);
+  const [loadingRes, setLoadingRes] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteResultsConfirm, setShowDeleteResultsConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deletingResults, setDeletingResults] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -81,22 +83,24 @@ const ExamDetail: React.FC = () => {
     fetchExam();
     loadResults();
   }, [slug]);
+
   const handleCopy = () => {
     const url = `${window.location.origin}/evaluaciones/${slug}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
   const handleDelete = async () => {
     if (!slug) return;
-    
+
     setDeleting(true);
     try {
       const token = localStorage.getItem('token');
       const res = await axios.delete(`${API_URL}/exams/${slug}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (res.data.success) {
         toast.success('Examen eliminado correctamente');
         navigate('/evaluaciones');
@@ -112,14 +116,14 @@ const ExamDetail: React.FC = () => {
 
   const handleDeleteResults = async () => {
     if (!slug) return;
-    
+
     setDeletingResults(true);
     try {
       const token = localStorage.getItem('token');
       const res = await axios.delete(`${API_URL}/exams/${slug}/results`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (res.data.success) {
         toast.success('Resultados eliminados correctamente');
         setResults([]); // Limpiar la lista local
@@ -133,130 +137,192 @@ const ExamDetail: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-12"><div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div></div>;
-  if (!exam) return <p className="p-6">Examen no encontrado.</p>;
+  if (loading) return (
+    <div className="flex justify-center py-12">
+      <div className="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
+    </div>
+  );
+
+  if (!exam) return (
+    <div className="text-center py-12">
+      <h2 className="text-2xl font-bold text-slate-900">Examen no encontrado</h2>
+      <button onClick={() => navigate('/evaluaciones')} className="btn btn-primary mt-4">
+        Volver a la lista
+      </button>
+    </div>
+  );
 
   return (
-    <div className="pt-20 p-4 min-h-screen bg-gradient-to-br from-blue-50 to-white flex justify-center">
-      <div className="w-full max-w-4xl space-y-8">
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-blue-100">
-          <h2 className="text-2xl font-extrabold text-blue-700 mb-2 text-center drop-shadow">{exam.titulo}</h2>
-          <div className="h-1 w-16 bg-blue-200 rounded mx-auto mb-6" />
-          <textarea readOnly className="w-full p-3 border rounded-lg h-32 mb-6 bg-blue-50 text-gray-700 font-mono" value={exam.texto} />          <div className="flex flex-col sm:flex-row items-center mb-6 gap-2">
-            <input
-              readOnly
-              className="flex-1 form-input border-2 border-blue-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition bg-blue-50"
-              value={`${window.location.origin}/evaluaciones/${slug}`}
-            />
-            <div className="flex gap-2">
-              <button onClick={handleCopy} className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center transition">
-                <Clipboard size={16} className="mr-1" />
-                {copied ? 'Copiado' : 'Copiar enlace'}
-              </button>
-              <button 
-                onClick={() => setShowDeleteConfirm(true)} 
-                className="p-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center transition"
-                title="Eliminar examen"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 mb-6 text-center">Comparte este enlace con tus estudiantes.</p>
-          <div className="space-y-4">
-            {exam.preguntas.map((q, idx) => (
-              <div key={idx} className="p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
-                <p className="font-semibold text-lg mb-2 text-blue-800">{idx + 1}. {q.pregunta}</p>
-                <ul className="list-disc list-inside space-y-1">
-                  {q.opciones.map((opt, i) => (
-                    <li
-                      key={i}
-                      className={`pl-2 ${opt === q.respuesta ? 'text-green-600 font-semibold' : 'text-gray-800'}`}
-                    >
-                      {opt}{opt === q.respuesta ? ' (Correcta)' : ''}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>        <div className="bg-white p-8 rounded-xl shadow-lg border border-blue-100">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold text-blue-700">Resultados de los estudiantes</h3>
-            <div className="flex gap-2">
-              <button
-                onClick={fetchResults}
-                disabled={refreshing}
-                className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Actualizar resultados"
-              >
-                <RefreshCw size={14} className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-                {refreshing ? 'Actualizando...' : 'Actualizar'}
-              </button>
-              {results.length > 0 && (
-                <button
-                  onClick={() => setShowDeleteResultsConfirm(true)}
-                  className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition flex items-center"
-                  title="Eliminar todos los resultados"
-                >
-                  <Trash2 size={14} className="mr-1" />
-                  Limpiar resultados
-                </button>
-              )}
-            </div>
-          </div>
-          {loadingRes ? (
-            <div className="flex justify-center"><div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div></div>
-          ) : results.length > 0 ? (            <table className="w-full table-auto border-collapse rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-blue-100">
-                  <th className="border p-2 text-left">Alumno</th>
-                  <th className="border p-2 text-left">Puntaje</th>
-                  <th className="border p-2 text-left">Tiempo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((r, i) => (
-                  <tr key={i} className="hover:bg-blue-50">
-                    <td className="border p-2">{r.studentName}</td>
-                    <td className="border p-2 font-bold text-blue-700">{r.score} / 20</td>
-                    <td className="border p-2 text-gray-600">{formatTime(r.evalTime)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-gray-500">No hay resultados aún.</p>          )}
+    <div className="max-w-5xl mx-auto space-y-8">
+      {/* Header with Back Button */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => navigate('/evaluaciones')}
+          className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{exam.titulo}</h1>
+          <p className="text-slate-500 text-sm">Detalles y resultados de la evaluación</p>
         </div>
-      </div>      {/* Modal de confirmación para eliminar */}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content - Exam Preview */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="card">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-slate-900">Contenido del Examen</h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                  title="Eliminar examen"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Share Link Box */}
+            <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-6">
+              <label className="block text-xs font-semibold text-indigo-900 uppercase tracking-wide mb-2">
+                Enlace para estudiantes
+              </label>
+              <div className="flex gap-2">
+                <input
+                  readOnly
+                  className="flex-1 bg-white border border-indigo-200 text-indigo-600 text-sm rounded-lg px-3 py-2 focus:outline-none"
+                  value={`${window.location.origin}/evaluaciones/${slug}`}
+                />
+                <button
+                  onClick={handleCopy}
+                  className="btn btn-primary py-2 px-4 flex items-center gap-2"
+                >
+                  {copied ? <CheckCircle size={18} /> : <Clipboard size={18} />}
+                  {copied ? 'Copiado' : 'Copiar'}
+                </button>
+              </div>
+            </div>
+
+            <div className="prose prose-slate max-w-none mb-8">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-wrap font-serif">
+                {exam.texto}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {exam.preguntas.map((q, idx) => (
+                <div key={idx} className="border-b border-slate-100 last:border-0 pb-6 last:pb-0">
+                  <p className="font-semibold text-slate-900 mb-3">
+                    <span className="text-indigo-600 mr-2">{idx + 1}.</span>
+                    {q.pregunta}
+                  </p>
+                  <ul className="space-y-2 pl-6">
+                    {q.opciones.map((opt, i) => (
+                      <li
+                        key={i}
+                        className={`text-sm ${opt === q.respuesta ? 'text-emerald-600 font-medium flex items-center gap-2' : 'text-slate-600'}`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${opt === q.respuesta ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                        {opt}
+                        {opt === q.respuesta && <span className="text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">Correcta</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar - Results */}
+        <div className="lg:col-span-1">
+          <div className="card sticky top-24">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-slate-900">Resultados</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={fetchResults}
+                  disabled={refreshing}
+                  className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  title="Actualizar resultados"
+                >
+                  <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+                </button>
+                {results.length > 0 && (
+                  <button
+                    onClick={() => setShowDeleteResultsConfirm(true)}
+                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    title="Limpiar resultados"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {loadingRes ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full"></div>
+              </div>
+            ) : results.length > 0 ? (
+              <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                {results.map((r, i) => (
+                  <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                          <User size={14} />
+                        </div>
+                        <span className="font-medium text-slate-900 text-sm">{r.studentName}</span>
+                      </div>
+                      <span className={`text-sm font-bold px-2 py-1 rounded-lg ${r.score >= 14 ? 'bg-emerald-100 text-emerald-700' :
+                          r.score >= 11 ? 'bg-amber-100 text-amber-700' :
+                            'bg-rose-100 text-rose-700'
+                        }`}>
+                        {r.score}/20
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-slate-500 pl-10">
+                      <Clock size={12} />
+                      {formatTime(r.evalTime)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 px-4 bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+                <p className="text-slate-500 text-sm">Aún no hay resultados registrados.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal de confirmación para eliminar examen */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-red-600 mb-4">Confirmar eliminación</h3>
-            <p className="text-gray-700 mb-6">
-              ¿Estás seguro de que quieres eliminar este examen? Esta acción no se puede deshacer y se eliminarán todos los resultados asociados.
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl transform transition-all">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">¿Eliminar examen?</h3>
+            <p className="text-slate-600 mb-6">
+              Esta acción no se puede deshacer. Se eliminarán permanentemente el examen y todos los resultados asociados.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                className="btn btn-ghost"
                 disabled={deleting}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition flex items-center"
+                className="btn btn-danger"
                 disabled={deleting}
               >
-                {deleting ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                    Eliminando...
-                  </>
-                ) : (
-                  'Eliminar'
-                )}
+                {deleting ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
             </div>
           </div>
@@ -265,33 +331,26 @@ const ExamDetail: React.FC = () => {
 
       {/* Modal de confirmación para eliminar resultados */}
       {showDeleteResultsConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-orange-600 mb-4">Confirmar eliminación de resultados</h3>
-            <p className="text-gray-700 mb-6">
-              ¿Estás seguro de que quieres eliminar todos los resultados de este examen? Esta acción no se puede deshacer, pero el examen seguirá disponible para nuevos estudiantes.
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl transform transition-all">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">¿Limpiar resultados?</h3>
+            <p className="text-slate-600 mb-6">
+              Se eliminarán todos los intentos de los estudiantes. El examen seguirá disponible.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowDeleteResultsConfirm(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                className="btn btn-ghost"
                 disabled={deletingResults}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDeleteResults}
-                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition flex items-center"
+                className="btn btn-danger"
                 disabled={deletingResults}
               >
-                {deletingResults ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                    Eliminando...
-                  </>
-                ) : (
-                  'Eliminar resultados'
-                )}
+                {deletingResults ? 'Eliminando...' : 'Sí, limpiar'}
               </button>
             </div>
           </div>

@@ -70,10 +70,10 @@ const JuegosInteractivos: React.FC = () => {
     try {
       const dragData = JSON.parse(data);
       const { palabra, fromSentence, index: sourceIndex } = dragData;
-      
+
       const nuevasRespuestas = [...respuestas];
       const currentSentence = [...nuevasRespuestas[actividadActual]];
-      
+
       if (fromSentence) {
         // Reordenar dentro de la oración
         if (sourceIndex !== targetIndex) {
@@ -101,7 +101,7 @@ const JuegosInteractivos: React.FC = () => {
 
   const removerPalabraDeLaOracion = (index: number) => {
     if (verificado[actividadActual]) return;
-    
+
     const nuevasRespuestas = [...respuestas];
     nuevasRespuestas[actividadActual] = nuevasRespuestas[actividadActual].filter((_, i) => i !== index);
     setRespuestas(nuevasRespuestas);
@@ -109,9 +109,9 @@ const JuegosInteractivos: React.FC = () => {
   const agregarPalabra = (palabra: string) => {
     const idx = actividadActual;
     const actividad = recurso.contenido.actividades[idx];
-    
+
     if (verificado[idx]) return;
-    
+
     if (actividad.tipo === 'formar_oracion') {
       // Para formar oraciones, agregar todas las palabras en orden
       if (!respuestas[idx].includes(palabra)) {
@@ -129,21 +129,21 @@ const JuegosInteractivos: React.FC = () => {
   // Verificar la actividad actual
   const verificarActividad = () => {
     if (!recurso) return;
-    
+
     const act = recurso.contenido.actividades[actividadActual];
     const respuestaUsuario = respuestas[actividadActual];
-    
+
     let esCorrecto = false;
     if (act.tipo === 'formar_oracion') {
       esCorrecto = JSON.stringify(respuestaUsuario) === JSON.stringify(act.respuesta);
     } else if (act.tipo === 'completar_oracion') {
       esCorrecto = JSON.stringify(respuestaUsuario) === JSON.stringify(act.respuesta);
     }
-    
+
     const nuevosResultados = [...resultados];
     nuevosResultados[actividadActual] = esCorrecto;
     setResultados(nuevosResultados);
-    
+
     const nuevosVerificados = [...verificado];
     nuevosVerificados[actividadActual] = true;
     setVerificado(nuevosVerificados);
@@ -161,11 +161,11 @@ const JuegosInteractivos: React.FC = () => {
     const nuevasRespuestas = [...respuestas];
     nuevasRespuestas[actividadActual] = [];
     setRespuestas(nuevasRespuestas);
-    
+
     const nuevosResultados = [...resultados];
     nuevosResultados[actividadActual] = null;
     setResultados(nuevosResultados);
-    
+
     const nuevosVerificados = [...verificado];
     nuevosVerificados[actividadActual] = false;
     setVerificado(nuevosVerificados);
@@ -186,12 +186,12 @@ const JuegosInteractivos: React.FC = () => {
   // Renderizado de cada actividad
   const renderActividad = (act: any) => {
     const idx = actividadActual;
-    
+
     if (act.tipo === 'formar_oracion') {
       return (
         <div className="space-y-4">
           <div className="text-lg font-semibold text-gray-800">{act.enunciado}</div>
-          
+
           {/* Palabras disponibles */}
           <div>
             <div className="text-sm font-medium text-gray-600 mb-2">Palabras disponibles:</div>
@@ -201,13 +201,12 @@ const JuegosInteractivos: React.FC = () => {
                   key={i}
                   draggable={!respuestas[idx].includes(palabra) && !verificado[idx]}
                   onDragStart={(e) => handleDragStart(e, palabra)}
-                  className={`px-3 py-2 rounded-lg border transition-all cursor-pointer select-none ${
-                    respuestas[idx].includes(palabra) 
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50' 
+                  className={`px-3 py-2 rounded-lg border transition-all cursor-pointer select-none ${respuestas[idx].includes(palabra)
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
                       : verificado[idx]
-                      ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
-                      : 'bg-white hover:bg-blue-50 border-blue-200 text-blue-700 hover:shadow-md transform hover:scale-105'
-                  }`}
+                        ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
+                        : 'bg-white hover:bg-blue-50 border-blue-200 text-blue-700 hover:shadow-md transform hover:scale-105'
+                    }`}
                   onClick={() => !respuestas[idx].includes(palabra) && agregarPalabra(palabra)}
                 >
                   {palabra}
@@ -218,10 +217,10 @@ const JuegosInteractivos: React.FC = () => {
               ))}
             </div>
           </div>
-            {/* Área de construcción de oración */}
+          {/* Área de construcción de oración */}
           <div>
             <div className="text-sm font-medium text-gray-600 mb-2">Tu oración:</div>
-            <div 
+            <div
               className="min-h-[80px] border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 transition-colors"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
@@ -236,16 +235,15 @@ const JuegosInteractivos: React.FC = () => {
                     key={i}
                     className="relative group"
                   >
-                    <span 
+                    <span
                       draggable={!verificado[idx]}
                       onDragStart={(e) => handleDragStartFromSentence(e, palabra, i)}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDropInSentence(e, i)}
-                      className={`px-3 py-2 rounded-md border font-medium cursor-move transition-all ${
-                        verificado[idx]
+                      className={`px-3 py-2 rounded-md border font-medium cursor-move transition-all ${verificado[idx]
                           ? 'bg-blue-100 border-blue-300 text-blue-800 cursor-default'
                           : 'bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 hover:shadow-md transform hover:scale-105'
-                      }`}
+                        }`}
                       title={verificado[idx] ? '' : 'Arrastra para reordenar o haz clic en × para quitar'}
                     >
                       {palabra}
@@ -299,34 +297,34 @@ const JuegosInteractivos: React.FC = () => {
             )}
           </div>
         </div>
-      );    } else if (act.tipo === 'completar_oracion') {
+      );
+    } else if (act.tipo === 'completar_oracion') {
       return (
         <div className="space-y-4">
           <div className="text-lg font-semibold text-gray-800">{act.enunciado}</div>
-            {/* Palabras disponibles */}
+          {/* Palabras disponibles */}
           <div>
             <div className="text-sm font-medium text-gray-600 mb-2">Opciones disponibles:</div>
             <div className="grid grid-cols-2 gap-2">
               {act.opciones.map((palabra: string, i: number) => {
                 const estaSeleccionada = respuestas[idx].includes(palabra);
                 const esLaSeleccionada = respuestas[idx][0] === palabra;
-                
+
                 return (
                   <div
                     key={i}
                     draggable={!verificado[idx]}
                     onDragStart={(e) => handleDragStart(e, palabra)}
-                    className={`px-4 py-3 rounded-lg border-2 transition-all cursor-pointer select-none text-center font-medium ${
-                      verificado[idx]
-                        ? estaSeleccionada 
-                          ? resultados[idx] 
-                            ? 'bg-green-100 border-green-500 text-green-800' 
+                    className={`px-4 py-3 rounded-lg border-2 transition-all cursor-pointer select-none text-center font-medium ${verificado[idx]
+                        ? estaSeleccionada
+                          ? resultados[idx]
+                            ? 'bg-green-100 border-green-500 text-green-800'
                             : 'bg-red-100 border-red-500 text-red-800'
                           : 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
                         : estaSeleccionada
-                        ? 'bg-blue-100 border-blue-500 text-blue-800 ring-2 ring-blue-200'
-                        : 'bg-white hover:bg-green-50 border-green-200 text-green-700 hover:shadow-md transform hover:scale-105'
-                    }`}
+                          ? 'bg-blue-100 border-blue-500 text-blue-800 ring-2 ring-blue-200'
+                          : 'bg-white hover:bg-green-50 border-green-200 text-green-700 hover:shadow-md transform hover:scale-105'
+                      }`}
                     onClick={() => !verificado[idx] && agregarPalabra(palabra)}
                   >
                     {palabra}
@@ -345,7 +343,7 @@ const JuegosInteractivos: React.FC = () => {
               })}
             </div>
           </div>
-          
+
           {/* Mostrar selección actual */}
           {respuestas[idx].length > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -368,7 +366,7 @@ const JuegosInteractivos: React.FC = () => {
       </div>
     );
   }
-  
+
   if (!recurso) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -389,7 +387,7 @@ const JuegosInteractivos: React.FC = () => {
   const totalActividades = recurso.contenido.actividades.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-6">
+    <div className="min-h-screen bg-gray-50 pb-6">
       <div className="max-w-4xl mx-auto px-4">
         {/* Cabecera */}
         <div className="flex items-center mb-6">
@@ -413,7 +411,7 @@ const JuegosInteractivos: React.FC = () => {
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${((actividadActual + 1) / totalActividades) * 100}%` }}
             ></div>
@@ -423,19 +421,18 @@ const JuegosInteractivos: React.FC = () => {
         {/* Contenido de la actividad */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           {renderActividad(actividadActiva)}
-          
+
           {/* Resultado de verificación */}
           {verificado[actividadActual] && (
-            <div className={`mt-6 p-4 rounded-lg ${
-              resultados[actividadActual] 
-                ? 'bg-green-50 border border-green-200' 
+            <div className={`mt-6 p-4 rounded-lg ${resultados[actividadActual]
+                ? 'bg-green-50 border border-green-200'
                 : 'bg-red-50 border border-red-200'
-            }`}>
+              }`}>
               <div className="flex items-center">
                 {resultados[actividadActual] ? (
                   <>                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-white text-sm">✓</span>
-                    </div>
+                    <span className="text-white text-sm">✓</span>
+                  </div>
                     <div>
                       <span className="text-green-800 font-semibold">¡Correcto! Excelente trabajo.</span>
                       {actividadActual < totalActividades - 1 && (
@@ -465,11 +462,10 @@ const JuegosInteractivos: React.FC = () => {
             <button
               onClick={anteriorActividad}
               disabled={actividadActual === 0}
-              className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-                actividadActual === 0
+              className={`flex items-center px-4 py-2 rounded-lg transition-colors ${actividadActual === 0
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-              }`}
+                }`}
             >
               <ChevronLeft size={18} className="mr-1" />
               Anterior
@@ -477,11 +473,10 @@ const JuegosInteractivos: React.FC = () => {
             <button
               onClick={siguienteActividad}
               disabled={actividadActual === totalActividades - 1}
-              className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-                actividadActual === totalActividades - 1
+              className={`flex items-center px-4 py-2 rounded-lg transition-colors ${actividadActual === totalActividades - 1
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-              }`}
+                }`}
             >
               Siguiente
               <ChevronRight size={18} className="ml-1" />
@@ -494,11 +489,10 @@ const JuegosInteractivos: React.FC = () => {
               <button
                 onClick={verificarActividad}
                 disabled={respuestas[actividadActual].length === 0}
-                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                  respuestas[actividadActual].length === 0
+                className={`px-6 py-2 rounded-lg font-medium transition-colors ${respuestas[actividadActual].length === 0
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
+                  }`}
               >
                 Verificar
               </button>

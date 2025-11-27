@@ -16,7 +16,7 @@ const RecursosList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState('');
   const [deleteModal, setDeleteModal] = useState({ open: false, id: 0, title: '' });
-  
+
   // Cargar recursos
   const fetchRecursos = async () => {
     try {
@@ -32,28 +32,28 @@ const RecursosList: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   // Cargar recursos al montar el componente
   useEffect(() => {
     fetchRecursos();
   }, []);
-  
+
   // Filtrar recursos
   const filteredRecursos = recursos.filter(recurso => {
     // Filtrar por término de búsqueda
     const matchesTerm = recurso.titulo.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     // Filtrar por tipo
     const matchesTipo = tipoFiltro ? recurso.tipo === tipoFiltro : true;
-    
+
     return matchesTerm && matchesTipo;
   });
-  
+
   // Abrir modal de confirmación para eliminar
   const confirmDelete = (id: number, title: string) => {
     setDeleteModal({ open: true, id, title });
   };
-  
+
   // Eliminar recurso
   const handleDelete = async () => {
     try {
@@ -69,7 +69,7 @@ const RecursosList: React.FC = () => {
       setDeleteModal({ open: false, id: 0, title: '' });
     }
   };
-  
+
   // Descargar recurso como PDF (generado en el frontend)
   const handleDownload = (id: number) => {
     try {
@@ -115,7 +115,7 @@ const RecursosList: React.FC = () => {
       // ENCABEZADO con barra de color
       doc.setFillColor(colorTipo[0], colorTipo[1], colorTipo[2]);
       doc.rect(0, 0, pageWidth, 25, 'F');
-      
+
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
@@ -139,26 +139,26 @@ const RecursosList: React.FC = () => {
         doc.setFillColor(248, 250, 252);
         const textLines = doc.splitTextToSize(contenido.texto, pageWidth - 2 * margin - 10);
         const boxHeight = textLines.length * 6 + 20;
-        
+
         checkNewPage(boxHeight + 10);
         doc.roundedRect(margin, yPos, pageWidth - 2 * margin, boxHeight, 3, 3, 'F');
-        
+
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(colorTipo[0], colorTipo[1], colorTipo[2]);
         doc.text('Texto de Lectura', margin + 5, yPos + 10);
-        
+
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
         doc.text(textLines, margin + 5, yPos + 18);
-        
+
         yPos += boxHeight + 15;
 
         // Preguntas
         if (contenido.preguntas && Array.isArray(contenido.preguntas)) {
           checkNewPage(30);
-          
+
           doc.setFontSize(13);
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(colorTipo[0], colorTipo[1], colorTipo[2]);
@@ -175,7 +175,7 @@ const RecursosList: React.FC = () => {
             doc.setFontSize(9);
             doc.setFont('helvetica', 'bold');
             doc.text(`${index + 1}`, margin + 4, yPos + 2, { align: 'center' });
-            
+
             // Pregunta
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
@@ -188,29 +188,29 @@ const RecursosList: React.FC = () => {
             if (pregunta.opciones && Array.isArray(pregunta.opciones)) {
               doc.setFont('helvetica', 'normal');
               doc.setFontSize(10);
-              
+
               pregunta.opciones.forEach((opcion: string, idx: number) => {
                 const letra = String.fromCharCode(65 + idx);
                 const esCorrecta = pregunta.respuesta === letra;
-                
+
                 checkNewPage(15);
-                
+
                 const opcionLines = doc.splitTextToSize(opcion, pageWidth - 2 * margin - 30);
-                
+
                 // Fondo verde suave para respuesta correcta
                 if (esCorrecta) {
                   doc.setFillColor(220, 252, 231);
                   doc.roundedRect(margin + 12, yPos - 3, pageWidth - 2 * margin - 12, opcionLines.length * 5 + 4, 2, 2, 'F');
                 }
-                
+
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(esCorrecta ? 5 : 80, esCorrecta ? 150 : 80, esCorrecta ? 105 : 80);
                 doc.text(`${letra})`, margin + 15, yPos + 1);
-                
+
                 doc.setFont('helvetica', 'normal');
                 doc.setTextColor(esCorrecta ? 5 : 60, esCorrecta ? 150 : 60, esCorrecta ? 105 : 60);
                 doc.text(opcionLines, margin + 24, yPos + 1);
-                
+
                 yPos += opcionLines.length * 5 + 2;
               });
             }
@@ -261,15 +261,15 @@ const RecursosList: React.FC = () => {
           // Respuesta
           if (ejercicio.respuesta) {
             const respuestaLines = doc.splitTextToSize(ejercicio.respuesta, pageWidth - 2 * margin - 20);
-            
+
             doc.setFillColor(220, 252, 231);
             doc.roundedRect(margin + 12, yPos, pageWidth - 2 * margin - 12, respuestaLines.length * 5 + 8, 2, 2, 'F');
-            
+
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(5, 150, 105);
             doc.text('Respuesta:', margin + 15, yPos + 4);
-            
+
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
             doc.text(respuestaLines, margin + 15, yPos + 9);
@@ -292,7 +292,7 @@ const RecursosList: React.FC = () => {
           const temaTexto = tema.tema || tema;
           const temaLines = doc.splitTextToSize(temaTexto, pageWidth - 2 * margin - 20);
           let boxHeight = temaLines.length * 6 + 15;
-          
+
           if (tema.pautas) {
             const pautasLines = doc.splitTextToSize(tema.pautas, pageWidth - 2 * margin - 25);
             boxHeight += pautasLines.length * 5 + 8;
@@ -347,24 +347,24 @@ const RecursosList: React.FC = () => {
       // Guardar
       const fileName = `${recurso.titulo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
       doc.save(fileName);
-      
+
       toast.success('PDF descargado correctamente');
     } catch (error) {
       console.error('Error al generar el PDF:', error);
       toast.error('No se pudo generar el PDF');
     }
   };
-  
+
   // Navegar a la vista del recurso
   const handleViewResource = (id: number) => {
     navigate(`/recursos/${id}`);
   };
-  
+
   // Ir al dashboard para crear un nuevo recurso
   const handleNewResource = () => {
     navigate('/dashboard');
   };
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -372,9 +372,9 @@ const RecursosList: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
-    <div className="pt-20 pb-6">
+    <div className="pb-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-2">Mis Recursos</h1>
@@ -382,7 +382,7 @@ const RecursosList: React.FC = () => {
             {filteredRecursos.length} recursos disponibles
           </p>
         </div>
-        
+
         <div className="mt-4 md:mt-0">
           <button
             onClick={handleNewResource}
@@ -393,7 +393,7 @@ const RecursosList: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Filtros */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -411,7 +411,7 @@ const RecursosList: React.FC = () => {
               />
             </div>
           </div>
-          
+
           <div className="md:w-64">
             <select
               className="form-select"
@@ -429,7 +429,7 @@ const RecursosList: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Lista de recursos */}
       {filteredRecursos.length > 0 ? (
         <motion.div
@@ -473,7 +473,7 @@ const RecursosList: React.FC = () => {
           )}
         </div>
       )}
-      
+
       {/* Modal de confirmación para eliminar */}
       <DeleteConfirmation
         isOpen={deleteModal.open}

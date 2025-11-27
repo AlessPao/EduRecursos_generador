@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BookOpen, List, User, X, ClipboardList } from 'lucide-react';
+import { Home, BookOpen, List, User, X, ClipboardList, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,6 +10,8 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
+  const { logout } = useAuth();
+
   // Enlaces del menú
   const menuItems = [
     { path: '/dashboard', label: 'Inicio', icon: <Home size={20} /> },
@@ -16,30 +19,96 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
     { path: '/evaluaciones', label: 'Evaluaciones', icon: <ClipboardList size={20} /> },
     { path: '/perfil', label: 'Mi Perfil', icon: <User size={20} /> }
   ];
-  
-  // Variantes de animación
+
+  // Animación sidebar móvil
   const sidebarVariants = {
     open: {
       x: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30
-      }
+      transition: { type: 'spring', stiffness: 300, damping: 30 }
     },
     closed: {
       x: '-100%',
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30
-      }
+      transition: { type: 'spring', stiffness: 300, damping: 30 }
     }
   };
-  
+
+  // Contenido compartido
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      {/* HEADER — solo móvil */}
+      <div className="flex items-center p-6 border-b border-slate-100 md:hidden">
+        <div className="bg-indigo-600 p-1.5 rounded-lg mr-3">
+          <BookOpen className="h-6 w-6 text-white" />
+        </div>
+        <span className="text-xl font-bold text-slate-800 tracking-tight">EduRecursos</span>
+
+        <button
+          onClick={closeSidebar}
+          className="ml-auto p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+      {/* NAVEGACIÓN */}
+      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        <div className="mb-2 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          Menu Principal
+        </div>
+
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            onClick={closeSidebar}
+            className={({ isActive }) =>
+              `flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group ${isActive
+                ? 'bg-indigo-50 text-indigo-700 font-medium shadow-sm'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span
+                  className={`mr-3 transition-colors ${isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'
+                    }`}
+                >
+                  {item.icon}
+                </span>
+                <span>{item.label}</span>
+
+                {isActive && (
+                  <motion.div
+                    layoutId="activeIndicator"
+                    className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-600"
+                  />
+                )}
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* LOGOUT */}
+      <div className="p-4 border-t border-slate-100">
+        <button
+          onClick={logout}
+          className="flex items-center w-full px-4 py-3 text-slate-600 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-colors group"
+        >
+          <LogOut
+            size={20}
+            className="mr-3 text-slate-400 group-hover:text-rose-500 transition-colors"
+          />
+          <span className="font-medium">Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <>
-      {/* Overlay para móviles */}
+      {/* Overlay móvil */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -47,77 +116,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeSidebar}
-            className="md:hidden fixed inset-0 z-20 bg-black bg-opacity-50"
+            className="md:hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm"
           />
         )}
       </AnimatePresence>
-      
-      {/* Sidebar para móviles */}
+
+      {/* Sidebar móvil */}
       <motion.aside
         variants={sidebarVariants}
         initial="closed"
         animate={isOpen ? 'open' : 'closed'}
-        className="md:hidden fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg overflow-y-auto"
+        className="md:hidden fixed top-16 left-0 z-50 w-72 h-[calc(100vh-64px)] bg-white shadow-2xl"
       >
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center">
-            <BookOpen className="h-7 w-7 text-blue-600" />
-            <span className="ml-2 text-lg font-bold">EduRecursos</span>
-          </div>
-          <button 
-            onClick={closeSidebar}
-            className="p-1 rounded-full text-gray-700 hover:text-blue-500 hover:bg-gray-100"
-          >
-            <X size={20} />
-          </button>
-        </div>
-        
-        <nav className="mt-4 px-2">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={closeSidebar}
-              className={({ isActive }) => 
-                `flex items-center px-4 py-3 mb-2 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`
-              }
-            >
-              {item.icon}
-              <span className="ml-3">{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
+        <SidebarContent />
       </motion.aside>
-      
-      {/* Sidebar para desktop */}
-      <aside className="hidden md:block w-64 bg-white shadow-sm overflow-y-auto">
-        <div className="flex items-center p-4 border-b">
-          <BookOpen className="h-6 w-6 text-blue-600" />
-          <span className="ml-2 text-lg font-bold">EduRecursos</span>
-        </div>
-        
-        <nav className="mt-4 px-2">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => 
-                `flex items-center px-4 py-3 mb-2 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`
-              }
-            >
-              {item.icon}
-              <span className="ml-3">{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
+
+      {/* Sidebar desktop */}
+      <aside className="hidden md:block w-72 bg-white border-r border-slate-200 h-[calc(100vh-64px)]">
+        <SidebarContent />
       </aside>
     </>
   );

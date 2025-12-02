@@ -46,21 +46,21 @@ const RequestPasswordReset: React.FC = () => {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl"
+          className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700"
         >
           <div className="text-center">
-            <div className="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
-              <Mail className="h-8 w-8 text-green-600" />
+            <div className="mx-auto h-16 w-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+              <Mail className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
               Código enviado
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
               Si el correo está registrado, recibirás un código de recuperación en unos minutos.
             </p>
           </div>
@@ -75,7 +75,7 @@ const RequestPasswordReset: React.FC = () => {
             
             <Link
               to="/login"
-              className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver al login
@@ -87,29 +87,29 @@ const RequestPasswordReset: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl"
+        className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700"
       >
         <div className="text-center">
           <Link to="/" className="inline-flex items-center justify-center">
-            <BookOpen className="h-12 w-12 text-blue-600" />
-            <span className="ml-2 text-2xl font-bold text-gray-900">Educa Recursos</span>
+            <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+            <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-white">Educa Recursos</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
             Recuperar contraseña
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
             Ingresa tu correo electrónico y te enviaremos un código para recuperar tu cuenta.
           </p>
         </div>
         
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300">
               Correo electrónico
             </label>
             <input
@@ -118,8 +118,8 @@ const RequestPasswordReset: React.FC = () => {
               autoComplete="email"
               placeholder="tu-email@ejemplo.com"
               className={`mt-1 appearance-none relative block w-full px-3 py-3 border ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
-              } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors`}              {...register('email', {
+                errors.email ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-slate-600'
+              } placeholder-gray-500 dark:placeholder-slate-500 text-gray-900 dark:text-white bg-white dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 focus:z-10 sm:text-sm transition-colors`}              {...register('email', {
                 required: 'El correo electrónico es requerido',
                 pattern: {
                   value: /^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/i,
@@ -154,7 +154,7 @@ const RequestPasswordReset: React.FC = () => {
           <div className="text-center">
             <Link
               to="/login"
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors inline-flex items-center"
+              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors inline-flex items-center"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
               Volver al login

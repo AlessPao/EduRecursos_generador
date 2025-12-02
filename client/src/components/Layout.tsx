@@ -12,7 +12,7 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 dark:bg-slate-950 flex flex-col">
       <Navbar toggleSidebar={toggleSidebar} />
 
       {/* Empuja sidebar + contenido 64px hacia abajo */}

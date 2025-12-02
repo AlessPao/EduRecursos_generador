@@ -150,8 +150,8 @@ const EvaluationForm: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Crear Nuevo Examen</h1>
-        <p className="text-slate-600">Completa los detalles para generar tu evaluación automáticamente.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Crear Nuevo Examen</h1>
+        <p className="text-slate-600 dark:text-slate-400">Completa los detalles para generar tu evaluación automáticamente.</p>
       </div>
 
       <div className="card">
@@ -172,18 +172,24 @@ const EvaluationForm: React.FC = () => {
             <input
               value={tema}
               onChange={e => setTema(e.target.value)}
-              className={`form-input ${tema && temaValidations.isValid ? 'border-emerald-500 focus:border-emerald-500 focus:ring-emerald-500' : tema && !temaValidations.isValid ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500' : ''}`}
+              className={`form-input ${
+                tema && temaValidations.isValid
+                  ? 'border-emerald-500 dark:border-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-emerald-500 dark:focus:ring-emerald-400'
+                  : tema && !temaValidations.isValid
+                  ? 'border-rose-500 dark:border-rose-400 focus:border-rose-500 dark:focus:border-rose-400 focus:ring-rose-500 dark:focus:ring-rose-400'
+                  : ''
+              }`}
               placeholder="Ej: Los animales de la selva, La amistad"
               required
             />
 
             {/* Tip cuando el campo está vacío */}
             {!tema && (
-              <div className="mt-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100 flex items-start gap-3">
-                <Lightbulb className="h-5 w-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+              <div className="mt-3 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 flex items-start gap-3">
+                <Lightbulb className="h-5 w-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-indigo-900">Consejo para mejores resultados</p>
-                  <p className="text-sm text-indigo-700 mt-1">
+                  <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-300">Consejo para mejores resultados</p>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-400 mt-1">
                     Entre más detalles específicos incluyas, mejor será el contenido generado.
                     Ejemplos: "Los animales marinos del océano Pacífico", "La amistad entre niños de diferentes culturas"
                   </p>
@@ -193,60 +199,60 @@ const EvaluationForm: React.FC = () => {
 
             {/* Validaciones visuales del tema */}
             {tema && (
-              <div className="mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <p className="text-sm font-semibold text-slate-700 mb-2">
+              <div className="mt-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Verificando tema:
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-center text-sm">
                     {temaValidations.notEmpty ? (
-                      <Check className="h-4 w-4 text-emerald-500 mr-2" />
+                      <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 mr-2" />
                     ) : (
-                      <X className="h-4 w-4 text-rose-500 mr-2" />
+                      <X className="h-4 w-4 text-rose-500 dark:text-rose-400 mr-2" />
                     )}
-                    <span className={temaValidations.notEmpty ? 'text-slate-700' : 'text-slate-500'}>
+                    <span className={temaValidations.notEmpty ? 'text-slate-700 dark:text-slate-300' : 'text-slate-500 dark:text-slate-500'}>
                       No debe estar vacío
                     </span>
                   </div>
 
                   <div className="flex items-center text-sm">
                     {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
-                      <Check className="h-4 w-4 text-emerald-500 mr-2" />
+                      <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 mr-2" />
                     ) : (
-                      <X className="h-4 w-4 text-rose-500 mr-2" />
+                      <X className="h-4 w-4 text-rose-500 dark:text-rose-400 mr-2" />
                     )}
-                    <span className={temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'text-slate-700' : 'text-slate-500'}>
+                    <span className={temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'text-slate-700 dark:text-slate-300' : 'text-slate-500 dark:text-slate-500'}>
                       Entre 3 y 100 caracteres ({tema.trim().length}/100)
                     </span>
                   </div>
 
                   <div className="flex items-center text-sm">
                     {temaValidations.onlyValidChars ? (
-                      <Check className="h-4 w-4 text-emerald-500 mr-2" />
+                      <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400 mr-2" />
                     ) : (
-                      <X className="h-4 w-4 text-rose-500 mr-2" />
+                      <X className="h-4 w-4 text-rose-500 dark:text-rose-400 mr-2" />
                     )}
-                    <span className={temaValidations.onlyValidChars ? 'text-slate-700' : 'text-slate-500'}>
+                    <span className={temaValidations.onlyValidChars ? 'text-slate-700 dark:text-slate-300' : 'text-slate-500 dark:text-slate-500'}>
                       Sin caracteres especiales
                     </span>
                   </div>
                 </div>
 
                 {/* Indicador general de validez */}
-                <div className="mt-4 pt-3 border-t border-slate-200">
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
                   {temaValidations.isValid ? (
-                    <div className="flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 p-2 rounded-lg">
+                    <div className="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg border border-emerald-100 dark:border-emerald-800">
                       <Check className="h-4 w-4 mr-2" />
                       ¡Excelente! Tu tema está listo
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="flex items-center text-sm font-medium text-rose-600 bg-rose-50 p-2 rounded-lg">
+                      <div className="flex items-center text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 p-2 rounded-lg border border-rose-100 dark:border-rose-800">
                         <AlertCircle className="h-4 w-4 mr-2" />
                         Completa los requisitos arriba
                       </div>
                       {tema.trim().length >= 3 && tema.trim().length <= 15 && (
-                        <div className="flex items-start text-sm text-amber-700 bg-amber-50 p-2 rounded-lg">
+                        <div className="flex items-start text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg border border-amber-100 dark:border-amber-800">
                           <Lightbulb className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
                           <span>
                             <strong>Tip:</strong> Agrega más detalles específicos para obtener contenido más rico y personalizado
@@ -285,11 +291,11 @@ const EvaluationForm: React.FC = () => {
                 min={1}
                 max={10}
               />
-              <p className="text-xs text-slate-500 mt-1">Máximo 10 preguntas</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Máximo 10 preguntas</p>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex justify-end">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
             <button
               type="submit"
               className="btn btn-primary w-full md:w-auto flex items-center justify-center gap-2 shadow-lg shadow-indigo-200"

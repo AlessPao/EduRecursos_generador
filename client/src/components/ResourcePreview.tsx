@@ -11,25 +11,25 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
 }) => {
   // Renderizar según el tipo de recurso
   const renderContent = () => {
-    if (!contenido) return <p>No hay contenido para mostrar</p>;
+    if (!contenido) return <p className="text-slate-500 dark:text-slate-400">No hay contenido para mostrar</p>;
 
     switch (tipo) {
       case "comprension":
         return (
           <div className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-md">
-              <p className="text-gray-800">{contenido.texto}</p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
+              <p className="text-gray-800 dark:text-slate-200">{contenido.texto}</p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">Preguntas</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Preguntas</h3>
               <div className="space-y-3">
                 {contenido.preguntas.map((pregunta: any, index: number) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-md">
-                    <p className="font-medium">
+                  <div key={index} className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                    <p className="font-medium text-slate-900 dark:text-white">
                       {index + 1}. {pregunta.pregunta}
                     </p>
-                    <p className="text-sm text-gray-700 mt-2">
+                    <p className="text-sm text-gray-700 dark:text-slate-300 mt-2">
                       <span className="font-medium">Respuesta:</span>{" "}
                       {pregunta.respuesta}
                     </p>
@@ -40,10 +40,10 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
 
             {contenido.vocabulario && (
               <div>
-                <h3 className="font-semibold text-lg mb-2">Vocabulario</h3>
-                <div className="bg-yellow-50 p-3 rounded-md">
+                <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Vocabulario</h3>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md">
                   {contenido.vocabulario.map((item: any, index: number) => (
-                    <div key={index} className="mb-2">
+                    <div key={index} className="mb-2 text-slate-800 dark:text-slate-200">
                       <span className="font-medium">{item.palabra}:</span>{" "}
                       {item.definicion}
                     </div>
@@ -57,38 +57,38 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
       case "escritura":
         return (
           <div className="space-y-4">
-            <div className="bg-green-50 p-4 rounded-md">
-              <p className="text-gray-800">{contenido.descripcion}</p>
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-md">
+              <p className="text-gray-800 dark:text-slate-200">{contenido.descripcion}</p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">Instrucciones</h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <p>{contenido.instrucciones}</p>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Instrucciones</h3>
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <p className="text-slate-800 dark:text-slate-200">{contenido.instrucciones}</p>
               </div>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 Estructura Propuesta
               </h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <p>{contenido.estructuraPropuesta}</p>
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <p className="text-slate-800 dark:text-slate-200">{contenido.estructuraPropuesta}</p>
               </div>
             </div>
 
             {contenido.conectores && (
               <div>
-                <h3 className="font-semibold text-lg mb-2">
+                <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                   Conectores Útiles
                 </h3>
-                <div className="bg-blue-50 p-3 rounded-md">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
                   <div className="flex flex-wrap gap-2">
                     {contenido.conectores.map(
                       (conector: string, index: number) => (
                         <span
                           key={index}
-                          className="bg-white px-2 py-1 rounded-md text-sm border"
+                          className="bg-white dark:bg-slate-700 px-2 py-1 rounded-md text-sm border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200"
                         >
                           {conector}
                         </span>
@@ -100,11 +100,11 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
             )}
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 Lista de Verificación
               </h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <ul className="list-disc list-inside">
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <ul className="list-disc list-inside text-slate-800 dark:text-slate-200">
                   {contenido.listaVerificacion.map(
                     (item: string, index: number) => (
                       <li key={index}>{item}</li>
@@ -119,27 +119,27 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
       case "gramatica":
         return (
           <div className="space-y-4">
-            <div className="bg-orange-50 p-4 rounded-md">
-              <p className="font-medium">Instrucciones:</p>
-              <p className="text-gray-800">{contenido.instrucciones}</p>
+            <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-md">
+              <p className="font-medium text-slate-900 dark:text-white">Instrucciones:</p>
+              <p className="text-gray-800 dark:text-slate-200">{contenido.instrucciones}</p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">Ejemplo</h3>
-              <div className="bg-yellow-50 p-3 rounded-md">
-                <p>{contenido.ejemplo}</p>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Ejemplo</h3>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md">
+                <p className="text-slate-800 dark:text-slate-200">{contenido.ejemplo}</p>
               </div>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">Ejercicios</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Ejercicios</h3>
               <div className="space-y-3">
                 {contenido.items.map((item: any, index: number) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-md">
-                    <p className="font-medium">
+                  <div key={index} className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                    <p className="font-medium text-slate-900 dark:text-white">
                       {index + 1}. {item.consigna}
                     </p>
-                    <p className="text-sm text-gray-700 mt-2">
+                    <p className="text-sm text-gray-700 dark:text-slate-300 mt-2">
                       <span className="font-medium">Respuesta:</span>{" "}
                       {item.respuesta}
                     </p>
@@ -153,34 +153,34 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
       case "oral":
         return (
           <div className="space-y-4">
-            <div className="bg-violet-50 p-4 rounded-md">
-              <p className="text-gray-800">{contenido.descripcion}</p>
+            <div className="bg-violet-50 dark:bg-violet-900/20 p-4 rounded-md">
+              <p className="text-gray-800 dark:text-slate-200">{contenido.descripcion}</p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 Instrucciones para el Docente
               </h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <p>{contenido.instruccionesDocente}</p>
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <p className="text-slate-800 dark:text-slate-200">{contenido.instruccionesDocente}</p>
               </div>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 Guión para Estudiantes
               </h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <p>{contenido.guionEstudiante}</p>
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <p className="text-slate-800 dark:text-slate-200">{contenido.guionEstudiante}</p>
               </div>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 Preguntas Orientadoras
               </h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <ol className="list-decimal list-inside">
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <ol className="list-decimal list-inside text-slate-800 dark:text-slate-200">
                   {contenido.preguntasOrientadoras.map(
                     (pregunta: string, index: number) => (
                       <li key={index}>{pregunta}</li>
@@ -191,11 +191,11 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-2">
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 Criterios de Evaluación
               </h3>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <ul className="list-disc list-inside">
+              <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-md">
+                <ul className="list-disc list-inside text-slate-800 dark:text-slate-200">
                   {contenido.criteriosEvaluacion.map(
                     (criterio: string, index: number) => (
                       <li key={index}>{criterio}</li>
@@ -553,7 +553,7 @@ const ResourcePreview: React.FC<ResourcePreviewProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm p-4 overflow-auto max-h-[600px]">
+    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-4 overflow-auto max-h-[600px]">
       {renderContent()}
     </div>
   );

@@ -62,18 +62,18 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     <motion.div
       whileHover={{ y: -5 }}
       whileTap={{ scale: 0.98 }}
-      className={`group cursor-pointer h-full bg-white rounded-2xl border ${theme.border} p-6 shadow-sm hover:shadow-xl transition-all duration-300`}
+      className={`group cursor-pointer h-full bg-white dark:bg-slate-800 rounded-2xl border ${theme.border} dark:border-slate-700 p-6 shadow-sm hover:shadow-xl transition-all duration-300`}
       onClick={onClick}
     >
-      <div className={`w-14 h-14 rounded-2xl ${theme.bg} ${theme.hover} flex items-center justify-center mb-5 transition-colors duration-300`}>
+      <div className={`w-14 h-14 rounded-2xl ${theme.bg} dark:bg-opacity-20 ${theme.hover} flex items-center justify-center mb-5 transition-colors duration-300`}>
         {theme.icon}
       </div>
 
-      <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">
+      <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
         {title}
       </h3>
 
-      <p className="text-slate-500 text-sm leading-relaxed">
+      <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
         {description}
       </p>
     </motion.div>

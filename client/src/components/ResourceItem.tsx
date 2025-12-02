@@ -42,7 +42,7 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         return <BookOpen size={20} className="text-blue-600" />;
     }
   };
-  
+
   // Obtener el color de la etiqueta según el tipo
   const getBadgeColor = () => {
     switch (tipo) {
@@ -62,7 +62,7 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         return 'bg-blue-100 text-blue-800';
     }
   };
-  
+
   // Obtener el nombre del tipo
   const getTipoNombre = () => {
     switch (tipo) {
@@ -82,7 +82,7 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         return tipo;
     }
   };
-  
+
   // Si el recurso es de tipo ice_breakers, mostrar opciones específicas
   if (tipo === 'ice_breakers') {
     return (
@@ -90,11 +90,11 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-4 hover:shadow-md transition-shadow"
+        className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm p-4 mb-4 hover:shadow-md transition-shadow"
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div className="flex items-start mb-3 md:mb-0">
-            <div className="p-2 rounded-full bg-gray-100 mr-3">
+            <div className="p-2 rounded-full bg-gray-100 dark:bg-slate-700 mr-3">
               {getIcon()}
             </div>
             <div>
@@ -102,19 +102,19 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getBadgeColor()}`}>
                   {getTipoNombre()}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-slate-400">
                   Creado: {formatDate(createdAt)}
                 </span>
               </div>
-              <Link 
-                to={`/recursos/${id}`} 
-                className="text-lg font-medium hover:text-blue-600 transition-colors"
+              <Link
+                to={`/recursos/${id}`}
+                className="text-lg font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {titulo}
               </Link>
             </div>
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <Link
               to={`/ice-breakers/${id}/presentacion`}
@@ -145,7 +145,7 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
       </motion.div>
     );
   }
-  
+
   // Si el recurso es de tipo drag_and_drop, solo mostrar opciones Jugar y Borrar
   if (tipo === 'drag_and_drop') {
     return (
@@ -153,11 +153,11 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-4 hover:shadow-md transition-shadow"
+        className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm p-4 mb-4 hover:shadow-md transition-shadow"
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div className="flex items-start mb-3 md:mb-0">
-            <div className="p-2 rounded-full bg-gray-100 mr-3">
+            <div className="p-2 rounded-full bg-gray-100 dark:bg-slate-700 mr-3">
               {getIcon()}
             </div>
             <div>
@@ -165,19 +165,19 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getBadgeColor()}`}>
                   {getTipoNombre()}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-slate-400">
                   Creado: {formatDate(createdAt)}
                 </span>
               </div>
-              <Link 
-                to={`/recursos/${id}`} 
-                className="text-lg font-medium hover:text-blue-600 transition-colors"
+              <Link
+                to={`/recursos/${id}`}
+                className="text-lg font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {titulo}
               </Link>
             </div>
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <Link
               to={`/juegos/${id}`}
@@ -200,17 +200,17 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
       </motion.div>
     );
   }
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-4 hover:shadow-md transition-shadow"
+      className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm p-4 mb-4 hover:shadow-md transition-shadow"
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between">
         <div className="flex items-start mb-3 md:mb-0">
-          <div className="p-2 rounded-full bg-gray-100 mr-3">
+          <div className="p-2 rounded-full bg-gray-100 dark:bg-slate-700 mr-3">
             {getIcon()}
           </div>
           <div>
@@ -218,19 +218,19 @@ const ResourceItem: React.FC<ResourceItemProps> = ({
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getBadgeColor()}`}>
                 {getTipoNombre()}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 Creado: {formatDate(createdAt)}
               </span>
             </div>
-            <Link 
-              to={`/recursos/${id}`} 
-              className="text-lg font-medium hover:text-blue-600 transition-colors"
+            <Link
+              to={`/recursos/${id}`}
+              className="text-lg font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               {titulo}
             </Link>
           </div>
         </div>
-        
+
         <div className="flex flex-wrap gap-2">
           {tipo === 'comprension' && (
             <>

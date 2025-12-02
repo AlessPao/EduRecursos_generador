@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -26,10 +27,11 @@ import IceBreakerPresentation from './pages/IceBreakerPresentation';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <Routes>
-        {/* Rutas públicas */}
-        <Route path="/" element={<Landing />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <Routes>
+          {/* Rutas públicas */}
+          <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/request-password-reset" element={<RequestPasswordReset />} />
@@ -38,7 +40,7 @@ const App: React.FC = () => {
         <Route path="/evaluaciones/:slug" element={<ExamPublic />} />
         <Route path="/juegos/:id" element={<JuegosInteractivos />} />
         <Route path="/ice-breakers/:id/presentacion" element={<IceBreakerPresentation />} />
-        
+
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
@@ -54,12 +56,13 @@ const App: React.FC = () => {
             <Route path="/evaluaciones/:slug/detalle" element={<ExamDetail />} />
           </Route>
         </Route>
-        
+
         {/* Redirecciones y ruta 404 */}
         <Route path="/dashboard/recursos" element={<Navigate to="/recursos" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
+    </ThemeProvider>
   );
 };
 

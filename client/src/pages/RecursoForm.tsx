@@ -7,7 +7,7 @@ import axios from 'axios';
 import { TIPOS_RECURSOS, OPCIONES_FORMULARIO, API_URL, OpcionesFormulario } from '../config';
 import ResourcePreview from '../components/ResourcePreview';
 import { formatTipoRecurso } from '../utils/formatters';
-import { Edit, Save, Download, ArrowLeft, Check, X } from 'lucide-react';
+import { Edit, Save, Download, ArrowLeft, Check, X, FileText, List, MessageCircle, Type, HelpCircle, Trash2, Plus } from 'lucide-react';
 
 // Tipo para los datos del formulario
 interface RecursoFormData {
@@ -304,7 +304,7 @@ const RecursoForm: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white rounded-lg shadow-sm p-6"
+            className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 p-6 md:p-8"
           >
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="form-group">
@@ -376,83 +376,47 @@ const RecursoForm: React.FC = () => {
 
                         {/* Tip cuando el campo está vacío */}
                         {!watchedTema && (
-                          <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
-                            <div className="flex items-start">
-                              <div className="flex-shrink-0">
-                                <svg className="h-4 w-4 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                </svg>
+                          <div className="mt-3 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 flex gap-3">
+                            <div className="flex-shrink-0 mt-0.5">
+                              <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <span className="text-xs">💡</span>
                               </div>
-                              <div className="ml-2">
-                                <p className="text-sm text-blue-700 font-medium">💡 Consejo:</p>
-                                <p className="text-xs text-blue-600 mt-1">
-                                  Entre más detalles específicos incluyas, mejor será el contenido generado.
-                                  Ejemplos: "Los ecosistemas acuáticos de América", "La historia de mi comunidad"
-                                </p>
-                              </div>
+                            </div>
+                            <div>
+                              <p className="text-sm text-indigo-900 font-semibold mb-1">Consejo para mejores resultados</p>
+                              <p className="text-sm text-indigo-700 leading-relaxed">
+                                Entre más detalles específicos incluyas, mejor será el contenido generado.
+                                <span className="block mt-1 text-indigo-600 italic">Ejemplos: "Los ecosistemas acuáticos de América", "La historia de mi comunidad"</span>
+                              </p>
                             </div>
                           </div>
                         )}
 
                         {/* Validaciones visuales del tema */}
                         {watchedTema && (
-                          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
-                            <p className="text-sm font-medium text-gray-700 mb-2">
-                              Requisitos del tema:
+                          <div className="mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+                              Requisitos del tema
                             </p>
-                            <div className="space-y-1">
-                              <div className="flex items-center text-xs">
-                                {temaValidations.notEmpty ? (
-                                  <Check className="h-3 w-3 text-green-500 mr-2" />
-                                ) : (
-                                  <X className="h-3 w-3 text-red-500 mr-2" />
-                                )}
-                                <span className={temaValidations.notEmpty ? 'text-green-600' : 'text-red-600'}>
-                                  No debe estar vacío
-                                </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <div className={`flex items-center text-xs px-2 py-1 rounded-md transition-colors ${temaValidations.notEmpty ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                                {temaValidations.notEmpty ? <Check size={14} className="mr-2 text-emerald-500" /> : <div className="w-3.5 h-3.5 mr-2 rounded-full border border-slate-300"></div>}
+                                No debe estar vacío
                               </div>
 
-                              <div className="flex items-center text-xs">
-                                {temaValidations.hasMinLength && temaValidations.hasMaxLength ? (
-                                  <Check className="h-3 w-3 text-green-500 mr-2" />
-                                ) : (
-                                  <X className="h-3 w-3 text-red-500 mr-2" />
-                                )}
-                                <span className={temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'text-green-600' : 'text-red-600'}>
-                                  Entre 3 y 100 caracteres
-                                </span>
+                              <div className={`flex items-center text-xs px-2 py-1 rounded-md transition-colors ${temaValidations.hasMinLength && temaValidations.hasMaxLength ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                                {temaValidations.hasMinLength && temaValidations.hasMaxLength ? <Check size={14} className="mr-2 text-emerald-500" /> : <div className="w-3.5 h-3.5 mr-2 rounded-full border border-slate-300"></div>}
+                                3-100 caracteres
                               </div>
 
-                              <div className="flex items-center text-xs">
-                                {temaValidations.onlyValidChars ? (
-                                  <Check className="h-3 w-3 text-green-500 mr-2" />
-                                ) : (
-                                  <X className="h-3 w-3 text-red-500 mr-2" />
-                                )}
-                                <span className={temaValidations.onlyValidChars ? 'text-green-600' : 'text-red-600'}>
-                                  Sin símbolos
-                                </span>
+                              <div className={`flex items-center text-xs px-2 py-1 rounded-md transition-colors ${temaValidations.onlyValidChars ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                                {temaValidations.onlyValidChars ? <Check size={14} className="mr-2 text-emerald-500" /> : <div className="w-3.5 h-3.5 mr-2 rounded-full border border-slate-300"></div>}
+                                Sin símbolos especiales
                               </div>
-                            </div>
 
-                            {/* Indicador general de validez */}
-                            <div className="mt-2 pt-2 border-t border-gray-200">
-                              <div className="flex items-center text-xs">
-                                {temaValidations.isValid ? (
-                                  <>
-                                    <Check className="h-3 w-3 text-green-500 mr-2" />
-                                    <span className="text-green-600 font-medium">
-                                      ¡Tema válido!
-                                    </span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <X className="h-3 w-3 text-red-500 mr-2" />
-                                    <span className="text-red-600 font-medium">
-                                      Completa todos los requisitos
-                                    </span>
-                                  </>
-                                )}
+                              <div className={`flex items-center text-xs px-2 py-1 rounded-md transition-colors ${temaValidations.isValid ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                                {temaValidations.isValid ? <Check size={14} className="mr-2 text-emerald-500" /> : <div className="w-3.5 h-3.5 mr-2 rounded-full border border-slate-300"></div>}
+                                Formato válido
                               </div>
                             </div>
                           </div>
@@ -1240,155 +1204,320 @@ const RecursoForm: React.FC = () => {
 
               {/* Si estamos editando un recurso existente, mostrar campos editables para el contenido */}
               {!isCreating && isEditing && recurso && (
-                <div className="form-group mt-4">
-                  <label className="form-label">Contenido del recurso</label>
+                <div className="mt-8 space-y-6">
+                  <div className="flex items-center space-x-2 text-indigo-700 dark:text-indigo-400 border-b border-indigo-100 dark:border-indigo-800 pb-2">
+                    <Edit size={20} />
+                    <h3 className="text-lg font-semibold">Editar Contenido</h3>
+                  </div>
+
                   {/* Renderizado dinámico según tipo de recurso */}
                   {recurso.tipo === 'comprension' && (
-                    <>
-                      <label className="form-label">Texto principal</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={4}
-                        value={editableContenido?.texto || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, texto: e.target.value })}
-                      />
-                      <label className="form-label">Preguntas</label>
-                      {editableContenido?.preguntas?.map((item: any, idx: number) => (
-                        <div key={idx} className="mb-2 p-2 border rounded">
-                          <input
-                            className="form-input mb-1"
-                            value={item.pregunta}
-                            onChange={e => {
-                              const preguntas = [...editableContenido.preguntas];
-                              preguntas[idx].pregunta = e.target.value;
+                    <div className="space-y-6">
+                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <label className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                          <FileText size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                          Texto principal
+                        </label>
+                        <textarea
+                          className="form-input min-h-[200px] font-medium text-slate-600 dark:text-slate-200"
+                          value={editableContenido?.texto || ''}
+                          onChange={e => setEditableContenido({ ...editableContenido, texto: e.target.value })}
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-300">
+                            <HelpCircle size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                            Preguntas y Respuestas
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const preguntas = [...(editableContenido.preguntas || [])];
+                              preguntas.push({ pregunta: '', respuesta: '' });
                               setEditableContenido({ ...editableContenido, preguntas });
                             }}
-                          />
+                            className="btn btn-sm bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border-indigo-200 dark:border-indigo-700"
+                          >
+                            <Plus size={16} className="mr-1" />
+                            Agregar Pregunta
+                          </button>
+                        </div>
+                        <div className="grid gap-4">
+                          {editableContenido?.preguntas?.map((item: any, idx: number) => (
+                            <div key={idx} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow relative group">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const preguntas = [...editableContenido.preguntas];
+                                  preguntas.splice(idx, 1);
+                                  setEditableContenido({ ...editableContenido, preguntas });
+                                }}
+                                className="absolute top-2 right-2 p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                title="Eliminar pregunta"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                              <div className="mb-3 pr-8">
+                                <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 block">Pregunta {idx + 1}</label>
+                                <input
+                                  className="form-input font-medium"
+                                  value={item.pregunta}
+                                  onChange={e => {
+                                    const preguntas = [...editableContenido.preguntas];
+                                    preguntas[idx].pregunta = e.target.value;
+                                    setEditableContenido({ ...editableContenido, preguntas });
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 block">Respuesta Esperada</label>
+                                <textarea
+                                  className="form-input text-sm"
+                                  rows={2}
+                                  value={item.respuesta}
+                                  onChange={e => {
+                                    const preguntas = [...editableContenido.preguntas];
+                                    preguntas[idx].respuesta = e.target.value;
+                                    setEditableContenido({ ...editableContenido, preguntas });
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {recurso.tipo === 'escritura' && (
+                    <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            <FileText size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                            Descripción
+                          </label>
                           <textarea
                             className="form-input"
-                            rows={2}
-                            value={item.respuesta}
-                            onChange={e => {
-                              const preguntas = [...editableContenido.preguntas];
-                              preguntas[idx].respuesta = e.target.value;
-                              setEditableContenido({ ...editableContenido, preguntas });
-                            }}
+                            rows={4}
+                            value={editableContenido?.descripcion || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, descripcion: e.target.value })}
                           />
                         </div>
-                      ))}
-                    </>
-                  )}
-                  {recurso.tipo === 'escritura' && (
-                    <>
-                      <label className="form-label">Descripción</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={3}
-                        value={editableContenido?.descripcion || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, descripcion: e.target.value })}
-                      />
-                      <label className="form-label">Instrucciones</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.instrucciones || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, instrucciones: e.target.value })}
-                      />
-                      <label className="form-label">Estructura Propuesta</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.estructuraPropuesta || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, estructuraPropuesta: e.target.value })}
-                      />
-                      <label className="form-label">Lista de verificación (un ítem por línea)</label>
-                      <textarea
-                        className="form-input"
-                        rows={2}
-                        value={editableContenido?.listaVerificacion?.join('\n') || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, listaVerificacion: e.target.value.split('\n') })}
-                      />
-                    </>
-                  )}
-                  {recurso.tipo === 'gramatica' && (
-                    <>
-                      <label className="form-label">Instrucciones</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.instrucciones || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, instrucciones: e.target.value })}
-                      />
-                      <label className="form-label">Ejemplo</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.ejemplo || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, ejemplo: e.target.value })}
-                      />
-                      <label className="form-label">Ítems</label>
-                      {editableContenido?.items?.map((item: any, idx: number) => (
-                        <div key={idx} className="mb-2 p-2 border rounded">
-                          <input
-                            className="form-input mb-1"
-                            value={item.consigna}
-                            onChange={e => {
-                              const items = [...editableContenido.items];
-                              items[idx].consigna = e.target.value;
-                              setEditableContenido({ ...editableContenido, items });
-                            }}
-                          />
-                          <input
+                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            <List size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                            Instrucciones
+                          </label>
+                          <textarea
                             className="form-input"
-                            value={item.respuesta}
-                            onChange={e => {
-                              const items = [...editableContenido.items];
-                              items[idx].respuesta = e.target.value;
-                              setEditableContenido({ ...editableContenido, items });
-                            }}
+                            rows={4}
+                            value={editableContenido?.instrucciones || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, instrucciones: e.target.value })}
                           />
                         </div>
-                      ))}
-                    </>
+                      </div>
+
+                      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <label className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                          <Type size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                          Estructura Propuesta
+                        </label>
+                        <textarea
+                          className="form-input"
+                          rows={3}
+                          value={editableContenido?.estructuraPropuesta || ''}
+                          onChange={e => setEditableContenido({ ...editableContenido, estructuraPropuesta: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <label className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                          <Check size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                          Lista de verificación (un ítem por línea)
+                        </label>
+                        <textarea
+                          className="form-input font-mono text-sm"
+                          rows={5}
+                          value={editableContenido?.listaVerificacion?.join('\n') || ''}
+                          onChange={e => setEditableContenido({ ...editableContenido, listaVerificacion: e.target.value.split('\n') })}
+                        />
+                      </div>
+                    </div>
                   )}
+
+                  {recurso.tipo === 'gramatica' && (
+                    <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                            <List size={16} className="mr-2 text-indigo-500" />
+                            Instrucciones
+                          </label>
+                          <textarea
+                            className="form-input"
+                            rows={3}
+                            value={editableContenido?.instrucciones || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, instrucciones: e.target.value })}
+                          />
+                        </div>
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                            <HelpCircle size={16} className="mr-2 text-indigo-500" />
+                            Ejemplo
+                          </label>
+                          <textarea
+                            className="form-input"
+                            rows={3}
+                            value={editableContenido?.ejemplo || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, ejemplo: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <label className="flex items-center text-sm font-semibold text-slate-700">
+                            <List size={16} className="mr-2 text-indigo-500" />
+                            Ejercicios
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const items = [...(editableContenido.items || [])];
+                              items.push({ consigna: '', respuesta: '' });
+                              setEditableContenido({ ...editableContenido, items });
+                            }}
+                            className="btn btn-sm bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
+                          >
+                            <Plus size={16} className="mr-1" />
+                            Agregar Ejercicio
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          {editableContenido?.items?.map((item: any, idx: number) => (
+                            <div key={idx} className="flex items-start space-x-3 bg-white p-3 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors group relative">
+                              <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full text-xs font-bold mt-2">
+                                {idx + 1}
+                              </span>
+                              <div className="flex-grow grid md:grid-cols-2 gap-3 pr-8">
+                                <div>
+                                  <label className="text-xs text-slate-500 mb-1 block">Consigna</label>
+                                  <input
+                                    className="form-input text-sm"
+                                    value={item.consigna}
+                                    onChange={e => {
+                                      const items = [...editableContenido.items];
+                                      items[idx].consigna = e.target.value;
+                                      setEditableContenido({ ...editableContenido, items });
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-slate-500 mb-1 block">Respuesta</label>
+                                  <input
+                                    className="form-input text-sm"
+                                    value={item.respuesta}
+                                    onChange={e => {
+                                      const items = [...editableContenido.items];
+                                      items[idx].respuesta = e.target.value;
+                                      setEditableContenido({ ...editableContenido, items });
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const items = [...editableContenido.items];
+                                  items.splice(idx, 1);
+                                  setEditableContenido({ ...editableContenido, items });
+                                }}
+                                className="absolute top-2 right-2 p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
+                                title="Eliminar ejercicio"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {recurso.tipo === 'oral' && (
-                    <>
-                      <label className="form-label">Descripción</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.descripcion || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, descripcion: e.target.value })}
-                      />
-                      <label className="form-label">Instrucciones para el docente</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.instruccionesDocente || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, instruccionesDocente: e.target.value })}
-                      />
-                      <label className="form-label">Guión para estudiantes</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.guionEstudiante || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, guionEstudiante: e.target.value })}
-                      />
-                      <label className="form-label">Preguntas orientadoras (un ítem por línea)</label>
-                      <textarea
-                        className="form-input mb-2"
-                        rows={2}
-                        value={editableContenido?.preguntasOrientadoras?.join('\n') || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, preguntasOrientadoras: e.target.value.split('\n') })}
-                      />
-                      <label className="form-label">Criterios de evaluación (un ítem por línea)</label>
-                      <textarea
-                        className="form-input"
-                        rows={2}
-                        value={editableContenido?.criteriosEvaluacion?.join('\n') || ''}
-                        onChange={e => setEditableContenido({ ...editableContenido, criteriosEvaluacion: e.target.value.split('\n') })}
-                      />
-                    </>
+                    <div className="space-y-6">
+                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                          <FileText size={16} className="mr-2 text-indigo-500" />
+                          Descripción General
+                        </label>
+                        <textarea
+                          className="form-input"
+                          rows={3}
+                          value={editableContenido?.descripcion || ''}
+                          onChange={e => setEditableContenido({ ...editableContenido, descripcion: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                            <MessageCircle size={16} className="mr-2 text-indigo-500" />
+                            Instrucciones para el Docente
+                          </label>
+                          <textarea
+                            className="form-input"
+                            rows={4}
+                            value={editableContenido?.instruccionesDocente || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, instruccionesDocente: e.target.value })}
+                          />
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                            <MessageCircle size={16} className="mr-2 text-emerald-500" />
+                            Guión para Estudiantes
+                          </label>
+                          <textarea
+                            className="form-input"
+                            rows={4}
+                            value={editableContenido?.guionEstudiante || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, guionEstudiante: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                            <HelpCircle size={16} className="mr-2 text-indigo-500" />
+                            Preguntas Orientadoras
+                            <span className="ml-2 text-xs font-normal text-slate-400">(un ítem por línea)</span>
+                          </label>
+                          <textarea
+                            className="form-input font-mono text-sm"
+                            rows={4}
+                            value={editableContenido?.preguntasOrientadoras?.join('\n') || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, preguntasOrientadoras: e.target.value.split('\n') })}
+                          />
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                          <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
+                            <Check size={16} className="mr-2 text-indigo-500" />
+                            Criterios de Evaluación
+                            <span className="ml-2 text-xs font-normal text-slate-400">(un ítem por línea)</span>
+                          </label>
+                          <textarea
+                            className="form-input font-mono text-sm"
+                            rows={4}
+                            value={editableContenido?.criteriosEvaluacion?.join('\n') || ''}
+                            onChange={e => setEditableContenido({ ...editableContenido, criteriosEvaluacion: e.target.value.split('\n') })}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
@@ -1462,8 +1591,8 @@ const RecursoForm: React.FC = () => {
               />
             </motion.div>
           ) : (
-            <div className="bg-gray-50 rounded-lg border p-6 flex items-center justify-center h-96">
-              <p className="text-gray-500 text-center">
+            <div className="bg-gray-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6 flex items-center justify-center h-96">
+              <p className="text-gray-500 dark:text-slate-400 text-center">
                 {isCreating
                   ? 'Completa el formulario y genera el recurso para ver la vista previa'
                   : 'Cargando recurso...'}

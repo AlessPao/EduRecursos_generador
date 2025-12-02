@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, PenTool, SpellCheck, MessageCircle, ArrowRight, Snowflake, Gamepad2, CheckCircle, Star } from 'lucide-react';
+import { BookOpen, PenTool, SpellCheck, MessageCircle, ArrowRight, Snowflake, Gamepad2, CheckCircle, Star, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Landing: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   // Redirigir al dashboard si ya está autenticado
   if (isAuthenticated) {
@@ -54,20 +56,31 @@ const Landing: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 font-sans">
       {/* Encabezado */}
-      <header className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300">
+      <header className="fixed w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <div className="bg-indigo-600 p-1.5 rounded-lg">
                 <BookOpen className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-slate-800 tracking-tight">EduRecursos</span>
+              <span className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">EduRecursos</span>
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link to="/login" className="text-slate-600 hover:text-indigo-600 font-medium text-sm transition-colors">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Cambiar tema"
+              >
+                {isDark ? (
+                  <Sun className="h-5 w-5 text-slate-400" />
+                ) : (
+                  <Moon className="h-5 w-5 text-slate-600" />
+                )}
+              </button>
+              <Link to="/login" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium text-sm transition-colors">
                 Iniciar Sesión
               </Link>
               <Link to="/register" className="btn btn-primary shadow-indigo-200/50">
@@ -80,9 +93,9 @@ const Landing: React.FC = () => {
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-indigo-50/50 to-white -z-10"></div>
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50 -z-10"></div>
-        <div className="absolute top-1/2 -left-24 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-indigo-50/50 to-white dark:from-indigo-950/30 dark:to-slate-950 -z-10"></div>
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-100 dark:bg-indigo-900/30 rounded-full blur-3xl opacity-50 -z-10"></div>
+        <div className="absolute top-1/2 -left-24 w-64 h-64 bg-blue-100 dark:bg-blue-900/30 rounded-full blur-3xl opacity-50 -z-10"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-4xl mx-auto">
@@ -94,10 +107,10 @@ const Landing: React.FC = () => {
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold tracking-wide uppercase mb-6">
                 <Star className="w-3 h-3 mr-1" /> Nuevo: Juegos Interactivos
               </span>
-              <h1 className="text-5xl font-extrabold text-slate-900 sm:text-6xl lg:text-7xl tracking-tight mb-8">
-                Recursos Educativos para <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">2° Grado</span>
+              <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white sm:text-6xl lg:text-7xl tracking-tight mb-8">
+                Recursos Educativos para <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">2° Grado</span>
               </h1>
-              <p className="mt-6 text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
                 Plataforma integral para docentes. Genera fichas, actividades y juegos personalizados alineados con el currículo nacional en segundos.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
@@ -120,11 +133,11 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Características */}
-      <section className="py-20 bg-white relative">
+      <section className="py-20 bg-white dark:bg-slate-900 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Todo lo que necesitas</h2>
-            <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">Todo lo que necesitas</h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
               Una suite completa de herramientas diseñadas específicamente para potenciar el aprendizaje en segundo grado.
             </p>
           </div>
@@ -151,7 +164,7 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Beneficios / CTA Intermedio */}
-      <section className="py-20 bg-slate-50 border-y border-slate-200">
+      <section className="py-20 bg-slate-50 dark:bg-slate-950 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-indigo-900 rounded-3xl overflow-hidden shadow-2xl relative">
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-indigo-800 rounded-full blur-3xl opacity-50"></div>
@@ -202,7 +215,7 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 pt-16 pb-8">
+      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1 md:col-span-2">
@@ -210,33 +223,33 @@ const Landing: React.FC = () => {
                 <div className="bg-indigo-600 p-1.5 rounded-lg">
                   <BookOpen className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-slate-900">EduRecursos</span>
+                <span className="text-xl font-bold text-slate-900 dark:text-white">EduRecursos</span>
               </div>
-              <p className="text-slate-500 max-w-xs leading-relaxed">
+              <p className="text-slate-500 dark:text-slate-400 max-w-xs leading-relaxed">
                 Ayudando a docentes a crear mejores experiencias de aprendizaje para sus estudiantes.
               </p>
             </div>
 
             <div>
-              <h4 className="font-bold text-slate-900 mb-4">Plataforma</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link to="/login" className="hover:text-indigo-600 transition-colors">Iniciar Sesión</Link></li>
-                <li><Link to="/register" className="hover:text-indigo-600 transition-colors">Registrarse</Link></li>
-                <li><span className="text-slate-400 cursor-not-allowed">Precios (Pronto)</span></li>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4">Plataforma</h4>
+              <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                <li><Link to="/login" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Iniciar Sesión</Link></li>
+                <li><Link to="/register" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Registrarse</Link></li>
+                <li><span className="text-slate-400 dark:text-slate-500 cursor-not-allowed">Precios (Pronto)</span></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold text-slate-900 mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link to="/privacy" className="hover:text-indigo-600 transition-colors">Privacidad</Link></li>
-                <li><span className="text-slate-400 cursor-not-allowed">Términos</span></li>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                <li><Link to="/privacy" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Privacidad</Link></li>
+                <li><span className="text-slate-400 dark:text-slate-500 cursor-not-allowed">Términos</span></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-400 text-sm">
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-slate-400 dark:text-slate-500 text-sm">
               &copy; {new Date().getFullYear()} EduRecursos. Todos los derechos reservados.
             </p>
             <div className="flex space-x-6">

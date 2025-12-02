@@ -158,13 +158,13 @@ const ExamDetail: React.FC = () => {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/evaluaciones')}
-          className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
+          className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
         >
           <ArrowLeft size={24} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{exam.titulo}</h1>
-          <p className="text-slate-500 text-sm">Detalles y resultados de la evaluación</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{exam.titulo}</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Detalles y resultados de la evaluación</p>
         </div>
       </div>
 
@@ -173,11 +173,11 @@ const ExamDetail: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="card">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-slate-900">Contenido del Examen</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Contenido del Examen</h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                  className="p-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
                   title="Eliminar examen"
                 >
                   <Trash2 size={20} />
@@ -186,14 +186,14 @@ const ExamDetail: React.FC = () => {
             </div>
 
             {/* Share Link Box */}
-            <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-6">
-              <label className="block text-xs font-semibold text-indigo-900 uppercase tracking-wide mb-2">
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800 mb-6">
+              <label className="block text-xs font-semibold text-indigo-900 dark:text-indigo-300 uppercase tracking-wide mb-2">
                 Enlace para estudiantes
               </label>
               <div className="flex gap-2">
                 <input
                   readOnly
-                  className="flex-1 bg-white border border-indigo-200 text-indigo-600 text-sm rounded-lg px-3 py-2 focus:outline-none"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-600 text-indigo-600 dark:text-indigo-400 text-sm rounded-lg px-3 py-2 focus:outline-none"
                   value={`${window.location.origin}/evaluaciones/${slug}`}
                 />
                 <button
@@ -207,27 +207,39 @@ const ExamDetail: React.FC = () => {
             </div>
 
             <div className="prose prose-slate max-w-none mb-8">
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-wrap font-serif">
+              <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap font-serif">
                 {exam.texto}
               </div>
             </div>
 
             <div className="space-y-6">
               {exam.preguntas.map((q, idx) => (
-                <div key={idx} className="border-b border-slate-100 last:border-0 pb-6 last:pb-0">
-                  <p className="font-semibold text-slate-900 mb-3">
-                    <span className="text-indigo-600 mr-2">{idx + 1}.</span>
+                <div key={idx} className="border-b border-slate-100 dark:border-slate-700 last:border-0 pb-6 last:pb-0">
+                  <p className="font-semibold text-slate-900 dark:text-white mb-3">
+                    <span className="text-indigo-600 dark:text-indigo-400 mr-2">{idx + 1}.</span>
                     {q.pregunta}
                   </p>
                   <ul className="space-y-2 pl-6">
                     {q.opciones.map((opt, i) => (
                       <li
                         key={i}
-                        className={`text-sm ${opt === q.respuesta ? 'text-emerald-600 font-medium flex items-center gap-2' : 'text-slate-600'}`}
+                        className={`text-sm ${
+                          opt === q.respuesta
+                            ? 'text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2'
+                            : 'text-slate-600 dark:text-slate-400'
+                        }`}
                       >
-                        <span className={`w-2 h-2 rounded-full ${opt === q.respuesta ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                        <span className={`w-2 h-2 rounded-full ${
+                          opt === q.respuesta
+                            ? 'bg-emerald-500 dark:bg-emerald-400'
+                            : 'bg-slate-300 dark:bg-slate-600'
+                        }`}></span>
                         {opt}
-                        {opt === q.respuesta && <span className="text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">Correcta</span>}
+                        {opt === q.respuesta && (
+                          <span className="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-800">
+                            Correcta
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -241,12 +253,12 @@ const ExamDetail: React.FC = () => {
         <div className="lg:col-span-1">
           <div className="card sticky top-24">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-slate-900">Resultados</h3>
+              <h3 className="font-bold text-slate-900 dark:text-white">Resultados</h3>
               <div className="flex gap-2">
                 <button
                   onClick={fetchResults}
                   disabled={refreshing}
-                  className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
                   title="Actualizar resultados"
                 >
                   <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
@@ -254,7 +266,7 @@ const ExamDetail: React.FC = () => {
                 {results.length > 0 && (
                   <button
                     onClick={() => setShowDeleteResultsConfirm(true)}
-                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    className="p-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
                     title="Limpiar resultados"
                   >
                     <Trash2 size={18} />
@@ -270,22 +282,22 @@ const ExamDetail: React.FC = () => {
             ) : results.length > 0 ? (
               <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                 {results.map((r, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+                  <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-600 transition-colors">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-400 dark:text-slate-500">
                           <User size={14} />
                         </div>
-                        <span className="font-medium text-slate-900 text-sm">{r.studentName}</span>
+                        <span className="font-medium text-slate-900 dark:text-white text-sm">{r.studentName}</span>
                       </div>
-                      <span className={`text-sm font-bold px-2 py-1 rounded-lg ${r.score >= 14 ? 'bg-emerald-100 text-emerald-700' :
-                          r.score >= 11 ? 'bg-amber-100 text-amber-700' :
-                            'bg-rose-100 text-rose-700'
+                      <span className={`text-sm font-bold px-2 py-1 rounded-lg ${r.score >= 14 ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' :
+                          r.score >= 11 ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
+                            'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400'
                         }`}>
                         {r.score}/20
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500 pl-10">
+                    <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 pl-10">
                       <Clock size={12} />
                       {formatTime(r.evalTime)}
                     </div>
@@ -293,8 +305,8 @@ const ExamDetail: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 px-4 bg-slate-50 rounded-xl border border-slate-100 border-dashed">
-                <p className="text-slate-500 text-sm">Aún no hay resultados registrados.</p>
+              <div className="text-center py-8 px-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 border-dashed">
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Aún no hay resultados registrados.</p>
               </div>
             )}
           </div>
@@ -304,9 +316,9 @@ const ExamDetail: React.FC = () => {
       {/* Modal de confirmación para eliminar examen */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl transform transition-all">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">¿Eliminar examen?</h3>
-            <p className="text-slate-600 mb-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200 dark:border-slate-700 transform transition-all">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">¿Eliminar examen?</h3>
+            <p className="text-slate-600 dark:text-slate-300 mb-6">
               Esta acción no se puede deshacer. Se eliminarán permanentemente el examen y todos los resultados asociados.
             </p>
             <div className="flex gap-3 justify-end">
@@ -332,9 +344,9 @@ const ExamDetail: React.FC = () => {
       {/* Modal de confirmación para eliminar resultados */}
       {showDeleteResultsConfirm && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl transform transition-all">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">¿Limpiar resultados?</h3>
-            <p className="text-slate-600 mb-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200 dark:border-slate-700 transform transition-all">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">¿Limpiar resultados?</h3>
+            <p className="text-slate-600 dark:text-slate-300 mb-6">
               Se eliminarán todos los intentos de los estudiantes. El examen seguirá disponible.
             </p>
             <div className="flex gap-3 justify-end">

@@ -16,15 +16,15 @@ const Login: React.FC = () => {
   const { login, isAuthenticated, error, clearError } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Configuración de React Hook Form
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
-  
+
   // Redirigir al dashboard si ya está autenticado
   if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
   }
-  
+
   // Manejar envío del formulario
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -40,40 +40,40 @@ const Login: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-slate-950">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Link to="/" className="flex items-center">
             <BookOpen className="h-10 w-10 text-blue-600" />
           </Link>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
           Iniciar Sesión
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
           ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link to="/register" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
             Regístrate
           </Link>
         </p>
       </div>
-      
+
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10"
+          className="bg-white dark:bg-slate-900 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-200 dark:border-slate-700"
         >
           {error && (
-            <div className="mb-4 bg-red-50 p-4 rounded-md flex items-start">
-              <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-4 bg-red-50 dark:bg-red-900/20 p-4 rounded-md flex items-start border border-red-200 dark:border-red-800">
+              <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mt-0.5 mr-2" />
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
-          
+
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label htmlFor="email" className="form-label">
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
                 id="email"
                 type="email"
                 autoComplete="email"
-                className={`form-input ${errors.email ? 'border-red-500' : ''}`}                {...register('email', { 
+                className={`form-input ${errors.email ? 'border-red-500' : ''}`}                {...register('email', {
                   required: 'El correo electrónico es requerido',
                   pattern: {
                     value: /^[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/i,
@@ -104,7 +104,7 @@ const Login: React.FC = () => {
                 </p>
               )}
             </div>
-            
+
             <div>
               <label htmlFor="password" className="form-label">
                 Contraseña
@@ -114,7 +114,7 @@ const Login: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 className={`form-input ${errors.password ? 'border-red-500' : ''}`}
-                {...register('password', { 
+                {...register('password', {
                   required: 'La contraseña es requerida',
                   minLength: {
                     value: 6,
@@ -128,18 +128,18 @@ const Login: React.FC = () => {
                 </p>
               )}
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="text-sm">
                 <Link
                   to="/request-password-reset"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
             </div>
-            
+
             <div>
               <button
                 type="submit"

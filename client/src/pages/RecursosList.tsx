@@ -377,8 +377,8 @@ const RecursosList: React.FC = () => {
     <div className="pb-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Mis Recursos</h1>
-          <p className="text-gray-600">
+          <h1 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">Mis Recursos</h1>
+          <p className="text-gray-600 dark:text-slate-400">
             {filteredRecursos.length} recursos disponibles
           </p>
         </div>
@@ -395,7 +395,7 @@ const RecursosList: React.FC = () => {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -451,8 +451,8 @@ const RecursosList: React.FC = () => {
           ))}
         </motion.div>
       ) : (
-        <div className="bg-gray-50 rounded-lg border p-8 text-center">
-          <p className="text-gray-600 mb-4">No se encontraron recursos</p>
+        <div className="bg-gray-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+          <p className="text-gray-600 dark:text-slate-400 mb-4">No se encontraron recursos</p>
           {tipoFiltro || searchTerm ? (
             <button
               onClick={() => {

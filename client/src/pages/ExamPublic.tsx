@@ -175,7 +175,7 @@ const ExamPublic: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-3xl mx-auto">
         <AnimatePresence mode="wait">
           {!started && score === null ? (
@@ -236,29 +236,29 @@ const ExamPublic: React.FC = () => {
               className="space-y-6"
             >
               {/* Header Sticky */}
-              <div className="sticky top-4 z-10 bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-slate-200 p-4 flex justify-between items-center">
+              <div className="sticky top-4 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold">
+                  <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold">
                     {studentName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 font-medium">Estudiante</p>
-                    <p className="text-sm font-bold text-slate-900">{studentName}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Estudiante</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">{studentName}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg">
-                  <Clock className="h-4 w-4 text-slate-500" />
-                  <span className="font-mono font-medium text-slate-700">{formatTime(elapsedTime)}</span>
+                <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
+                  <Clock className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                  <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{formatTime(elapsedTime)}</span>
                 </div>
               </div>
 
               {/* Reading Text */}
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-indigo-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   Lectura
                 </h2>
-                <div className="prose prose-slate max-w-none prose-lg leading-relaxed bg-slate-50 p-6 rounded-xl border border-slate-100 font-serif text-slate-700">
+                <div className="prose prose-slate max-w-none prose-lg leading-relaxed bg-slate-50 dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 font-serif text-slate-700 dark:text-slate-200">
                   {exam.texto}
                 </div>
               </div>
@@ -271,23 +271,24 @@ const ExamPublic: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8"
+                    className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8"
                   >
                     <div className="flex gap-4 mb-6">
-                      <span className="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold text-sm">
+                      <span className="flex-shrink-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center font-bold text-sm">
                         {idx + 1}
                       </span>
-                      <h3 className="text-lg font-medium text-slate-900 pt-1">{q.pregunta}</h3>
+                      <h3 className="text-lg font-medium text-slate-900 dark:text-white pt-1">{q.pregunta}</h3>
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 pl-12">
                       {q.opciones.map((opt) => (
                         <label
                           key={opt}
-                          className={`relative flex items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 group ${answers[idx] === opt
-                              ? 'border-indigo-600 bg-indigo-50 shadow-sm'
-                              : 'border-slate-100 bg-white hover:border-indigo-200 hover:bg-slate-50'
-                            }`}
+                          className={`relative flex items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 group ${
+                            answers[idx] === opt
+                              ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-sm'
+                              : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-200 dark:hover:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+                          }`}
                         >
                           <input
                             type="radio"
@@ -297,11 +298,18 @@ const ExamPublic: React.FC = () => {
                             onChange={() => handleSelect(idx, opt)}
                             className="sr-only"
                           />
-                          <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-colors ${answers[idx] === opt ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 group-hover:border-indigo-400'
-                            }`}>
+                          <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-colors ${
+                            answers[idx] === opt
+                              ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-600 dark:bg-indigo-500'
+                              : 'border-slate-300 dark:border-slate-600 group-hover:border-indigo-400 dark:group-hover:border-indigo-500'
+                          }`}>
                             {answers[idx] === opt && <div className="w-2 h-2 bg-white rounded-full" />}
                           </div>
-                          <span className={`text-base ${answers[idx] === opt ? 'text-indigo-900 font-medium' : 'text-slate-700'}`}>
+                          <span className={`text-base ${
+                            answers[idx] === opt
+                              ? 'text-indigo-900 dark:text-indigo-100 font-medium'
+                              : 'text-slate-700 dark:text-slate-300'
+                          }`}>
                             {opt}
                           </span>
                         </label>

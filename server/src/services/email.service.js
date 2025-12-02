@@ -1,13 +1,26 @@
 import nodemailer from 'nodemailer';
-import { EMAIL_USER, EMAIL_PASS } from '../config/index.js';
+import { EMAIL_USER, EMAIL_PASS, EMAIL_HOST, EMAIL_PORT } from '../config/index.js';
 
-// Configurar el transportador de nodemailer
+// Configurar el transportador de nodemailer con configuración completa
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: EMAIL_HOST,
+  port: EMAIL_PORT,
+  secure: false, // true for 465, false for other ports
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASS
-  }
+  },
+  // Configuraciones importantes para producción
+  connectionTimeout: 10000, // 10 segundos
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+  // Opciones adicionales para evitar problemas en producción
+  tls: {
+    rejectUnauthorized: false // Permite certificados autofirmados (útil en desarrollo)
+  },
+  pool: true, // Usa un pool de conexiones
+  maxConnections: 5,
+  maxMessages: 100
 });
 
 // Verificar la configuración del transportador

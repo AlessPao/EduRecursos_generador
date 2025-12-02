@@ -342,8 +342,23 @@ export const requestPasswordReset = async (req, res, next) => {
       expiresAt
     });
 
-    // Enviar email con el código
-    await sendRecoveryCode(email, code);
+    // Enviar email con el código (con timeout)
+    try {
+      await Promise.race([
+        sendRecoveryCode(email, code),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout al enviar email')), 15000)
+        )
+      ]);
+    } catch (emailError) {
+      console.error('Error al enviar email de recuperación:', emailError);
+      // Incluso si falla el email, el código se guardó en la BD
+      // El usuario podría intentar de nuevo
+      return res.status(500).json({
+        success: false,
+        message: 'Error al enviar el correo. Por favor, intenta de nuevo en unos momentos.'
+      });
+    }
 
     res.status(200).json({
       success: true,
